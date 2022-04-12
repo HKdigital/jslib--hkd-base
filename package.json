@@ -1,0 +1,8 @@
+{
+  "name": "hkd-jslib-base",
+  "description": "Base library for javascript projects by HKdigital",
+  "author": "Jens Kleinhout / HKdigital",
+  "license": "ISC",
+  "version": "1.0.0",
+  "type": "module"
+}
