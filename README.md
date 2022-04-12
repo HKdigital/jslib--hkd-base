@@ -6,9 +6,9 @@ This library contains base code that gives you a quick start when creating a Jav
 
 Most other Javascript libraries created by HKdigital depend on this library.
 
-## Checkout the HKdigital devtool
+## Add libraries to your project
 
-Checkout [HKdigital devtool](https://github.com/HKdigital/hkdigital-devtool) if you want to start a Javascript project from scratch. This devtool can setup a NodeJS (backend) or SVELTE (frontend) project for you.
+You can add libraries to your project as git submodules. But Checkout [HKdigital devtool](https://github.com/HKdigital/hkdigital-devtool) if you want to start a Javascript project from scratch. This devtool can setup a NodeJS (backend) or SVELTE (frontend) project for you.
 
 ### Add libraries to you project
 
