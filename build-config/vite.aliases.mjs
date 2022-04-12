@@ -10,7 +10,7 @@
 export function generateAliases( { resolveCurrentLibPath } )
 {
   return [
-    { find: "$hk",
+    { find: "$hkd-base",
       replacement: resolveCurrentLibPath() }
   ];
 }
