@@ -624,7 +624,7 @@ export function patchObject( obj, changes, options={} )
       }
 
       // console.log( "DELETE", change );
-      set( obj, path, undefined ); // undefined deletes property
+      objectSet( obj, path, undefined ); // undefined deletes property
       continue;
     }
 
@@ -641,14 +641,14 @@ export function patchObject( obj, changes, options={} )
       // Ignore add
       continue;
     }
-    else if( ignoreUpdate && get( obj, path ) !== undefined )
+    else if( ignoreUpdate && objectGet( obj, path ) !== undefined )
     {
       // Ignore update
       continue;
     }
 
     // Set new value
-    set( obj, path, newValue );
+    objectSet( obj, path, newValue );
 
   } // end for
 }
