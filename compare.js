@@ -126,7 +126,7 @@ import { objectGet } from "$hk/object.js";
 // ---------------------------------------------------------------------- Method
 
 /**
- * Comparator that can be used for sorting smallest values first
+ * Compare function that can be used for sorting smallest values first
  *
  * @param {mixed} x - First value
  * @param {mixed} y - Second value
@@ -154,7 +154,7 @@ export function smallestFirst( x, y )
 // ---------------------------------------------------------------------- Method
 
 /**
- * Comparator that can be used for sorting largest values first
+ * Compare function that can be used for sorting largest values first
  *
  * @param {mixed} x - First value
  * @param {mixed} y - Second value
@@ -185,13 +185,16 @@ export function largestFirst( x, y )
  * Comparator that can be used for sorting using an object path
  *
  * @param {function} compareFn - Function to use to compare the values
- * @param {string|string[]} path - Object path
  *
- * @param {mixed} x - First value
- * @param {mixed} y - Second value
+ * @param {mixed} a - First value
+ * @param {mixed} b - Second value
+ *
+ * @param {string|string[]} path - Object path
  */
-export function compareUsingPath( compareFn, path, a, b )
+export function compareUsingPath( compareFn, a, b, path )
 {
+
+
   // @note assume a and b are objects
 
   const valueA = objectGet( a, path );

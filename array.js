@@ -7,7 +7,7 @@ import {
   expectArray,
   expectFunction,
   expectArrayLike,
-  expectStringOrArrayOfStrings} from "$hk/expect.js";
+  expectArrayOfStrings} from "$hk/expect.js";
 
 import {
   smallestFirst,
@@ -25,22 +25,35 @@ const array_slice = Array.prototype.slice;
 
 /* ------------------------------------------------------------------ Exports */
 
+export { PATH_SEPARATOR } from "$hk/object.js";
+
 // ---------------------------------------------------------------------- Method
 
 /**
- * Convert an value to an array
- * - Converts Arguments object ot plain JS array
- * - If the value is undefined an empty array is returned
- * - Not array objects are "wrapped" in an array
+ * Convert a value to an array
+ * - Converts an Arguments object to plain JS array
+ * - If the value is undefined or null, an empty array is returned
+ * - A primitive value is "wrapped" in an array
  *
  * @param {mixed} value - Item to convert
  *
- * @param {number} [start] - Zero-based index at which to start extraction
- * @param {number} [end] - Zero-based index before which to end extraction
+ * @param {number} [start]
+ *   Index of the array to start extraction.
+ *   (the first element of the array is at index 0)
  *
- * @return {Array} array
+ * @param {number} [end]
+ *   Index of the array where the extraction should end
+ *
+ * --
+ *
+ * @returns {Array} array
+ *
+ * --
+ *
+ * @example
+ *   toArray( [ 1, 2, 3, 4, 5 ], 2, 4 ) returns [ 3, 4 ]
  */
-export function from( value, start, end )
+export function toArray( value, start, end )
 {
   if( Array.isArray(value) )
   {
@@ -57,12 +70,12 @@ export function from( value, start, end )
     return value.slice( start, end );
   }
 
-  if( undefined === value )
+  if( undefined === value || null === value )
   {
     //
-    // Return an empty array if value is undefined
+    // Return an empty array if value is undefined or null
     //
-    // @note this behaviour differs from Array.from
+    // ==> this behaviour differs from Array.from() <==
     //
     return [];
   }
@@ -91,23 +104,62 @@ export function from( value, start, end )
 // ---------------------------------------------------------------------- Method
 
 /**
- * Convert string with slash [/] separated values to an array path
+ * Convert an async iterator to an array
+ * - If no async iterator is passed, the value will be processed by `from()`
+ *
+ * @param {AsyncIterator|mixed} value
+ *   Async iterator or value to convert to array
+ *
+ * @returns {Array} list of items returned by the iterator
+ */
+export async function toArrayAsync( value )
+{
+  if( (value instanceof Object) &&
+      typeof value[ Symbol.asyncIterator ] === "function" )
+  {
+    // value is an async iterator
+
+    const arr = [];
+
+    for await (const item of value)
+    {
+      arr.push( item );
+    }
+
+    return arr;
+  }
+  else {
+    // value is not an async iterator
+
+    return toArray( value );
+  }
+}
+
+// ---------------------------------------------------------------------- Method
+
+/**
+ * Convert a path string to an array path
+ * - The path string will be spit at the `pathSeparator` token
  * - If the supplied path is already an array, the original array will
  *   be returned
  *
- * @param {string|string[]} path - String or array path (e.g. "some/path/to")
+ * @param {string|string[]} path
+ *   String or array path (e.g. "some.path.to")
+ *
+ * @param {string} [pathSeparator=PATH_SEPARATOR]
+ *   A custom path separator to use instead of the default "."
  *
  * @returns {string[]} array path (e.g. ["some", "path", "to"])
  */
-export function fromPath( path )
+export function toArrayPath( path, pathSeparator=PATH_SEPARATOR )
 {
   if( typeof path === "string" )
   {
-    return path.split( PATH_SEPARATOR );
+    return path.split( pathSeparator );
   }
   else if( Array.isArray( path ) )
   {
-    // Nothing to do
+    // path is already an array
     return path;
   }
   else {
@@ -115,35 +167,6 @@ export function fromPath( path )
       "Missing or invalid parameter [path] (expected string or array)");
   }
 }
-
-// ---------------------------------------------------------------------- Method
-
-//
-// FIXME for await is not supported in all browsers!!!!
-//
-// UPDATE: Edge since 2020-01, all other browsers around 2018 -> can be enabled
-//
-
-/**
- * Convert an async iterator to an array
- *
- * @param {AsyncIterator} ait - Async iterator
- *
- * @returns {Array} list of items returned by the iterator
- */
-// export function async fromAsync( ait )
-// {
-//   expect.asyncIterator( ait, "Missing or invalid parameter [ait]");
-
-//   const result = [];
-
-//   for await (const item of ait)
-//   {
-//     result.push( item );
-//   }
-
-//   return result;
-// }
 
 // ---------------------------------------------------------------------- Method
 
@@ -160,8 +183,14 @@ export function fromPath( path )
  */
 export function loop( arr, callback, additionalArguments )
 {
-  expectArray( arr, "Missing or invalid parameter [arr]" );
   expectFunction( callback, "Missing or invalid parameter [callback]" );
+
+  if( !arr )
+  {
+    return;
+  }
+
+  expectArray( arr, "Missing or invalid parameter [arr]" );
 
   if( !arr.length )
   {
@@ -173,7 +202,7 @@ export function loop( arr, callback, additionalArguments )
 
   if( !additionalArguments )
   {
-    for( let j = 1, n = arr.length; j < n; j = j + 1 )
+    for( let j = 0, n = arr.length; j < n; j = j + 1 )
     {
       callback( arr[j] );
     }
@@ -205,27 +234,34 @@ export function loop( arr, callback, additionalArguments )
  *
  * @param {object} [options]
  *
- * @param {number} [options.sort] Sort direction (1=normal, -1=reversed)
- *
  * @param {boolean} [options.outputAsSet=false]
- *   Output a Set insetad of an array
+ *   Output a Set instead of an array
+ *
+ * @param {string} [options.pathSeparator=PATH_SEPARATOR]
+ *   A custom path separator to use instead of the default "."
+ *
+ *
  *
  * @returns {mixed[]} values
  */
 export function pathValues( items, path, options={} )
 {
+  // == Process parameters
+
   expectArray( items,
     "Missing or invalid parameter [items]" );
 
-  expectStringOrArrayOfStrings( path,
-    "Missing or invalid parameter [path]" );
+  const { outputAsSet=false, pathSeparator=PATH_SEPARATOR } = options;
 
-  expectObject( options,
-    "Missing or invalid parameter [options]" );
+  if( typeof path === "string" )
+  {
+    path = toArrayPath( path, pathSeparator );
+  }
+  else {
+    expectArrayOfStrings( path, "Missing or invalid parameter [path]" );
+  }
 
-  const outputAsSet = options.outputAsSet;
-
-  // >> Plain array output >>
+  // >> CASE A: Output as plain Array
 
   if( !outputAsSet )
   {
@@ -240,28 +276,10 @@ export function pathValues( items, path, options={} )
       values.push( objectGet( item, path ) );
     }
 
-    if( undefined !== options.sort )
-    {
-      switch( options.sort )
-      {
-        case 1:
-          values.sort( smallestFirst );
-          break;
-
-        case -1:
-          values.sort( largestFirst );
-          break;
-
-        default:
-          throw new Error(
-           "Invalid value for parameter [options.sort] (expected 1 or -1)");
-      }
-    }
-
     return values;
   }
 
-  // >> Output as Set >>
+  // >> CASE B: Output as Set
 
   const values = new Set();
 
@@ -286,7 +304,8 @@ export function pathValues( items, path, options={} )
  * @see methods `sortByKeyValue` and `sortByPathValue`
  *      for simple sort operations
  *
- * @param {function} comparator_fn - Comparator function (e.g. sortByKeyValue)
+ * @param {function} comparator_fn
+ *   Comparator function (e.g. compareUsingPath)
  *
  * @param {Array} arr - Array to sort
  * @param {string} path - Path to use for sorting
@@ -296,47 +315,156 @@ export function pathValues( items, path, options={} )
  * @param {function} [options.reversed=false] - Sort in reversed order
  * @param {function} [options.natsort=false] - Use natural sort for strings
  */
-export function sort( comparator_fn, arr, path, options )
+// export function sort( comparator_fn, arr, path, options )
+// {
+//   expectFunction( comparator_fn,
+//     "Missing or invalid parameter [comparator_fn]" );
+
+//   expectArray( arr, "Invalid or missing parameter [arr]" );
+
+//   expectString( path, "Invalid or missing parameter [path]");
+
+//   if( options )
+//   {
+//     expectObject( options, "Invalid parameter [options]");
+//   }
+
+//   let compareFn;
+
+//   options =
+//     Object.assign( { customCompareFn: null, reversed: false }, options );
+
+//   if( options.customCompareFn )
+//   {
+//     compareFn = options.customCompareFn;
+//   }
+//   else if( options.reversed )
+//   {
+//     if( !options.natsort )
+//     {
+//       compareFn = largestFirst;
+//     }
+//     else {
+//       // new Intl.Collator('nl').compare);
+
+//       throw new Error("Not implemented yet");
+//     }
+//   }
+//   else {
+//     if( !options.natsort )
+//     {
+//       compareFn = smallestFirst;
+//     }
+//     else {
+//       throw new Error("Not implemented yet");
+//     }
+//   }
+
+//   // if( path )
+//   // {
+
+//   // }
+
+//   arr.sort( comparator_fn.bind( null, compareFn, path ) );
+// }
+
+// ---------------------------------------------------------------------- Method
+
+/**
+ * Sort function that sorts a list of objects by values encountered at the
+ * specified key values of the object.
+ * - Sorts array inline (no new array is returned)
+ * - This method is faster than `sortByPathValue` since the value lookup in the
+ *   items can be done faster
+ *
+ * @param {Object[]} items - List of items to sort
+ *
+ * @param {string} key
+ *   Object key to use for getting the values in the items to compare.
+ *
+ * @param {function} [compareFn=smallestFirst]
+ *   Function to use to compare values. See `compare.js`.
+ */
+export function sortByKeyValue( items, key, compareFn=smallestFirst )
 {
-  expectArray( arr, "Invalid or missing parameter [arr]" );
+  expectFunction( compareFn,
+    "Missing or invalid parameter [compareFn]" );
 
-  expectString( path, "Invalid or missing parameter [path]");
+  expectArray( items, "Invalid or missing parameter [items]" );
 
-  if( options )
+  expectString( key, "Invalid parameter [key]");
+
+  items.sort( ( itemA, itemB ) => {
+
+    return compareFn( itemA[ key ], itemB[ key ] );
+  } );
+}
+
+// ---------------------------------------------------------------------- Method
+
+/**
+ * Sort function that sorts a list of objects by values encountered at the
+ * specified object path.
+ * - Sorts array inline (no new array is returned)
+ *
+ * @param {Object[]} items - List of items to sort
+ *
+ * @param {string[]|string} path
+ *   Path to use for getting the values in the items to compare.
+ *   If a string path has been supplied, the default path separator
+ *   (PATH_SEPARATOR) is assumed. Use `toArrayPath` to convert paths with
+ *   custom path separators.
+ *
+ * @param {function} [compareFn=smallestFirst]
+ *   Function to use to compare values. See `compare.js`.
+ */
+export function sortByPathValue( items, path, compareFn=smallestFirst )
+{
+  expectFunction( compareFn,
+    "Missing or invalid parameter [compareFn]" );
+
+  expectArray( items, "Invalid or missing parameter [items]" );
+
+  if( typeof path === "string" )
   {
-    expectObject( options, "Invalid parameter [options]");
-  }
-
-  let compareFn;
-
-  options =
-    Object.assign( { customCompareFn: null, reversed: false }, options );
-
-  if( options.customCompareFn )
-  {
-    compareFn = options.customCompareFn;
-  }
-  else if( options.reversed )
-  {
-    if( !options.natsort )
-    {
-      compareFn = largestFirst;
-    }
-    else {
-      throw new Error("Not implemented yet");
-    }
+    path = toArrayPath( path );
   }
   else {
-    if( !options.natsort )
-    {
-      compareFn = smallestFirst;
-    }
-    else {
-      throw new Error("Not implemented yet");
-    }
+    expectArrayOfStrings( path, "Invalid parameter [path]");
   }
 
-  arr.sort( comparator_fn.bind( null, compareFn, path ) );
+  const cache = new Map();
+
+  items.sort( ( itemA, itemB ) => {
+
+    let valueA = cache.get( itemA );
+
+    if( undefined === valueA )
+    {
+      valueA = objectGet( itemA, path );
+
+      if( undefined !== valueA )
+      {
+        cache.set( itemA, valueA );
+      }
+    }
+
+    let valueB = cache.get( itemB );
+
+    if( undefined === valueB )
+    {
+      valueB = objectGet( itemB, path );
+
+      if( undefined !== valueB )
+      {
+        cache.set( itemB, valueB );
+      }
+    }
+
+    return compareFn( valueA, valueB );
+  } );
+
+  cache.clear();
 }
 
 // ---------------------------------------------------------------------- Method
@@ -354,10 +482,10 @@ export function sort( comparator_fn, arr, path, options )
  * @param {function} [options.reversed=false] - Sort in reversed order
  * @param {function} [options.natsort=false] - Use natural sort for strings
  */
-export function sortByKeyValue()
-{
-  return sort( compareUsingKey, ...arguments );
-}
+// export function sortByKeyValue()
+// {
+//   return sort( compareUsingKey, ...arguments );
+// }
 
 // ---------------------------------------------------------------------- Method
 
@@ -374,10 +502,10 @@ export function sortByKeyValue()
  * @param {function} [options.reversed=false] - Sort in reversed order
  * @param {function} [options.natsort=false] - Use natural sort for strings
  */
-export function sortByPathValue()
-{
-  return sort( compareUsingPath, ...arguments );
-}
+// export function sortByPathValue()
+// {
+//   return sort( compareUsingPath, ...arguments );
+// }
 
 // ---------------------------------------------------------------------- Method
 

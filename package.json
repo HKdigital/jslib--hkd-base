@@ -4,5 +4,15 @@
   "author": "Jens Kleinhout / HKdigital",
   "license": "ISC",
   "version": "1.0.0",
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "dev": "node devtool.mjs run",
+    "build": "node devtool.mjs  build",
+    "preview": "node devtool.mjs preview",
+    "test": "jest --config ./config/jest.config.js --watch"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.17.9",
+    "jest": "^27.5.1"
+  }
 }

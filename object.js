@@ -10,7 +10,7 @@ import {
 
 import { equals } from "$hk/compare.js";
 
-import { fromPath } from "$hk/array.js";
+import { toArrayPath } from "$hk/array.js";
 
 import { isIterable } from "$hk/is.js";
 
@@ -161,7 +161,7 @@ export function objectSet( obj, path, value )
 {
   expectObject( obj, "Missing or invalid parameter [obj]");
 
-  const arrPath = fromPath( path );
+  const arrPath = toArrayPath( path );
 
   if( arguments.length < 3 )
   {
@@ -239,7 +239,7 @@ export function deletePath( obj, path )
 {
   expectObject( obj, "Missing or invalid parameter [obj]");
 
-  const arrPath = fromPath( path );
+  const arrPath = toArrayPath( path );
 
   const n = arrPath.length;
   const n_1 = n - 1;
@@ -380,7 +380,7 @@ export function objectGet( obj, path, defaultValue )
 {
   expectObject( obj, "Missing or invalid parameter [obj]");
 
-  const arrPath = fromPath( path );
+  const arrPath = toArrayPath( path );
 
   if( !path.length || (1 === path.length && !path[0].length) )
   {
