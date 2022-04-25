@@ -1,7 +1,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { parseValue, parseObject } from "$hk/parse.js";
+import { parseValue, parseObject } from "@hk/parse.js";
 
 /* ------------------------------------------------------------------ Exports */
 

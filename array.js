@@ -7,17 +7,17 @@ import {
   expectArray,
   expectFunction,
   expectArrayLike,
-  expectArrayOfStrings} from "$hk/expect.js";
+  expectArrayOfStrings} from "@hk/expect.js";
 
 import {
   smallestFirst,
   largestFirst,
   compareUsingKey,
-  compareUsingPath } from "$hk/compare.js";
+  compareUsingPath } from "@hk/compare.js";
 
-import { objectGet, PATH_SEPARATOR } from "$hk/object.js";
+import { objectGet, PATH_SEPARATOR } from "@hk/object.js";
 
-import Selector from "$hk/classes/Selector.js";
+import Selector from "@hk/classes/Selector.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -25,7 +25,7 @@ const array_slice = Array.prototype.slice;
 
 /* ------------------------------------------------------------------ Exports */
 
-export { PATH_SEPARATOR } from "$hk/object.js";
+export { PATH_SEPARATOR } from "@hk/object.js";
 
 // ---------------------------------------------------------------------- Method
 

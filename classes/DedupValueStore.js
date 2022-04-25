@@ -19,9 +19,9 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectDefined } from "$hk/expect.js";
+import { expectDefined } from "@hk/expect.js";
 
-import { value$, default as ValueStore } from "$hk/classes/ValueStore.js";
+import { value$, default as ValueStore } from "@hk/classes/ValueStore.js";
 
 /* ------------------------------------------------------------------- Export */
 

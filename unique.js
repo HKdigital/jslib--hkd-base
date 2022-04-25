@@ -4,7 +4,7 @@
 import {
   base58fromNumber,
   ALPHABET_BASE_58,
-  ALPHABET_BASE_HUMAN } from "$hk/bases.js";
+  ALPHABET_BASE_HUMAN } from "@hk/bases.js";
 
 function vars() {} /* use function as object for hoisting */
 

@@ -16,9 +16,9 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectFunction, expectDefined } from "$hk/expect.js";
+import { expectFunction, expectDefined } from "@hk/expect.js";
 
-import { HkPromise } from "$hk/promises.js";
+import { HkPromise } from "@hk/promises.js";
 
 /* ---------------------------------------------------------------- Internals */
 

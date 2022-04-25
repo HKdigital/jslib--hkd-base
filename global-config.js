@@ -1,9 +1,9 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectString, expectObject } from "$hk/expect.js";
+import { expectString, expectObject } from "@hk/expect.js";
 
-import ValueStoreMap from "$hk/classes/ValueStoreMap.js";
+import ValueStoreMap from "@hk/classes/ValueStoreMap.js";
 
 /* ---------------------------------------------------------------- Internals */
 

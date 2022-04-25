@@ -22,9 +22,9 @@ import {
   expectNotEmptyString,
   expectSymbolOrString,
   expectObject,
-  expectFunction } from "$hk/expect.js";
+  expectFunction } from "@hk/expect.js";
 
-import DedupValueStore from "$hk/classes/DedupValueStore.js";
+import DedupValueStore from "@hk/classes/DedupValueStore.js";
 
 import {
   STOPPED,
@@ -34,11 +34,11 @@ import {
   UNAVAILABLE,
   ERROR,
   state_label,
-  displayState } from "$hk/enum/service_states.js";
+  displayState } from "@hk/enum/service_states.js";
 
 const AVAILABLE = Symbol("available"); // Extra state for availability
 
-import log, { LogBase } from "$hk/log.js";
+import log, { LogBase } from "@hk/log.js";
 
 // import { SystemLogger } from "$platform/system.js";
 

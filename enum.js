@@ -1,8 +1,8 @@
 
-import { expectSymbol } from "$hk/expect.js";
+import { expectSymbol } from "@hk/expect.js";
 
-export { default as SERVICE_STATES } from "$hk/enum/service_states";
-export { default as LOG_TYPES } from "$hk/enum/log_types";
+export { default as SERVICE_STATES } from "@hk/enum/service_states";
+export { default as LOG_TYPES } from "@hk/enum/log_types";
 
 /**
  * Convert an enum value to a string

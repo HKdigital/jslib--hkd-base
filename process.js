@@ -6,7 +6,7 @@
  *
  * @example
  *
- *   import { defer } from '$hk/process.js';
+ *   import { defer } from '@hk/process.js';
  *
  *   defer( () => {
  *     console.log("The execution of the function has been defered");

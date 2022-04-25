@@ -27,7 +27,7 @@ import {
   expectStringOrUndefined,
   expectBoolean,
   expectObject,
-  expectArray } from "$hk/expect.js";
+  expectArray } from "@hk/expect.js";
 
 import {
   STOPPED,
@@ -37,7 +37,7 @@ import {
   UNAVAILABLE,
   ERROR,
   /*displayState,*/
-  Base } from "$hk/services.js";
+  Base } from "@hk/services.js";
 
 /* ---------------------------------------------------------------- Internals */
 

@@ -13,7 +13,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectString } from "$hk/expect.js";
+import { expectString } from "@hk/expect.js";
 
 /* ------------------------------------------------------------------ Exports */
 

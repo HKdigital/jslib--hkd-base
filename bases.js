@@ -9,5 +9,5 @@
  *   <TODO>
  */
 
-export * from "$hk/helpers/base58.js";
-export * from "$hk/helpers/base-human.js";
+export * from "@hk/helpers/base58.js";
+export * from "@hk/helpers/base-human.js";

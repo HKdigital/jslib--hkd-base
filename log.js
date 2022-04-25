@@ -1,15 +1,15 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { DEBUG, INFO, WARNING, ERROR } from "$hk/enum/log_types.js";
+import { DEBUG, INFO, WARNING, ERROR } from "@hk/enum/log_types.js";
 
-import { getGlobalConfig } from "$hk/global-config.js";
+import { getGlobalConfig } from "@hk/global-config.js";
 
 // import Console from "$platform/console.js";
 
 import { getStack } from "$platform/trace.js";
 
-export { default as LogBase } from "$hk/classes/LogBase.js";
+export { default as LogBase } from "@hk/classes/LogBase.js";
 
 /* ---------------------------------------------------------------- Internals */
 

@@ -10,8 +10,8 @@
 
 /* ------------------------------------------------------------------ Exports */
 
-export * from "$hk/enum/service_states.js";
+export * from "@hk/enum/service_states.js";
 
-export { default as Base } from "$hk/classes/ServiceBase.js";
+export { default as Base } from "@hk/classes/ServiceBase.js";
 
-export { default as Init } from "$hk/services/InitService.js";
+export { default as Init } from "@hk/services/InitService.js";

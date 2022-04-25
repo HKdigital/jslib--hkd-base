@@ -1,6 +1,6 @@
 
 import { expectString,
-         expectArray } from "$hk/expect.js";
+         expectArray } from "@hk/expect.js";
 
 /**
  * Returns a function that can check if a list of objects has changed
