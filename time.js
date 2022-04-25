@@ -6,7 +6,7 @@
  *
  * @example
  *
- *   import { delay, now } from '@hk/time.js';
+ *   import { delay, now } from './time.js';
  *
  *   async function test()
  *   {
@@ -20,8 +20,8 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectPositiveNumber } from "@hk/expect.js";
-import { HkPromise } from "@hk/promises.js";
+import { expectPositiveNumber } from "./expect.js";
+import { HkPromise } from "./promises.js";
 
 /* ---------------------------------------------------------------- Internals */
 

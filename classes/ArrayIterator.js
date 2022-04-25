@@ -1,7 +1,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectArray } from "@hk/expect.js";
+import { expectArray } from "../expect.js";
 
 /* ------------------------------------------------------------------ Exports */
 

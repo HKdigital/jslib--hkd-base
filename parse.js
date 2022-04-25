@@ -1,9 +1,9 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { raise } from "@hk/exceptions.js";
+import { raise } from "./exceptions.js";
 
-import { equals } from "@hk/compare.js";
+import { equals } from "./compare.js";
 
 /* ---------------------------------------------------------------- Internals */
 

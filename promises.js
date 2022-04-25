@@ -24,7 +24,7 @@ import {
   expectNumber,
   expectArray,
   expectObject,
-  expectFunction } from "@hk/expect.js";
+  expectFunction } from "./expect.js";
 
 /* ---------------------------------------------------------------- Internals */
 

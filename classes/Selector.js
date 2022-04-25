@@ -29,7 +29,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectObjectOrNull } from "@hk/expect.js";
+import { expectObjectOrNull } from "../expect.js";
 
 /* ---------------------------------------------------------------- Internals */
 

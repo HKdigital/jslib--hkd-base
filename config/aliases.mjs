@@ -5,6 +5,6 @@ export async function getAliases(
   } )
 {
   return {
-    "$hk": resolveCurrentLibPath()
+    // "@hk": resolveCurrentLibPath()
   };
 }

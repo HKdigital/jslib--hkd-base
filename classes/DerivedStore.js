@@ -31,8 +31,8 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectFunction } from "@hk/expect.js";
-import ValueStore from "@hk/classes/ValueStore.js";
+import { expectFunction } from "../expect.js";
+import ValueStore from "./ValueStore.js";
 
 /* ---------------------------------------------------------------- Internals */
 

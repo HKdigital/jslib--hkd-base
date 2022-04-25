@@ -46,7 +46,7 @@ export default {
   //
   moduleNameMapper: {
     "\\$rootDir/(.*)$": "<rootDir>/$1",
-    "\\@hk/(.*)$": "<rootDir>/$1",
+    "\\./(.*)$": "<rootDir>/$1",
     "\\@hkd-base/(.*)$": "<rootDir>/$1",
     "\\$jslib-hkd-base/(.*)$": "<rootDir>/$1",
     "\\$eslib-hkd-base/(.*)$": "<rootDir>/$1"

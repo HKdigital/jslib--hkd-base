@@ -1,10 +1,10 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectIterable, expectFunction } from "@hk/expect.js";
-import { smallestFirst, largestFirst } from "@hk/compare.js";
+import { expectIterable, expectFunction } from "./expect.js";
+import { smallestFirst, largestFirst } from "./compare.js";
 
-import IterableTree from "@hk/classes/IterableTree.js"
+import IterableTree from "./classes/IterableTree.js"
 
 /* ------------------------------------------------------------------ Exports */
 

@@ -222,6 +222,6 @@ export class UserError extends Error
 
 // -----------------------------------------------------------------------------
 
-export { getStack } from "$platform/trace.js";
+export { getStack } from "@platform/trace.js";
 
 

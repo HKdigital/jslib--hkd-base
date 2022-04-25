@@ -16,7 +16,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectFunction } from "@hk/expect.js";
+import { expectFunction } from "../expect.js";
 
 /* ------------------------------------------------------------------ Exports */
 

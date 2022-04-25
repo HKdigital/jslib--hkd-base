@@ -11,7 +11,7 @@
  *   <TODO>
  */
 
-export { default as ValueStore } from "@hk/classes/ValueStore.js";
-export { default as DedupValueStore } from "@hk/classes/DedupValueStore.js";
-export { default as DerivedStore } from "@hk/classes/DerivedStore.js";
-export { default as ValueStoreMap } from "@hk/classes/ValueStoreMap.js";
+export { default as ValueStore } from "./classes/ValueStore.js";
+export { default as DedupValueStore } from "./classes/DedupValueStore.js";
+export { default as DerivedStore } from "./classes/DerivedStore.js";
+export { default as ValueStoreMap } from "./classes/ValueStoreMap.js";

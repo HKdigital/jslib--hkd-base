@@ -2,7 +2,7 @@
 import {
   expectNotEmptyString,
   expectPositiveNumber,
-  expectDefined } from "@hk/expect.js";
+  expectDefined } from "../expect.js";
 
 const stores = new Map();
 

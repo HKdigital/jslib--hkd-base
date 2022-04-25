@@ -6,15 +6,15 @@ import {
   expectObject,
   expectArray,
   expectDefined,
-  expectObjectNoFunction } from "@hk/expect.js";
+  expectObjectNoFunction } from "./expect.js";
 
-import { equals } from "@hk/compare.js";
+import { equals } from "./compare.js";
 
-import { toArrayPath } from "@hk/array.js";
+import { toArrayPath } from "./array.js";
 
-import { isIterable } from "@hk/is.js";
+import { isIterable } from "./is.js";
 
-import { iterateObjectPaths, iterateObjectEntries } from "@hk/iterate.js";
+import { iterateObjectPaths, iterateObjectEntries } from "./iterate.js";
 
 // ------------------------------------------------------------------- Internals
 
