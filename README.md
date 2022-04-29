@@ -10,7 +10,7 @@ Most other Javascript libraries created by HKdigital depend on this library.
 
 You can add libraries to your project as git submodules.
 
-Checkout [HKdigital devtool](https://github.com/HKdigital/hkdigital-devtool) to make this process a bit easier than doing everything with the git command line tool.
+Checkout [HKdigital devtool](https://github.com/HKdigital/hkdigital-jsdevtool) to make this process a bit easier than doing everything with the git command line tool.
 
 The devtool can als be used to setup a NodeJS (backend) or SVELTE (frontend) project for you from scratch.
 
