@@ -1,10 +1,5 @@
 
-export async function getAliases(
-  {
-    resolveCurrentLibPath
-  } )
+export async function getCustomAliases( /*{ resolveCurrentLibPath }*/ )
 {
-  return {
-    // "@hk": resolveCurrentLibPath()
-  };
+  return {};
 }

@@ -1,13 +1,7 @@
-// import _module from "jest-config";
 
-// console.log( _module );
-// process.exit();
+// import { resolve } from "path";
 
-// export default default;
-
-import { resolve } from "path";
-
-// import { getAliases } from "./aliases.mjs";
+// import { getCustomAliases } from "./aliases.mjs";
 
 // // getDefaultAliasEntries
 
@@ -16,21 +10,19 @@ import { resolve } from "path";
 //   return resolve( "./", ...arguments );
 // }
 
-// const aliases = await getAliases( { resolveCurrentLibPath } );
+// const aliases = await getCustomAliases( { resolveCurrentLibPath } );
 
 // console.log( { aliases} );
 
-// const customAliases =
-//   {
-//     "\\$hk(.*)$": "<rootDir>/../jslib-hkd-base/$1"
-//   };
+// const customAliases = {};
 
 // const fs = require("fs");
 
 // if( fs.existsSync() )
 // {
-
 // }
+
+console.log("TODO: import custom aliases");
 
 export default {
   verbose: true,
@@ -47,10 +39,8 @@ export default {
   moduleNameMapper: {
     "\\$rootDir/(.*)$": "<rootDir>/$1",
     "\\./(.*)$": "<rootDir>/$1",
-    "\\@hkd-base/(.*)$": "<rootDir>/$1",
-    "\\$jslib-hkd-base/(.*)$": "<rootDir>/$1",
-    "\\$eslib-hkd-base/(.*)$": "<rootDir>/$1"
-    //"\\@hkd-some-other-lib(.*)$": "<rootDir>/../jslib-hsome-other-lib/$1",
+    "\\@hkd-base/(.*)$": "<rootDir>/$1"
+    //"\\@hkd-some-other-lib(.*)$": "<rootDir>/../jslib--hkd-some-other-lib/$1",
   }
 
   // globals: {
