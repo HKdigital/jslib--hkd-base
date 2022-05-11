@@ -3,11 +3,7 @@
 
 import { expectString } from "../expect.js";
 
-/* ------------------------------------------------------------------ Exports */
-
-export const SEPARATOR = "/";
-
-// ---------------------------------------------------------------------- Method
+/* ---------------------------------------------------------------- Internals */
 
 /**
  * Get the path without the extension part
@@ -16,7 +12,7 @@ export const SEPARATOR = "/";
  *
  * @returns {string} path without the extension
  */
-export function stripExtension( path )
+function stripExtensionFn( path )
 {
   expectString( path, "Missing or invalid parameter [path]" );
 
@@ -30,33 +26,48 @@ export function stripExtension( path )
   return path.slice( 0, x );
 }
 
-// ---------------------------------------------------------------------- Method
+/* ------------------------------------------------------------------ Exports */
+
+export const DEFAULT_SEPARATOR = "/";
+
+export { stripExtensionFn as stripExtension };
+
+// -----------------------------------------------------------------------------
 
 /**
  * Get the basename from a path
  *
- * e.g.
- *   basename('/foo/bar/baz/asdf/quux.html');
- *   => returns: 'quux.html'
- *
  * @param {string} path
+ *   Path to get the base name from
  *
- * @returns {string} basename
+ * @param {string} [options.stripExtension=false]
+ *   Is set to true, the extension is also removed from the basename
+ *
+ * @param {string} [options.separator=DEFAULT_SEPARATOR]
+ *   The separator that is used in the path
+ *
+ * @e.g.
+ *   basename('/foo/bar/baz/asdf/quux.html');
+ *     => returns: 'quux.html'
+ *
+ *   basename('/foo/bar/baz/asdf/quux.html', );
+ *     => returns: 'quux.html'
+
  */
-export function basename( path, stripExtension_=false, separator=SEPARATOR )
+export function basename( path, options )
 {
   expectString( path, "Missing or invalid parameter [path]" );
 
-  const x = path.lastIndexOf( separator );
+  const x = path.lastIndexOf( options ? options.separator : DEFAULT_SEPARATOR );
 
   if( x > 0 )
   {
     path = path.slice( x + 1 );
   }
 
-  if( stripExtension_ )
+  if( options && options.stripExtension )
   {
-    return stripExtension( path );
+    return stripExtensionFn( path );
   }
 
   return path;

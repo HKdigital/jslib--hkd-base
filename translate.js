@@ -5,16 +5,16 @@ import { expectNotEmptyString,
          expectObject } from "@hkd-base/expect.js";
 
 import { currentLanguage,
-         LANG_DEFAULT } from "@hkd-fe/stores/language.js";
+         LANG_DEFAULT } from "@hkd-base/stores/language.js";
 
 /* ---------------------------------------------------------------- Internals */
 
 const translations_ = {};
 
-// -------------------------------------------------------------------- Function
+/* ------------------------------------------------------------------ Exports */
 
 /**
- * Set translations for multiple texts at once
+ * Set multiple text translations at once
  *
  * @param {object} translations
  *   Object that contains `text label` => `translation` pairs
@@ -69,18 +69,21 @@ export function setTranslation( label, translation )
  *   `@hkd-base/language.js` will be used
  * 
  * @param {string} label - Label of the text to return
- * @param {string} [lang=LANG_DEFAULT]
+ * @param {string} [lang=<currentLanguage>]
  * 
  * @returns {string} text for the specified label and language
  */
-export function text( label, lang=LANG_DEFAULT )
+export function text( label, lang )
 {
-  if( !lang )
+  if( lang )
   {
+    expectNotEmptyString( lang, "Missing or invalid parameter [lang]" );
+  }
+  else {
     lang = currentLanguage.get();
   }
 
-  const item = translations[ label ];
+  const item = translations_[ label ];
 
   let text;
 

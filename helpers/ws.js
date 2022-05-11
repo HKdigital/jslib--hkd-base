@@ -6,6 +6,8 @@ import {
 
 const stores = new Map();
 
+// -----------------------------------------------------------------------------
+
 /**
  * Get an existing websocket store
  *
@@ -27,6 +29,8 @@ export function getWebsocketStore( label )
   return store;
 }
 
+// -----------------------------------------------------------------------------
+
 /**
  * Delete an existing websocket store
  *
@@ -36,6 +40,8 @@ export function deleteWebsocketStore( label )
 {
   stores.delete( label );
 }
+
+// -----------------------------------------------------------------------------
 
 /**
  * Create a writable store based on a web-socket.
