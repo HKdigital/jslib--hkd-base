@@ -39,7 +39,7 @@ function set_immediate_implementation()
         const source = event.source;
 
         if( (source === window || source === null) &&
-             event.data === 'std-next-tick')
+             event.data === 'hkd-process-next-tick')
         {
           event.stopPropagation();
           if( queue.length > 0 )
@@ -54,7 +54,7 @@ function set_immediate_implementation()
       return function nextTickUsingPostMessage( fn )
         {
           queue.push(fn);
-          window.postMessage('std-next-tick', '*');
+          window.postMessage('hkd-process-next-tick', '*');
         };
     }
   }

@@ -42,3 +42,58 @@ export function once( callback )
       }
     };
 }
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Returns a debounced function
+ * - The original function is not called more than once during the
+ *   specified interval
+ *
+ * @param {function} fn
+ * @param {number} [intervalMs=100]
+ *
+ * @returns {function} debounced function
+ */
+export function debounce( fn, intervalMs=200 )
+{
+  let idleTimer;
+  let lastArguments;
+
+  // console.log("debounce");
+
+  return function debounced()
+    {
+      // console.log("debounced");
+
+      if( idleTimer )
+      {
+        // console.log("idleTimer running");
+
+        // The function has been called recently
+        lastArguments = arguments;
+        return;
+      }
+
+      idleTimer = setTimeout( () =>
+        {
+          // console.log("idleTimer finished", lastArguments);
+
+          idleTimer = null;
+
+          if( lastArguments )
+          {
+            //
+            // At least one call has been "debounced"
+            // -> make call with last arguments, so function always receives
+            //    the arguments of the last call to the function
+            //
+            fn( ...lastArguments );
+            lastArguments = undefined;
+          }
+        },
+        intervalMs );
+
+      fn( ...arguments );
+    };
+}
