@@ -196,17 +196,26 @@ export function rethrow( message, error )
 
 // -----------------------------------------------------------------------------
 
-export class UserError extends Error
+export class ExtendedError extends Error
 {
-  constructor( message, internalError=null )
+  /**
+   * Construct a new Error instance that
+   * - This class can be used if an Error should be `stacked`:
+   *   to create a new error, with a new error message, while keeping
+   *   a reference to the error that caused the error to occur
+   *
+   * - A reference to the previous error instance will be stored
+   *   as property `previousError`
+   */
+  constructor( message, previousError=null )
   {
     super( message );
 
     // TODO: unique error id?
 
-    this.name = "UserError";
+    this.name = "ExtendedError";
 
-    this.previousError = internalError;
+    this.previousError = previousError;
   }
 
   export()
@@ -214,9 +223,9 @@ export class UserError extends Error
     return { message: this.message /* TODO: internal error, more details */ };
   }
 
-  static from( userError )
+  static from( previousError )
   {
-    return new UserError( userError.message );
+    return new ExtendedError( previousError.message );
   }
 }
 

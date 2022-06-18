@@ -1,14 +1,25 @@
 /**
- * CRC32 Helper
+ * crc.js
+ *
+ * @description
+ * This file contains a function that can be used to calculate a CRC32 value of
+ * a string.
+ *
+ * A CRC value is a hash that can be calculated very quickly and is
+ * often used for data integrity checks.
+ *
+ * CRC32 is not a cryptographic safe hash
  *
  * @see http://stackoverflow.com/questions/18638900/javascript-crc32
  */
-
 
 /* ---------------------------------------------------------------- Internals */
 
 let crcTable;
 
+/**
+ * Create a CRC data table that can be used by CRC calculation functions
+ */
 function makeCRCTable()
 {
   let c;
@@ -50,4 +61,3 @@ export function stringToCrc32( str )
 
   return (crc ^ (-1)) >>> 0;
 }
-

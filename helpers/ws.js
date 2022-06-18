@@ -1,21 +1,73 @@
+/**
+ * ws.js
+ *
+ * @description
+ * This file contains functions that can be used to work easily with WebSockets.
+ *
+ * Global WebSocketStore's can be created:
+ * - Subscribe to a WebsocketStore to receive data that was send by the
+ *   WebSocket backend
+ * - Set a store value to set data to the WebSocket backend
+ *
+ * --
+ *
+ * The functions in this file use configuration data from a global config.
+ *
+ * @see global-config.js
+ *
+ * So websocket connections must be defined first in the global config:
+ *
+ * @example
+ *   import { CONFIG_LABEL_BACKEND_WS } from "@hkd-base/helpers/ws.js";
+ *
+ *   setGlobalConfig( CONFIG_LABEL_BACKEND_WS,
+ *     {
+ *       url: "ws://localhost:12302"
+ *     } );
+ *
+ * @typedef WebSocketStoreConfig
+ *
+ * @property {string} url the WebSocket url
+ *
+ * @property {*} [initialValue=null]
+ *   Store value used before first response from the server if present
+ *
+ * @property {string[]} socketOptions
+ *   Options transparently passed to the WebSocket constructor
+ *
+ * @property {string[]} [minReconnectDelay=1000]
+ *   Minimal delay before trying to reconnect
+ *
+ * @property {string[]} [maxReconnectDelay=2000]
+ *   Maximum delay before trying to reconnect
+ */
+
+/* ------------------------------------------------------------------ Imports */
 
 import {
   expectNotEmptyString,
   expectPositiveNumber,
-  expectDefined } from "../expect.js";
+  expectDefined,
+  expectObject } from "../expect.js";
+
+import { getGlobalConfig } from "../global-config.js";
 
 const stores = new Map();
+
+/* ------------------------------------------------------------------ Exports */
+
+export const CONFIG_LABEL_BACKEND_WS = "backend-ws";
 
 // -----------------------------------------------------------------------------
 
 /**
  * Get an existing websocket store
  *
- * @param {string} label
+ * @param {string} [label=CONFIG_LABEL_BACKEND_WS]
  *
  * @returns {object|null} WebsocketStore or null if not found
  */
-export function getWebsocketStore( label )
+export function getWebsocketStore( label=CONFIG_LABEL_BACKEND_WS )
 {
   expectNotEmptyString( label, "Missing or invalid parameter [label]" );
 
@@ -34,9 +86,9 @@ export function getWebsocketStore( label )
 /**
  * Delete an existing websocket store
  *
- * @param {string} label
+ * @param {string} [label=CONFIG_LABEL_BACKEND_WS]
  */
-export function deleteWebsocketStore( label )
+export function deleteWebsocketStore( label=CONFIG_LABEL_BACKEND_WS )
 {
   stores.delete( label );
 }
@@ -48,32 +100,25 @@ export function deleteWebsocketStore( label )
  * Data is transferred as JSON.
  * Keeps socket open (reopens if closed) as long as there are subscriptions.
  *
- * @param {string} url the WebSocket url
+ * @param {string} [label=CONFIG_LABEL_BACKEND_WS]
  *
- * @param {*} [initialValue=null]
- *   Store value used before first response from the server if present
- *
- * @param {string[]} socketOptions
- *   Options transparently passed to the WebSocket constructor
- *
- * @param {string[]} [minReconnectDelay=1000]
- *   Minimal delay before trying to reconnect
- *
- * @param {string[]} [maxReconnectDelay=2000]
- *   Maximum delay before trying to reconnect
- *
- * @return {Store}
+ * @returns {object} Store instance
  */
-export function createWebsocketStore(
-  {
-    label,
+export function createWebsocketStore( label=CONFIG_LABEL_BACKEND_WS )
+{
+  const config = getGlobalConfig( label );
+
+  expectObject( config,
+    `Missing global config [${CONFIG_LABEL_BACKEND_WS}]` );
+
+
+  const {
     url,
     initialValue=null,
     socketOptions,
     minReconnectDelay=10000,
-    maxReconnectDelay=20000
-  } )
-{
+    maxReconnectDelay=20000 } = config;
+
   expectNotEmptyString( url,
     "Missing or invalid parameter [url]" );
 

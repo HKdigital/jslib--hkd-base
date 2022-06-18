@@ -1,8 +1,9 @@
-
-//
-// Encoding that contains for humans not ambiguous characters
-//
+/**
+ * base-human.js
+ *
+ * @description
+ * This file contains a list of characters that have very distinct shapes and
+ * thereby can be distinguisted easily by humans.
+ */
 
 export const ALPHABET_BASE_HUMAN = "3456789abcdefghjkmnpqrstuvwxy";
-// export const ALPHABET_BASE_HUMAN_UC = "3456789ABCDEFGHJKMNPQRSTUVWXY";
-// export const ALPHABET_BASE_HUMAN_UC = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
