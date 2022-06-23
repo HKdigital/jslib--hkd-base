@@ -2,7 +2,7 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectNotEmptyString,
-         expectObject } from "@hkd-base/expect.js";
+         expectObject } from "@hkd-base/helpers/expect.js";
 
 import { currentLanguage,
          LANG_DEFAULT } from "@hkd-base/stores/language.js";

@@ -48,9 +48,9 @@ import {
   expectNotEmptyString,
   expectPositiveNumber,
   expectDefined,
-  expectObject } from "../expect.js";
+  expectObject } from "../helpers/expect.js";
 
-import { getGlobalConfig } from "../global-config.js";
+import { getGlobalConfig } from "../helpers/global-config.js";
 
 const stores = new Map();
 

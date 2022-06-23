@@ -22,23 +22,23 @@ import {
   expectNotEmptyString,
   expectSymbolOrString,
   expectObject,
-  expectFunction } from "../expect.js";
+  expectFunction } from "../helpers/expect.js";
 
 import DedupValueStore from "./DedupValueStore.js";
 
 import {
   STOPPED,
-  STARTING,
+  // STARTING,
   RUNNING,
   STOPPING,
   UNAVAILABLE,
-  ERROR,
+  // ERROR,
   state_label,
-  displayState } from "../enum/service_states.js";
+  displayState } from "../constants/service-states.js";
 
 const AVAILABLE = Symbol("available"); // Extra state for availability
 
-import log, { LogBase } from "../log.js";
+import { LogBase } from "../helpers/log.js";
 
 // import { SystemLogger } from "@platform/system.js";
 

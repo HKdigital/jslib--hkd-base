@@ -1,7 +1,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectString } from "../expect.js";
+import { expectString } from "../helpers/helpers/expect.js";
 
 /* ---------------------------------------------------------------- Internals */
 

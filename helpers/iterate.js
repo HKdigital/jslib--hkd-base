@@ -4,7 +4,7 @@
 import { expectIterable, expectFunction } from "./expect.js";
 import { smallestFirst, largestFirst } from "./compare.js";
 
-import IterableTree from "./classes/IterableTree.js"
+import IterableTree from "../classes/IterableTree.js"
 
 /* ------------------------------------------------------------------ Exports */
 

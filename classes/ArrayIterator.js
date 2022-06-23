@@ -1,7 +1,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectArray } from "../expect.js";
+import { expectArray } from "../helpers/expect.js";
 
 /* ------------------------------------------------------------------ Exports */
 

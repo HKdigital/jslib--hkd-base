@@ -1,12 +1,12 @@
 /**
- * flow.js
+ * function.js
  *
  * @description
- * This file contains code for controlling data flows
+ * This file contains code for working with functions
  *
  * @example
  *
- *   import { once } from "./once.js";
+ *   import { once } from "./function.js";
  *
  *   const sayHelloOnce = once( () => { console.log("Hello"); } );
  *
@@ -16,7 +16,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectFunction } from "../expect.js";
+import { expectFunction } from "./expect.js";
 
 /* ------------------------------------------------------------------ Exports */
 

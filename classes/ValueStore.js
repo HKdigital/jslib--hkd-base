@@ -16,7 +16,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectFunction /*, expectDefined */ } from "../expect.js";
+import { expectFunction } from "../helpers/expect.js";
 
 // import { HkPromise } from "../promises.js";
 

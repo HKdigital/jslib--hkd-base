@@ -17,7 +17,7 @@ import {
 
 import { objectGet, PATH_SEPARATOR } from "./object.js";
 
-import Selector from "./classes/Selector.js";
+import Selector from "../classes/Selector.js";
 
 /* ---------------------------------------------------------------- Internals */
 

@@ -20,7 +20,7 @@
 
 import { expectArrayOfStrings,
          expectPositiveNumber,
-         expectDefined } from "../expect.js";
+         expectDefined } from "../helpers/expect.js";
 
 /* ---------------------------------------------------------------- Internals */
 

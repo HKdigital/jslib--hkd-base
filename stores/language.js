@@ -1,8 +1,9 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectNotEmptyString } from "@hkd-base/expect.js";
-import { ValueStore } from "@hkd-base/stores.js";
+import { expectNotEmptyString } from "@hkd-base/helpers/expect.js";
+
+import ValueStore from "@hkd-base/classes/ValueStore.js";
 
 /* ------------------------------------------------------------------ Exports */
 

@@ -31,7 +31,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectFunction } from "../expect.js";
+import { expectFunction } from "../helpers/expect.js";
 import ValueStore from "./ValueStore.js";
 
 /* ---------------------------------------------------------------- Internals */

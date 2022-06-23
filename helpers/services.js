@@ -10,8 +10,8 @@
 
 /* ------------------------------------------------------------------ Exports */
 
-export * from "./enum/service_states.js";
+export * from "../constants/service-states.js";
 
-export { default as Base } from "./classes/ServiceBase.js";
+export { default as Base } from "../classes/ServiceBase.js";
 
-export { default as Init } from "./services/InitService.js";
+export { default as Init } from "../services/InitService.js";

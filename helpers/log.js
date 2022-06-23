@@ -1,7 +1,10 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { DEBUG, INFO, WARNING, ERROR } from "./enum/log_types.js";
+import { DEBUG,
+         INFO,
+         WARNING,
+         ERROR } from "../constants/log-types.js";
 
 import { getGlobalConfig } from "./global-config.js";
 
@@ -9,7 +12,7 @@ import { getGlobalConfig } from "./global-config.js";
 
 import { getStack } from "@platform/trace.js";
 
-export { default as LogBase } from "./classes/LogBase.js";
+export { default as LogBase } from "../classes/LogBase.js";
 
 /* ---------------------------------------------------------------- Internals */
 

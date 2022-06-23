@@ -1,23 +1,23 @@
 /**
- * base58.js
+ * base-58.js
  *
  * @description
- * This file contains code for working with base58 encoding
+ * This file contains code for working with base 58 encoding
  *
  * @example
  *
- *   import { base58fromNumber } from "./base58.js";
+ *   import { base58fromNumber } from "./base-58.js";
  *
  *   console.log( base58fromNumber( 1234513245 ) ) // base 58 encoded string
  */
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectString } from "../expect.js";
+import { expectString } from "../helpers/expect.js";
 
 /* ------------------------------------------------------------------ Exports */
 
-// Base58 helper functions
+// Base 58 helper functions
 //
 // Inspired by
 //   https://github.com/jimeh/node-base58/blob/master/src/base58.js

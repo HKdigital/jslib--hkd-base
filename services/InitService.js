@@ -27,7 +27,7 @@ import {
   expectStringOrUndefined,
   expectBoolean,
   expectObject,
-  expectArray } from "../expect.js";
+  expectArray } from "../helpers/expect.js";
 
 import {
   STOPPED,
@@ -37,7 +37,7 @@ import {
   UNAVAILABLE,
   ERROR,
   /*displayState,*/
-  Base } from "../services.js";
+  Base } from "../helpers/services.js";
 
 /* ---------------------------------------------------------------- Internals */
 

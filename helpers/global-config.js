@@ -1,9 +1,10 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectString, expectObject } from "./expect.js";
+import { expectString,
+         expectObject } from "./expect.js";
 
-import ValueStoreMap from "./classes/ValueStoreMap.js";
+import ValueStoreMap from "../classes/ValueStoreMap.js";
 
 /* ---------------------------------------------------------------- Internals */
 

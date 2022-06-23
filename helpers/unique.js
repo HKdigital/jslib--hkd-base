@@ -1,10 +1,10 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import {
-  base58fromNumber,
-  ALPHABET_BASE_58,
-  ALPHABET_BASE_HUMAN } from "./bases.js";
+import { base58fromNumber,
+         ALPHABET_BASE_58 } from "./base-58.js";
+
+import { ALPHABET_BASE_HUMAN } from "./base-human.js";
 
 function vars() {} /* use function as object for hoisting */
 

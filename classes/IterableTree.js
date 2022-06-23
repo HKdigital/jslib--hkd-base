@@ -1,9 +1,9 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectObject } from "../expect.js";
+import { expectObject } from "../helpers/expect.js";
 
-import { PATH_SEPARATOR } from "../object.js";
+import { PATH_SEPARATOR } from "../helpers/object.js";
 
 /* ------------------------------------------------------------------ Exports */
 

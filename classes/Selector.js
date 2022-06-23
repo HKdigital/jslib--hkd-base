@@ -29,7 +29,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectObjectOrNull } from "../expect.js";
+import { expectObjectOrNull } from "../helpers/expect.js";
 
 /* ---------------------------------------------------------------- Internals */
 

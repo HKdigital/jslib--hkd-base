@@ -19,8 +19,6 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-// import { expectDefined } from "../expect.js";
-
 import { value$, default as ValueStore } from "./ValueStore.js";
 
 /* ------------------------------------------------------------------- Export */

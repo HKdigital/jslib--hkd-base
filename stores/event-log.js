@@ -1,5 +1,5 @@
 
-import { generateLocalId } from "@hkd-base/unique.js";
+import { generateLocalId } from "@hkd-base/helpers/unique.js";
 
 import ValueStore from "@hkd-base/classes/ValueStore.js";
 

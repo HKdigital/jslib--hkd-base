@@ -17,7 +17,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectFunction, expectDefined } from "../expect.js";
+import { expectFunction, expectDefined } from "../helpers/expect.js";
 
 import ValueStore from "./ValueStore.js";
 
