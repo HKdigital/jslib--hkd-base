@@ -14,8 +14,8 @@ Checkout [HKdigital devtool](https://github.com/HKdigital/hkdigital-jsdevtool) t
 
 The devtool can als be used to setup a NodeJS (backend) or SVELTE (frontend) project for you from scratch.
 
-e.g. to add a library (which is a git submodule) to the folder `/lib/hkd-jslib-base`:
+e.g. to add a library (which is a git submodule) to the folder `/lib/jslib--hkd-base`:
 
 ```bash
-node devtool.mjs submodule-add git@github.com:HKdigital/hkd-jslib-fe.git
+node devtool.mjs submodule-add git@github.com:HKdigital/jslib--hkd-base.git
 ```
