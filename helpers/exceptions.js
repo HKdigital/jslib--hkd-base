@@ -231,6 +231,6 @@ export class ExtendedError extends Error
 
 // -----------------------------------------------------------------------------
 
-export { getStack } from "@platform/trace.js";
+export { getStack } from "@platform/helpers/trace.js";
 
 

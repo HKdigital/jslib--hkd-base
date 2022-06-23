@@ -8,9 +8,9 @@ import { DEBUG,
 
 import { getGlobalConfig } from "./global-config.js";
 
-// import Console from "@platform/console.js";
+// import Console from "@platform/helpers/console.js";
 
-import { getStack } from "@platform/trace.js";
+import { getStack } from "@platform/helpers/trace.js";
 
 export { default as LogBase } from "../classes/LogBase.js";
 
