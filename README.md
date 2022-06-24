@@ -1,4 +1,15 @@
-# Base library for javascript projects by HKdigital
+<div align="center" style="text-align: center; ">
+  <br>
+  <br>
+  <img alt="HKdigital" src="doc/doc-include/HKdigital-logo.svg" style="height: 100px;" />
+  <br>
+  <br>
+</div>
+
+<div align="center" style="text-align: center;">
+  <h1>Base library for javascript projects by HKdigital</h1>
+  <br>
+</div>
 
 ## About
 
