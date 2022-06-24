@@ -20,13 +20,13 @@ Most other Javascript libraries created by HKdigital depend on this library.
 ### Issues
 If you encounter problems or have a good idea to make this library better, please create an [issue](https://github.com/HKdigital/jslib-hkd-base/issues).
 
-You can add libraries to your project as git submodules.
-
 ## Setup a project using the Devtool
 
 The [HKdigital devtool](https://github.com/HKdigital/hkdigital-jsdevtool) can be used to setup a NodeJS (backend) or SVELTE (frontend) project from scratch.
 
 ### Add libraries to your project
+
+You can add libraries to your project as git submodules.
 
 To add a library (which is a git submodule) to the folder `/lib/jslib--hkd-base`:
 
