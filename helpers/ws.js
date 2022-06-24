@@ -18,9 +18,9 @@
  * So websocket connections must be defined first in the global config:
  *
  * @example
- *   import { CONFIG_LABEL_BACKEND_WS } from "@hkd-base/helpers/ws.js";
+ *   import { CONFIG_LABEL_DEFAULT_WS_SERVER } from "@hkd-base/helpers/ws.js";
  *
- *   setGlobalConfig( CONFIG_LABEL_BACKEND_WS,
+ *   setGlobalConfig( CONFIG_LABEL_DEFAULT_WS_SERVER,
  *     {
  *       url: "ws://localhost:12302"
  *     } );
@@ -56,18 +56,18 @@ const stores = new Map();
 
 /* ------------------------------------------------------------------ Exports */
 
-export const CONFIG_LABEL_BACKEND_WS = "backend-ws";
+export const CONFIG_LABEL_DEFAULT_WS_SERVER = "default-ws-server";
 
 // -----------------------------------------------------------------------------
 
 /**
  * Get an existing websocket store
  *
- * @param {string} [label=CONFIG_LABEL_BACKEND_WS]
+ * @param {string} [label=CONFIG_LABEL_DEFAULT_WS_SERVER]
  *
  * @returns {object|null} WebsocketStore or null if not found
  */
-export function getWebsocketStore( label=CONFIG_LABEL_BACKEND_WS )
+export function getWebsocketStore( label=CONFIG_LABEL_DEFAULT_WS_SERVER )
 {
   expectNotEmptyString( label, "Missing or invalid parameter [label]" );
 
@@ -86,9 +86,9 @@ export function getWebsocketStore( label=CONFIG_LABEL_BACKEND_WS )
 /**
  * Delete an existing websocket store
  *
- * @param {string} [label=CONFIG_LABEL_BACKEND_WS]
+ * @param {string} [label=CONFIG_LABEL_DEFAULT_WS_SERVER]
  */
-export function deleteWebsocketStore( label=CONFIG_LABEL_BACKEND_WS )
+export function deleteWebsocketStore( label=CONFIG_LABEL_DEFAULT_WS_SERVER )
 {
   stores.delete( label );
 }
@@ -100,16 +100,16 @@ export function deleteWebsocketStore( label=CONFIG_LABEL_BACKEND_WS )
  * Data is transferred as JSON.
  * Keeps socket open (reopens if closed) as long as there are subscriptions.
  *
- * @param {string} [label=CONFIG_LABEL_BACKEND_WS]
+ * @param {string} [label=CONFIG_LABEL_DEFAULT_WS_SERVER]
  *
  * @returns {object} Store instance
  */
-export function createWebsocketStore( label=CONFIG_LABEL_BACKEND_WS )
+export function createWebsocketStore( label=CONFIG_LABEL_DEFAULT_WS_SERVER )
 {
   const config = getGlobalConfig( label );
 
   expectObject( config,
-    `Missing global config [${CONFIG_LABEL_BACKEND_WS}]` );
+    `Missing global config [${CONFIG_LABEL_DEFAULT_WS_SERVER}]` );
 
 
   const {
