@@ -31,7 +31,7 @@ You can add libraries to your project as git submodules.
 To add a library (which is a git submodule) to the folder `/lib/jslib--hkd-base`:
 
 ```bash
-node devtool.mjs submodule-add git@github.com:HKdigital/jslib--hkd-base.git
+node devtool.mjs lib-add git@github.com:HKdigital/jslib--hkd-base.git
 ```
 
 The devtool includes support for import aliases, so you can refer to library files like this:
