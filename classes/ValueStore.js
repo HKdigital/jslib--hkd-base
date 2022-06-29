@@ -173,7 +173,7 @@ export default class ValueStore
           this.hasSubscribers.set( false );
         }
       }
-    }
+    };
 
     // -- Call callback directly upon registration (if value was set)
 
@@ -195,6 +195,8 @@ export default class ValueStore
    * Store a new value
    *
    * @param {mixed} [value] - Value to store
+   *
+   * @returns {mixed} the value that was set
    */
   set( value )
   {
@@ -224,6 +226,8 @@ export default class ValueStore
     // }
 
     this._callSubscribers();
+
+    return value;
   }
 
   // -------------------------------------------------------------------- Method
@@ -245,6 +249,8 @@ export default class ValueStore
    *
    * @param {function} [updateFn]
    *   Function that receives the current value and returns an updated value
+   *
+   * @returns {mixed} the value that was set
    */
   update( updateFn )
   {
@@ -253,6 +259,8 @@ export default class ValueStore
     const newValue = updateFn( this[ value$ ] );
 
     this.set( newValue );
+
+    return newValue;
   }
 
   /* ------------------------------------------------------- Internal methods */
