@@ -42,6 +42,8 @@ import { LogBase } from "../helpers/log.js";
 
 // import { SystemLogger } from "@platform/system.js";
 
+import InitService from "../services/InitService.js";
+
 /* ---------------------------------------------------------------- Internals */
 
   const customServiceName$ = Symbol("customServiceName");
@@ -283,14 +285,23 @@ export default class ServiceBase extends LogBase
    * - If the state returned by the dependency is not RUNNING, this service
    *   will be set to UNAVAILABLE
    *
-   * @param {object} [dependency]
-   *   Service or object this service depends on
+   * @param {object|string} [dependency]
+   *   Service or name of the service where this service depends on
    */
   setDependency( dependency )
   {
     // this.expectConfigured();
 
-    expectObject( dependency, "Missing or invalid parameter [dependency]" );
+    if( typeof dependency === "string" )
+    {
+      //
+      // Use InitService to get the Service by name
+      //
+      dependency = InitService.service( dependency );
+    }
+    else {
+      expectObject( dependency, "Missing or invalid parameter [dependency]" );
+    }
 
     expectFunction( dependency.subscribeToState,
       "Invalid parameter [dependency] (missing method [subscribeToState])" );

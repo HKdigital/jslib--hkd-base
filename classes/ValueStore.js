@@ -173,7 +173,7 @@ export default class ValueStore
           this.hasSubscribers.set( false );
         }
       }
-    }
+    };
 
     // -- Call callback directly upon registration (if value was set)
 
