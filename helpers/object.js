@@ -100,6 +100,35 @@ export function objectSize( obj )
 // ---------------------------------------------------------------------- Method
 
 /**
+ * Returns a shallow copy of the object without the properties that
+ * have the value [null] or [undefined]
+ *
+ * @param {object} obj
+ *
+ * @returns {object} new object without the null properties
+ */
+export function exportNotNull( obj )
+{
+  expectObject( obj, "Invalid parameter [obj]" );
+
+  const newObj = {};
+
+  for( const key in obj )
+  {
+    const value = obj[ key ];
+
+    if( value !== null && value !== undefined )
+    {
+      newObj[ key ] = value;
+    }
+  } // end for
+
+  return newObj;
+}
+
+// ---------------------------------------------------------------------- Method
+
+/**
  * Freezes an object recursively
  * - Allows non-objects to be passed as input parameter (non-objects are
  *   immutable by default).
