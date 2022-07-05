@@ -6,6 +6,8 @@ import { base58fromNumber,
 
 import { ALPHABET_BASE_HUMAN } from "./base-human.js";
 
+import { sinceMs } from "./time.js";
+
 function vars() {} /* use function as object for hoisting */
 
 function bootTimePrefix()
@@ -179,12 +181,12 @@ export function generateLocalId( timeMs )
  */
 export function getTimeBasedNumber30s( timeMs )
 {
-  const now = timeMs || Date.now();
-  const jan2017 = 1483228800000;
+  // const now = timeMs || Date.now();
+  // const jan2017 = 1483228800000;
 
   // @note
   // do not use bitwise shift since it only works on 32 bit numbers
-  return Math.floor( (now - jan2017) / 30000 );
+  return Math.floor( sinceMs() / 30000 );
 }
 
 // ---------------------------------------------------------------------- Method

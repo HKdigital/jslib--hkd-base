@@ -29,6 +29,29 @@ let _aheadOfReferenceTimeMs = 0;
 
 /* ------------------------------------------------------------------ Exports */
 
+export const MINUTE_MS = 60000;
+export const HOUR_MS = 60 * MINUTE_MS;
+export const DAY_MS = 24 * HOUR_MS;
+export const WEEK_MS = 7 * DAY_MS;
+
+export const TIME_2020_01_01 = 1577836800000;
+
+// -------------------------------------------------------------------- Function
+
+/**
+ * Get the number of milliseconds since the specified moment in time
+ *
+ * @param {number} [sinceMs=TIME_2020_01_01]
+ *
+ * @returns {number} number of milliseconds since the specified time
+ */
+export function sinceMs( sinceMs=TIME_2020_01_01 )
+{
+  return Date.now() - sinceMs;
+}
+
+// -------------------------------------------------------------------- Function
+
 /**
  * Returns a server synchronized time stamp like `Date.now()`
  * - Returns number of milliseconds since the UNIX EPOCH (1-1-1970),

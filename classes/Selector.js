@@ -5,15 +5,14 @@
  * This file contains a class that can be used to select items from lists of
  * objects.
  *
- * @note
- * Currently the selector only performs exact (key-value pair) matches
+ * @TODO
+ * Currently the selector only performs **exact** (key-value pair) matches
  *
  * @example
  *
  *   import Selector from "./Selector.js";
  *
- *   const selector = { age: 42 };
- *   const selectorObj = new Selector( selector );
+ *   const selector = new Selector( { age: 42 } );
  *
  *   const items =
  *     [
@@ -22,7 +21,7 @@
  *       { name: "Max", age: 43 }
  *     ]
  *
- *   const item = selectorObj.findFirst( items );
+ *   const item = selector.findFirst( items );
  *
  *   console.log( item );
  */
@@ -197,7 +196,7 @@ export default class Selector
     {
       if( values[ j ] !== item[ keys[ j ] ] )
       {
-        isMatch= false;
+        isMatch = false;
         break;
       }
     } // end for

@@ -86,33 +86,6 @@ export default class ServiceBase extends LogBase
 
     this.__logContext = { className: this.serviceName() };
 
-    // this.log =
-    //   {
-    //     debug: function() {
-    //       const event = log.createEvent( log.DEBUG, arguments, context );
-
-    //       log.event( event );
-    //     },
-
-    //     info: function() {
-    //       const event = log.createEvent( log.INFO, arguments, context );
-
-    //       log.event( event );
-    //     },
-
-    //     warning: function() {
-    //       const event = log.createEvent( log.WARNING, arguments, context );
-
-    //       log.event( event );
-    //     },
-
-    //     error: function() {
-    //       const event = log.createEvent( log.ERROR, arguments, context );
-
-    //       log.event( event );
-    //     }
-    //   };
-
     // -- Object where `on stop functions` can be registered
 
     this.onStopFns = {};
