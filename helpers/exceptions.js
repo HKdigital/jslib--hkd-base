@@ -32,30 +32,49 @@ export function raise( errorText, /* attributes, exception */ )
   let attributes;
   let exception;
 
+  if( typeof errorText !== "string" || !errorText.length )
+  {
+    throw new Error("Invalid parameter [errorText]");
+  }
+
   switch( arguments.length )
   {
     case 0:
       throw new Error( "Missing parameter [errorText]" );
 
     case 1:
-      if( typeof errorText !== "string" || !errorText.length )
       {
-        throw new Error("Invalid parameter [errorText]");
-      }
+        //
+        // Only parameter `errorText` has been supplied
+        //
 
-      // No attributes or original exception -> throw new Error
-      throw new Error( errorText );
+        // No attributes or original exception -> throw new Error
+        throw new Error( errorText );
+      }
 
     case 2:
     {
+      //
+      // Parameters `errorText` and `attributes` have been supplied
+      //
+      //   -- OR --
+      //
+      // Parameters `errorText` and `exception` have been supplied
+      //
+
       const param2 = arguments[1];
 
       if( param2 instanceof Error )
       {
         exception = param2;
+
+        //
+        // Convert exception to an ExtendedError
+        //
+        exception = new ExtendedError( errorText, exception );
       }
       else {
-        // Missing exception -> create new exception
+        // Create exception (Error instance)
         exception = new Error( errorText );
 
         attributes = param2;
@@ -64,6 +83,9 @@ export function raise( errorText, /* attributes, exception */ )
     }
     case 3:
     {
+      //
+      // Parameters `errorText`, `attributes` and `exception` have been supplied
+      //
       attributes = arguments[1];
       exception = arguments[2];
 
@@ -78,6 +100,11 @@ export function raise( errorText, /* attributes, exception */ )
         throw new Error(
           "Invalid value for parameter [exception] (expected Error)");
       }
+
+      //
+      // Convert exception to an ExtendedError
+      //
+      exception = new ExtendedError( errorText, exception );
       break;
     }
     default:
@@ -122,19 +149,21 @@ export function rethrow( message, error )
     throw new Error(`Invalid parameter [error] (expected Error)`);
   }
 
-  if( message )
-  {
-    if( typeof message === "string" )
-    {
-      // Prefix the new message to the existing error message
-      error.message = `${message}\n<- ${error.message}`;
-    }
-    else {
-      throw new Error("Missing parameter [errorText] or [expectedText]");
-    }
-  }
+  // if( message )
+  // {
+  //   if( typeof message === "string" )
+  //   {
+  //     // Prefix the new message to the existing error message
+  //     error.message = `${message}\n<- ${error.message}`;
+  //   }
+  //   else {
+  //     throw new Error("Missing parameter [errorText] or [expectedText]");
+  //   }
+  // }
 
-  throw error;
+  // throw error;
+
+  throw new ExtendedError( message, error );
 }
 
 // -----------------------------------------------------------------------------
@@ -205,27 +234,36 @@ export class ExtendedError extends Error
    *   a reference to the error that caused the error to occur
    *
    * - A reference to the previous error instance will be stored
-   *   as property `previousError`
+   *   as property `cause`
+   *
+   * @param {string} message
+   * @param {Error} cause - Error that cause this error
    */
-  constructor( message, previousError=null )
+  constructor( message, cause=null )
   {
-    super( message );
+    super( message ); // super must be called
 
     // TODO: unique error id?
 
     this.name = "ExtendedError";
 
-    this.previousError = previousError;
+    //
+    // @see https://developer.mozilla.org/
+    //      en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause
+    //
+    this.cause = cause;
   }
 
+  /**
+   * Export error data
+   *
+   * TODO: export options
+   */
   export()
   {
-    return { message: this.message /* TODO: internal error, more details */ };
-  }
-
-  static from( previousError )
-  {
-    return new ExtendedError( previousError.message );
+    return {
+      message: this.message /* TODO: internal error, more details */
+    };
   }
 }
 

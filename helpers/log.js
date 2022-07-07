@@ -33,9 +33,9 @@ function _getLogFacility()
     return config.facility;
   }
 
-  throw new Error("No log facility yet!");
-
-  // return Console;
+  throw new Error(
+    "No log facility has been configured.\n" +
+    "Use e.g. setGlobalConfig( 'log', { facility: Console } );");
 }
 
 /**
@@ -115,6 +115,9 @@ export function createEvent( type, args, context )
   return event;
 }
 
+/**
+ * Log a debug message or data
+ */
 export function debug()
 {
   const logEvent = _getLogFacility().logEvent;
@@ -124,6 +127,9 @@ export function debug()
   logEvent( event );
 }
 
+/**
+ * Log an info message or data
+ */
 export function logInfo()
 {
   const logEvent = _getLogFacility().logEvent;
@@ -133,6 +139,9 @@ export function logInfo()
   logEvent( event );
 }
 
+/**
+ * Log a warning message or data
+ */
 export function logWarning()
 {
   const logEvent = _getLogFacility().logEvent;
@@ -142,6 +151,9 @@ export function logWarning()
   logEvent( event );
 }
 
+/**
+ * Log an error message or data
+ */
 export function logError()
 {
   const logEvent = _getLogFacility().logEvent;
@@ -155,6 +167,11 @@ export function logError()
   logEvent( event );
 }
 
+/**
+ * Log an event
+ *
+ * @param {object} event
+ */
 export function logEvent( event )
 {
   const logEvent = _getLogFacility().logEvent;
@@ -172,4 +189,4 @@ export default {
   event: logEvent,
   createEvent,
   DEBUG, INFO, WARNING, ERROR,
-}
+};

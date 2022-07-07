@@ -26,17 +26,17 @@ import {
 
 import DedupValueStore from "./DedupValueStore.js";
 
+import HkPromise from "@hkd-base/classes/HkPromise.js";
+
 import {
   STOPPED,
   // STARTING,
   RUNNING,
   STOPPING,
   UNAVAILABLE,
-  // ERROR,
-  state_label,
+  ERROR,
+  stateLabel,
   displayState } from "../constants/service-states.js";
-
-const AVAILABLE = Symbol("available"); // Extra state for availability
 
 import { LogBase } from "../helpers/log.js";
 
@@ -46,22 +46,24 @@ import InitService from "../services/InitService.js";
 
 /* ---------------------------------------------------------------- Internals */
 
-  const customServiceName$ = Symbol("customServiceName");
+const WAIT_FOR_DEPENDENCIES_TIMEOUT = 5 * 1000;
 
-  const logContext$ = Symbol("logContext");
+const customServiceName$ = Symbol("customServiceName");
 
-  const availabilityStore$ = Symbol("availabilityStore");
+const logContext$ = Symbol("logContext");
 
-  const stateStore$ = Symbol("stateStore");
+const allDependenciesAvailable$ = Symbol("availabilityStore");
 
-  const targetState$ = Symbol("targetState");
+const stateStore$ = Symbol("stateStore");
 
-  const dependencies$ = Symbol("dependencies");
+const targetState$ = Symbol("targetState");
 
-  const transitionHandlers$ = Symbol("transitionHandlers");
+const dependencies$ = Symbol("dependencies");
 
-  const configureFn$ = Symbol("configureFn");
-  const configured$ = Symbol("configured");
+const transitionHandlers$ = Symbol("transitionHandlers");
+
+const configureFn$ = Symbol("configureFn");
+const configured$ = Symbol("configured");
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -94,7 +96,7 @@ export default class ServiceBase extends LogBase
 
     this[ transitionHandlers$ ] = {};
 
-    this[ availabilityStore$ ] = new DedupValueStore( AVAILABLE );
+    this[ allDependenciesAvailable$ ] = new DedupValueStore( true );
 
     this[ stateStore$ ] = new DedupValueStore( STOPPED );
 
@@ -208,7 +210,7 @@ export default class ServiceBase extends LogBase
     if( RUNNING !== currentState )
     {
       throw new Error(
-        `Service [${this.serviceName()}] should be in state [RUNNING]. ` +
+        `Service [${this.serviceName()}] should be in state [running]. ` +
         `(current state [${displayState(currentState)}])`);
     }
   }
@@ -225,29 +227,48 @@ export default class ServiceBase extends LogBase
     if( STOPPED !== currentState )
     {
       throw new Error(
-        `Service [${this.serviceName()}] should be in state [STOPPED]. ` +
+        `Service [${this.serviceName()}] should be in state [stopped]. ` +
         `(current state [${displayState(currentState)}])`);
     }
   }
 
   // -------------------------------------------------------------------- Method
 
-  setAvailable()
-  {
-    // this.expectConfigured();
+  // setDependenciesAvailable()
+  // {
+  //   // this.expectConfigured();
 
-    this[ availabilityStore$ ].set( AVAILABLE );
-  }
+  //   this[ allDependenciesAvailable$ ].set( true );
+  // }
 
   // -------------------------------------------------------------------- Method
 
-  setUnavailable()
+  // setUnavailable()
+  // {
+  //   // this.expectConfigured();
+
+  //   // this.log.debug("set unavailable");
+
+  //   this[ allDependenciesAvailable$ ].set( UNAVAILABLE );
+  // }
+
+  // -------------------------------------------------------------------- Method
+
+  /**
+   * Returns true all dependencies are available
+   * - A service is available if it is in state RUNNING and all dependencies
+   *   are available
+   */
+  isAvailable()
   {
-    // this.expectConfigured();
+    const state = this.getState();
 
-    // this.log.debug("set unavailable");
+    if( RUNNING === state && this[ allDependenciesAvailable$ ].get() )
+    {
+      return true;
+    }
 
-    this[ availabilityStore$ ].set( UNAVAILABLE );
+    return false;
   }
 
   // -------------------------------------------------------------------- Method
@@ -289,11 +310,18 @@ export default class ServiceBase extends LogBase
 
     if( dependencies.has( dependency ) )
     {
-      throw new Error(`Dependency [${dependencyName}] has already been set`);
+      throw new Error(
+        `Dependency [${dependencyName}] has already been set ` +
+        `in service [${this.serviceName()}]`);
     }
 
     dependencies.add( dependency );
 
+    //
+    // Subscribe to dependency state changes
+    // - Add unsubscribe function to `onStopFns` so it will be unsubscribed
+    //   if the service stops
+    //
     this.onStopFns[ `_unsubDep${dependencyName}` ] =
       dependency.subscribeToState( ( state ) =>
         {
@@ -306,16 +334,34 @@ export default class ServiceBase extends LogBase
               if( RUNNING !== dependency.getState() )
               {
                 allAvailable = false;
+                break;
               }
-            }
+            } // end for
 
             if( allAvailable )
             {
-              this.setAvailable();
+              //
+              // All dependencies are available
+              //
+              this[ allDependenciesAvailable$ ].set( true );
+            }
+            else {
+              //
+              // At least one dependency is not available
+              //
+              this[ allDependenciesAvailable$ ].set( false );
             }
           }
-          else if( STOPPING !== state ) {
-            this.setUnavailable();
+          else {
+            //
+            // Dependency is not in state RUNNING
+            //
+
+            // console.log(
+            //   `Service [${this.serviceName()}]: ` +
+            //   `dependency [${dependencyName}] is not available.`);
+
+            this[ allDependenciesAvailable$ ].set( false );
           }
         },
         true /* true -> run upon registration */ );
@@ -336,7 +382,7 @@ export default class ServiceBase extends LogBase
 
     expectSymbolOrString( state, "Missing or invalid parameter [state]" );
 
-    state = state_label( state );
+    state = stateLabel( state );
 
     // -- STOPPED -> Call onStopFns
 
@@ -371,16 +417,9 @@ export default class ServiceBase extends LogBase
 
     let state = this[ stateStore$ ].get();
 
-    if( RUNNING === state )
+    if( RUNNING === state && !this[ allDependenciesAvailable$ ].get() )
     {
-      const availability = this[ availabilityStore$ ].get();
-
-      // this.log.debug("getState", { state, availability } );
-
-      if( UNAVAILABLE === availability )
-      {
-        state = UNAVAILABLE;
-      }
+      state = UNAVAILABLE;
     }
 
     if( !outputAsString )
@@ -412,14 +451,23 @@ export default class ServiceBase extends LogBase
     let previousState =
       callOnRegistration ? null : this[ stateStore$ ].get();
 
-    const unsubscribeFromAvailabilityStore =
-      this[ availabilityStore$ ].subscribe( ( value ) =>
+    //
+    // Call the callback if the availability of dependencies changed
+    //
+    const unsubscribeAllDependenciesAvailable =
+      this[ allDependenciesAvailable$ ].subscribe( ( allAvailable ) =>
         {
           // this.log.debug(
           //   "availability changed",
           //   { realState: this[ stateStore$ ].get(), value } );
 
           const state = this.getState();
+
+          if( RUNNING === state && !allAvailable )
+          {
+            callback( UNAVAILABLE );
+            return;
+          }
 
           if( state === previousState )
           {
@@ -432,7 +480,10 @@ export default class ServiceBase extends LogBase
         },
         false );
 
-    const unsubscribeFromStateStore =
+    //
+    // Call the callback if the service state changed
+    //
+    const unsubscribeStateStore =
       this[ stateStore$ ].subscribe( () =>
       {
         const state = this.getState();
@@ -440,6 +491,14 @@ export default class ServiceBase extends LogBase
         // this.log.debug(
         //   "state changed",
         //   { state, realState: this[ stateStore$ ].get() } );
+
+        const allAvailable = this[ allDependenciesAvailable$ ].get();
+
+        if( RUNNING === state && !allAvailable )
+        {
+          callback( UNAVAILABLE );
+          return;
+        }
 
         if( state === previousState )
         {
@@ -456,6 +515,14 @@ export default class ServiceBase extends LogBase
     {
       const state = this.getState();
 
+      const allAvailable = this[ allDependenciesAvailable$ ].get();
+
+      if( RUNNING === state && !allAvailable )
+      {
+        callback( UNAVAILABLE );
+        return;
+      }
+
       if( state !== previousState )
       {
         callback( state );
@@ -463,9 +530,9 @@ export default class ServiceBase extends LogBase
     }
 
     return () => {
-      unsubscribeFromAvailabilityStore();
-      unsubscribeFromStateStore();
-    }
+      unsubscribeAllDependenciesAvailable();
+      unsubscribeStateStore();
+    };
   }
 
   // -------------------------------------------------------------------- Method
@@ -542,7 +609,7 @@ export default class ServiceBase extends LogBase
 
     expectFunction( callback, "Missing or invalid parameter [callback]" );
 
-    targetState = state_label( targetState );
+    targetState = stateLabel( targetState );
 
     const handlers = this[ transitionHandlers$ ];
 
@@ -583,7 +650,7 @@ export default class ServiceBase extends LogBase
 
     expectSymbolOrString( state, "Missing or invalid parameter [state]" );
 
-    state = state_label( state );
+    state = stateLabel( state );
 
     // -- STOPPED -> Call onStopFns
 
@@ -623,18 +690,182 @@ export default class ServiceBase extends LogBase
 
     // this.log.info(`_transitionToState( ${displayState(targetState)} )` );
 
+    if( RUNNING === targetState )
+    {
+      //
+      // If a service wants to transition to state running; all dependencies
+      // should be available first
+      //
+      // => Wait for dependencies that are not available yet
+      //
+      await this._waitForAllDependencies();
+    }
+
     const handlers = this[ transitionHandlers$ ];
 
     if( handlers[ targetState ] )
     {
       // await handlers[ targetState ]( currentState, this[ targetState$ ]);
+      try {
+        await handlers[ targetState ]( this._setState.bind( this ) );
 
-      await handlers[ targetState ]( this._setState.bind( this ) );
+
+      }
+      catch( e )
+      {
+        this._setState( ERROR );
+
+        throw new Error(
+          `Service [${this.serviceName()}] ` +
+          `failed to transition to state [${displayState(targetState)}]`,
+          { cause: e } );
+      }
     }
     else {
       // No handler -> automatically change the transition to the targetState
       this._setState( targetState );
     }
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Wait for all dependencies to become available
+   *
+   * @param {number} [timeoutMs=WAIT_FOR_DEPENDENCIES_TIMEOUT]
+   *
+   * @returns {Promise<boolean>} true if all dependencies are available
+   */
+  async _waitForAllDependencies(
+    {
+      timeoutMs=WAIT_FOR_DEPENDENCIES_TIMEOUT
+    }={} )
+  {
+    this._ensureDependenciesAreNotInStateError();
+
+    const promise = new HkPromise();
+
+    const waitForDepsKey$ = Symbol();
+
+    const onStopFns = this.onStopFns;
+
+    this[ allDependenciesAvailable$ ]
+      .subscribe(
+        ( allAvailable, unsubscribe ) => {
+
+          if( !onStopFns[ waitForDepsKey$ ] )
+          {
+            onStopFns[ waitForDepsKey$ ] = unsubscribe;
+          }
+
+          if( allAvailable )
+          {
+            allAvailable = true;
+
+            onStopFns[ waitForDepsKey$ ]();
+            delete onStopFns[ waitForDepsKey$ ];
+
+            promise.resolve( true );
+          }
+
+          // const notAvailable = this._listNotAvailableDependencyNames();
+
+          // this.log.debug(
+          //   `Service [${this.serviceName()}] waiting for ` +
+          //   `${notAvailable.length === 1 ? "dependency" : "dependencies"} ` +
+          //   `[${notAvailable.join(",")}]` );
+        } );
+
+    if( promise.resolved )
+    {
+      //
+      // All dependencies are already available
+      // - subscribe was called upon registration
+      //
+      return promise;
+    }
+
+    promise.catch( () =>
+      {
+        const notAvailable = this._listNotAvailableDependencyNames();
+
+        this.log.error(
+          new Error(
+            `Service [${this.serviceName()}] waiting for ` +
+            `${notAvailable.length === 1 ? "dependency" : "dependencies"} ` +
+            `[${notAvailable.join(",")}] timed out [${timeoutMs}]`) );
+      } );
+
+    promise.setTimeout( timeoutMs );
+
+    return promise;
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Get a list of dependency names
+   *
+   * @returns {string[]} list of dependency names
+   */
+  _listDependencyNames()
+  {
+    const list = [];
+
+    const dependencies = this[ dependencies$ ].values();
+
+    for( const dependency of dependencies )
+    {
+      list.push( dependency.serviceName() );
+    }
+
+    return list;
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Get a list of not available dependencies
+   *
+   * @returns {string[]} list of dependency names
+   */
+  _listNotAvailableDependencyNames()
+  {
+    let notAvailable = [];
+
+    const dependencies = this[ dependencies$ ];
+
+    for( const dependency of dependencies.values() )
+    {
+      if( RUNNING !== dependency.getState() )
+      {
+        // Dependency is not available
+        notAvailable.push( dependency.serviceName() );
+      }
+    } // end for
+
+    return notAvailable;
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Throws an exception if one of the dependencies is in state error
+   */
+  _ensureDependenciesAreNotInStateError()
+  {
+    const dependencies = this[ dependencies$ ];
+
+    for( const dependency of dependencies.values() )
+    {
+      if( ERROR === dependency.getState() )
+      {
+        this.log.debug(`Dependency [${dependency.serviceName()}] is in state [error]`);
+
+        throw new Error(
+          `Dependency [${dependency.serviceName()}] is in state [error]`);
+      }
+    } // end for
   }
 
 } // end class

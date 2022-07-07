@@ -199,7 +199,13 @@ class InitService extends Base
       await this.configure();
     }
 
-    await this.setTargetState( RUNNING );
+    try {
+      await this.setTargetState( RUNNING );
+    }
+    catch( e )
+    {
+      throw new Error( "Initservice.boot() failed", { cause: e } );
+    }
   }
 
   // -------------------------------------------------------------------- Method

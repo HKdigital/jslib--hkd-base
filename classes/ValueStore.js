@@ -35,6 +35,12 @@ export const subscribers$ = Symbol("subscribers");
 /* ------------------------------------------------------------------- Export */
 
 /**
+ * @callback {ValueStore~subscribeCallback}
+ * @param {mixed} value
+ * @param {function} unsubscribe
+ */
+
+/**
  * ValueStore
  * - Class that can be used to store a value and subscribe to value changes
  *
@@ -42,6 +48,7 @@ export const subscribers$ = Symbol("subscribers");
  *   that contains the value true or false. This property can be used to
  *   let code react if the first subscriber registered or the last subscriber
  *   unregistered.
+ *
  */
 export default class ValueStore
 {
@@ -137,7 +144,7 @@ export default class ValueStore
    * @param {boolean} [callOnRegistration=true]
    *   Call the callback directly (send an initial value)
    *
-   * @returns {function} unsubscribe function
+   * @returns {ValueStore~subscribeCallback} unsubscribe function
    */
   subscribe( callback, callOnRegistration=true )
   {

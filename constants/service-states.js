@@ -1,10 +1,14 @@
 
+// -----------------------------------------------------------------------------
+
 export const STOPPED = Symbol("stopped");
 export const STARTING = Symbol("starting");
 export const RUNNING = Symbol("running");
 export const STOPPING = Symbol("stopping");
 export const UNAVAILABLE = Symbol("unavailable");
 export const ERROR = Symbol("error");
+
+// -----------------------------------------------------------------------------
 
 const STATE_LABELS =
   {
@@ -16,10 +20,6 @@ const STATE_LABELS =
     [ERROR]: "error"
   };
 
-
-// STOPPED.toString = function() { return "JENS"; };
-
-
 const DISPLAY_STATE_LABELS =
   {
     "stopped": STOPPED,
@@ -30,6 +30,8 @@ const DISPLAY_STATE_LABELS =
     "error": ERROR
   };
 
+// -----------------------------------------------------------------------------
+
 /**
  * If a state label has been supplied (a symbol), the state label will be
  * returned. If a display string has been supplied (e.g. "stopping"), the
@@ -39,7 +41,7 @@ const DISPLAY_STATE_LABELS =
  *
  * @returns {Symbol} state label
  */
-export function state_label( state_label_or_string )
+export function stateLabel( state_label_or_string )
 {
   if( typeof state_label_or_string === "symbol" )
   {
@@ -63,6 +65,8 @@ export function state_label( state_label_or_string )
 
   return stateLabel;
 }
+
+// -----------------------------------------------------------------------------
 
 /**
  * Returns the service state as a string, e.g. for display purposes
