@@ -46,7 +46,7 @@ import InitService from "../services/InitService.js";
 
 /* ---------------------------------------------------------------- Internals */
 
-const WAIT_FOR_DEPENDENCIES_TIMEOUT = 5 * 1000;
+const WAIT_FOR_DEPENDENCIES_TIMEOUT = 30 * 1000;
 
 const customServiceName$ = Symbol("customServiceName");
 
