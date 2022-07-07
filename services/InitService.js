@@ -316,6 +316,10 @@ class InitService extends Base
 
     // - Start all services that are marked with `startOnBoot=true`
 
+    //
+    // FIXME: build a dependency tree first
+    //
+
     const registrations = this[ registrations$ ];
 
     for( const registration of registrations )
@@ -355,9 +359,25 @@ class InitService extends Base
 
     setState( STOPPING );
 
+    // -- Reverse registrations
+
+    //
+    // FIXME: building a dependency tree would be better
+    //
     const registrations = this[ registrations$ ];
 
+    const reversedRegistrations = [];
+
     for( const registration of registrations )
+    {
+      reversedRegistrations.push( registration );
+    }
+
+    reversedRegistrations.reverse();
+
+    // -- Stop services
+
+    for( const registration of reversedRegistrations )
     {
       const serviceName = registration.serviceName;
 
