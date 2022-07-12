@@ -127,15 +127,16 @@ import { objectGet } from "./object.js";
 
 /**
  * Compare function that can be used for sorting smallest values first
+ * - undefined values are placed at the ... of the sorted array
  *
  * @param {mixed} x - First value
  * @param {mixed} y - Second value
  */
 export function smallestFirst( x, y )
 {
-  if( typeof x === "undefined" )
+  if( x === undefined )
   {
-    if( typeof y === "undefined" )
+    if( y === undefined )
     {
       return 0;
     }
@@ -143,7 +144,7 @@ export function smallestFirst( x, y )
     return 1;
   }
 
-  if( typeof y === "undefined" )
+  if( y === undefined )
   {
     return -1;
   }
@@ -155,15 +156,16 @@ export function smallestFirst( x, y )
 
 /**
  * Compare function that can be used for sorting largest values first
+ * - undefined values are placed at the ... of the sorted array
  *
  * @param {mixed} x - First value
  * @param {mixed} y - Second value
  */
 export function largestFirst( x, y )
 {
-  if( typeof x === "undefined" )
+  if( x === undefined )
   {
-    if( typeof y === "undefined" )
+    if( y === undefined )
     {
       return 0;
     }
@@ -171,7 +173,7 @@ export function largestFirst( x, y )
     return 1;
   }
 
-  if( typeof y === "undefined" )
+  if( y === undefined )
   {
     return -1;
   }
@@ -194,7 +196,6 @@ export function largestFirst( x, y )
 export function compareUsingPath( compareFn, a, b, path )
 {
 
-
   // @note assume a and b are objects
 
   const valueA = objectGet( a, path );
@@ -216,6 +217,7 @@ export function compareUsingPath( compareFn, a, b, path )
  */
 export function compareUsingKey( compareFn, key, a, b )
 {
+
   // @note assume a and b are objects
 
   return compareFn( a[ key ], b[ key ] );

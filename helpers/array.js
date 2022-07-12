@@ -12,8 +12,8 @@ import {
 import {
   smallestFirst,
   largestFirst,
-  compareUsingKey,
-  compareUsingPath } from "./compare.js";
+  /*compareUsingKey,
+  compareUsingPath*/ } from "./compare.js";
 
 import { objectGet, PATH_SEPARATOR } from "./object.js";
 
@@ -26,6 +26,8 @@ const array_slice = Array.prototype.slice;
 /* ------------------------------------------------------------------ Exports */
 
 export { PATH_SEPARATOR } from "./object.js";
+
+export { smallestFirst, largestFirst };
 
 // ---------------------------------------------------------------------- Method
 

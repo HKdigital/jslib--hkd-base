@@ -816,7 +816,7 @@ export function getTree( obj, tree, options )
 
     // -- Get value from object at current path
 
-    let leaveValue = Object._get( obj, arrPath );
+    let leaveValue = objectGet( obj, arrPath );
 
     // -- Set value in result object at current path
 
@@ -824,13 +824,13 @@ export function getTree( obj, tree, options )
     {
       // option: shallowLeaves=false OR value is not an object
       // -> no need to convert leaves to shallow objects
-      Object._set( result, arrPath, leaveValue );
+      objectSet( result, arrPath, leaveValue );
     }
     else {
       // Set shallow leave value instead of nested object
 
       const shallowLeaveValue = shallowClone( leaveValue );
-      set( result, arrPath, shallowLeaveValue );
+      objectSet( result, arrPath, shallowLeaveValue );
     }
 
   } // end for
@@ -841,10 +841,11 @@ export function getTree( obj, tree, options )
 // ---------------------------------------------------------------------- Method
 
 /**
- * Deep copy a value (that is, a recursive copy of all nested properties,
- * also walking the prototype chain)
+ * Deep clone an object or any kind of other variable
+ * - Recursively clone all nested properties
+ * - Properties in the prototype chain are cloned too, but all copied into a
+ *   single prototype object
  * - This method works on objects, but also on any other JS variable type
- * - This method may work recursively
  * - If a value cannot be cloned, a reference is returned. o.a. for
  *   - Error objects
  *   - Browser objects

@@ -14,9 +14,16 @@ import { getStack } from "@platform/helpers/trace.js";
 
 export { default as LogBase } from "../classes/LogBase.js";
 
+//
+// Import default console logger as default log facility
+//
+import Console from "./console.js";
+
 /* ---------------------------------------------------------------- Internals */
 
-// let sequenceId = 1n;
+let originalConsole = null;
+
+// let sequenceId = 1n; // not yet supported in all browsers
 let sequenceId = 1;
 
 /**
@@ -26,7 +33,7 @@ let sequenceId = 1;
  */
 function _getLogFacility()
 {
-  const config = getGlobalConfig("log");
+  let config = getGlobalConfig("log", { facility: Console } );
 
   if( config && config.facility )
   {
@@ -179,6 +186,49 @@ export function logEvent( event )
   logEvent( event );
 }
 
+// -----------------------------------------------------------------------------
+
+/**
+ * Silence (drop) all console.log messages that are not of type `warning` or
+ * `error`
+ */
+export function setLogLevelWarning()
+{
+  if( !originalConsole )
+  {
+    originalConsole =
+      {
+        log: console.log,
+        group: console.group,
+        groupCollapsed: console.groupCollapsed
+      };
+  }
+
+  const noop = () => {};
+
+  global.console.log = noop;
+  global.console.group = noop;
+  global.console.groupCollapsed = noop;
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Unsilence all global console.log messages
+ */
+export function restoreLogLevelDefault()
+{
+  if( !originalConsole )
+  {
+    // Nothing silenced => nothing to do
+    return;
+  }
+
+  global.console.log = originalConsole.log;
+  global.console.group = originalConsole.group;
+  global.console.groupCollapsed = originalConsole.groupCollapsed;
+}
+
 // -------------------------------------------------------------- Export default
 
 export default {
@@ -189,4 +239,7 @@ export default {
   event: logEvent,
   createEvent,
   DEBUG, INFO, WARNING, ERROR,
+
+  setLogLevelWarning,
+  restoreLogLevelDefault
 };

@@ -34,21 +34,7 @@ export const HOUR_MS = 60 * MINUTE_MS;
 export const DAY_MS = 24 * HOUR_MS;
 export const WEEK_MS = 7 * DAY_MS;
 
-export const TIME_2020_01_01 = 1577836800000;
-
-// -------------------------------------------------------------------- Function
-
-/**
- * Get the number of milliseconds since the specified moment in time
- *
- * @param {number} [sinceMs=TIME_2020_01_01]
- *
- * @returns {number} number of milliseconds since the specified time
- */
-export function sinceMs( sinceMs=TIME_2020_01_01 )
-{
-  return Date.now() - sinceMs;
-}
+export const TIME_2020_01_01 = 1577836800000; // 2020-01-01T00:00:00.000Z
 
 // -------------------------------------------------------------------- Function
 
@@ -146,4 +132,19 @@ export function delay( delayOrMinDelayMs, maxDelayMs )
     } );
 
   return promise;
+}
+
+// -------------------------------------------------------------------- Function
+
+/**
+ * Get the number of milliseconds since the specified time stamp of the default
+ * reference time stamp TIME_2020_01_01
+ *
+ * @param {number} [sinceMs=TIME_2020_01_01]
+ *
+ * @returns {number} number of milliseconds since the specified time
+ */
+export function sinceMs( sinceMs=TIME_2020_01_01 )
+{
+  return Date.now() - sinceMs;
 }
