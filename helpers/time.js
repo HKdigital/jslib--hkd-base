@@ -35,6 +35,7 @@ export const DAY_MS = 24 * HOUR_MS;
 export const WEEK_MS = 7 * DAY_MS;
 
 export const TIME_2020_01_01 = 1577836800000; // 2020-01-01T00:00:00.000Z
+export const TIME_2100_01_01 = 4102444800000; // 2100-01-01T00:00:00.000Z
 
 // -------------------------------------------------------------------- Function
 

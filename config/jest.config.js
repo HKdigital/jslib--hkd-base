@@ -39,7 +39,7 @@ export default async () => {
     //
     moduleNameMapper: {
       "\\@rootDir/(.*)$": "<rootDir>/$1",
-      "\\./(.*)$": "<rootDir>/$1",
+      // "\\./(.*)$": "<rootDir>/$1",
       "\\@hkd-base/(.*)$": "<rootDir>/$1",
       "\\@platform/(.*)$": "<rootDir>/$1"
 

@@ -1,5 +1,7 @@
 
-import { loop } from "$rootDir/array.js";
+import { jest } from "@jest/globals";
+
+import { loop } from "@rootDir/helpers/array.js";
 
 /* -------------------------------------------------------------------- Tests */
 

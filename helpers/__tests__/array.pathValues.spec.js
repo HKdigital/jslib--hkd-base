@@ -1,6 +1,6 @@
 
 import { pathValues,
-         PATH_SEPARATOR } from "$rootDir/array.js";
+         PATH_SEPARATOR } from "@rootDir/helpers/array.js";
 
 /* -------------------------------------------------------------------- Tests */
 
