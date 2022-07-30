@@ -1,9 +1,12 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectString,
-         expectNotEmptyString,
-         expectObject } from "@hkd-base/helpers/expect.js";
+import { expectNotEmptyString,
+         expectObject,
+         expectObjectNoArray,
+         expectFunction } from "@hkd-base/helpers/expect.js";
+
+/* ---------------------------------------------------------------- Internals */
 
 /**
  * Ensure to return an URL instance
@@ -26,6 +29,78 @@ function toURL( url )
   return url;
 }
 
+/**
+ * Throws an exception if the URL object has any search parameter set
+ *
+ * @param  {URL} url
+ *
+ * @throws Error
+ */
+// function expectNoSearchParams( url )
+// {
+//   if( !(url instanceof URL) ) {
+//     throw new Error("Missing or invalid parameter [url]");
+//   }
+
+//   for( const value of url.searchParams.values() )
+//   {
+//     if( value )
+//     {
+//       throw new Error(`Url [${url}] should not contain search parameters`);
+//     }
+//   } // end for
+// }
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Set headers in an existing `Headers` object
+ * - Existing headers with the same name will be overwritten
+ * - The supplied `Headers` object will be updated, this function does not
+ *   return any value
+ *
+ * @param {Headers} target - Headers object to set the extra headers in
+ *
+ * @param {object} [nameValuePairs]
+ *   Object that contains custom headers. A header is a name, value pair.
+ */
+function setRequestHeaders( target, nameValuePairs )
+{
+  // eslint-disable-next-line no-undef
+  if( !(target instanceof Headers) )
+  {
+    throw new Error(
+      "Invalid parameter [target] (expected Headers object)" );
+  }
+
+  expectObjectNoArray( nameValuePairs,
+      "Missing or invalid parameter [options.headers]" );
+
+  if( nameValuePairs instanceof Headers )
+  {
+    throw new Error(
+      "Invalid parameter [nameValuePairs] (should not be a Headers object)");
+  }
+
+  for( const name in nameValuePairs )
+  {
+    expectNotEmptyString( name,
+      "Invalid parameter [nameValuePairs] (missing header name)" );
+
+    const value = nameValuePairs[ name ];
+
+    expectNotEmptyString( value, `Invalid value for header [${name}]` );
+
+
+    target.set( name, value ); /* overwrites existing value */
+  }
+}
+
+/* ------------------------------------------------------------------ Exports */
+
+export const METHOD_GET = "GET";
+export const METHOD_POST = "POST";
+
 // -----------------------------------------------------------------------------
 
 /**
@@ -47,6 +122,36 @@ export function expectValidHttpStatus( response, url )
 
   switch( response.status )
   {
+    case 401:
+      {
+        let errorMessage = "Server returned [401] Unauthorized";
+
+        const authValue = response.headers.get("www-authenticate");
+
+        if( authValue )
+        {
+          const from = authValue.indexOf("error=");
+
+          if( from !== -1 )
+          {
+            let to = authValue.indexOf(",", from);
+
+            if( -1 === to )
+            {
+              to = authValue.length;
+            }
+
+            errorMessage += ` (${authValue.slice( from, to )})`;
+          }
+        }
+
+        throw new Error( errorMessage );
+      }
+
+    case 403:
+      throw new Error(
+        `Server returned - 403 Forbidden, [${decodeURI(url.href)}]`);
+
     case 404:
       throw new Error(
         `Server returned - 404 Not Found, [${decodeURI(url.href)}]`);
@@ -68,15 +173,36 @@ export function expectValidHttpStatus( response, url )
  *
  * @param {string|URL} url - Url string or URL object
  *
- * @param {object} [options]
+ * @param {object} [urlSearchParams]
+ *   Parameters that should be added to the request url
+ *
+ * @param {array[]} [headers]
+ *   List of custom headers. Each header is an array that contains the header
+ *   name and the header value. E.g. [ "content-type", "application/json" ]
  *
  * @returns {mixed} parsed JSON response from backend server
  */
-export async function jsonGet( url, options )
+export async function jsonGet( { url, urlSearchParams, headers } )
 {
   url = toURL( url );
 
-  const response = await httpGet( url, { returnAbort: false, options } );
+  if( !headers )
+  {
+    headers = {};
+  }
+
+  headers[ "accept" ] = "application/json";
+
+  const { responsePromise } =
+    await httpRequest(
+      {
+        method: METHOD_GET,
+        url,
+        urlSearchParams,
+        headers
+      } );
+
+  const response = await responsePromise;
 
   expectValidHttpStatus( response, url );
 
@@ -107,53 +233,169 @@ export async function jsonGet( url, options )
 
 // -----------------------------------------------------------------------------
 
+// export function jsonPost( url, body=null, options ) {}
+
+// -----------------------------------------------------------------------------
+
 /**
- * Make GET request to backend
+ * Make GET request
  *
  * @param {string|URL} url - Url string or URL object
  *
- * @param {object} [options]
- * @param {boolean} [options.returnAbort=true]
+ * @param {object} [urlSearchParams]
+ *   Parameters that should be added to the request url
  *
- * @returns {object} if `options.returnAbort` was set to true,
- *   an object is returned that contains an abort function and a response
- *   promise: { abort: <function>, response: <Promise->*> }.
- *   if `options.returnAbort` was false, a response promise is returned
+ * @param {object} [headers]
+ *   Object that contains custom headers. A header is a name, value pair.
+ *
+ *   e.g. options.headers = { "content-type": "application/json" }
+ *
+ * @param {function} [requestHandler]
+ *   If defined, this function will receive the abort handler function
+ *
+ * @returns {Promise<*>} responsePromise
  */
-export function httpGet( url, options={} )
+export function httpGet( { url, urlSearchParams, headers } )
 {
-  let returnAbort;
+  return httpRequest(
+    {
+      method: METHOD_GET,
+      url,
+      urlSearchParams,
+      headers
+    } );
+}
 
-  ({ returnAbort=true } = options);
+// -----------------------------------------------------------------------------
 
-  if( typeof url === "string" )
+/**
+ * Make POST request
+ *
+ * @param {string|URL} url - Url string or URL object
+ *
+ * @param {*} [body] - POST data
+ *
+ * @param {object} [headers]
+ *   Object that contains custom headers. A header is a name, value pair.
+ *
+ *   e.g. options.headers = { "content-type": "application/json" }
+ *
+ * @param {function} [requestHandler]
+ *   If defined, this function will receive the abort handler function
+ *
+ * @returns {Promise<*>} responsePromise
+ */
+export async function httpPost( { url, body=null, headers } )
+{
+  return httpRequest(
+    {
+      method: METHOD_POST,
+      url,
+      body,
+      headers } );
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Make an HTTP request
+ *
+ * @param {string} method - Request method: METHOD_GET | METHOD_POST
+ *
+ * @param {string|URL} url - Url string or URL object
+ *
+ * @param {object} [urlSearchParams] - URL search parameters as key-value pairs
+ *
+ * @param {*} [body] - POST data
+ *
+ * @param {object} [headers]
+ *   Object that contains custom headers. A header is a name, value pair.
+ *
+ *   e.g. options.headers = { "content-type": "application/json" }
+ *
+ * @param {function} [requestHandler]
+ *   If defined, this function will receive the abort handler function
+ *
+ * @returns {Promise<*>} responsePromise
+ */
+export async function httpRequest(
   {
-    console.log( url );
-
-    url = new URL( url );
-  }
-  else if( !(url instanceof URL) ) {
-    throw new Error("Missing or invalid parameter [url]");
-  }
+    method,
+    url,
+    urlSearchParams=null,
+    body=null,
+    headers,
+    requestHandler
+  } )
+{
+  url = toURL( url );
 
   // @see https://developer.mozilla.org/en-US/docs/Web/API/Headers
 
   // eslint-disable-next-line no-undef
-  const headers = new Headers(
-    [
-      [ "accept", "application/json" ],
-    ] );
+  const requestHeaders = new Headers();
+    // [
+    //   [ "accept", "application/json" ]
+    // ] );
 
-  const init =
-    {
-      method: 'GET',
-      mode: 'cors',
-      cache: 'no-cache',
-      credentials: 'omit',
-      redirect: 'follow',
-      referrerPolicy: 'no-referrer',
-      headers
-    };
+  if( headers )
+  {
+    setRequestHeaders( requestHeaders, headers );
+  }
+
+  const init = {
+    mode: 'cors',
+    cache: 'no-cache',
+    credentials: 'omit',
+    redirect: 'follow',
+    referrerPolicy: 'no-referrer',
+    headers: requestHeaders
+  };
+
+  switch( method )
+  {
+    case METHOD_GET:
+      init.method = METHOD_GET;
+
+      if( urlSearchParams )
+      {
+        if( !(urlSearchParams instanceof URLSearchParams) )
+        {
+          throw new Error(
+            `Invalid parameter [urlSearchParams] ` +
+            `(expected instanceof URLSearchParams)`);
+        }
+
+        const existingParams = url.searchParams;
+
+        for( const [ name, value ] of urlSearchParams.entries() )
+        {
+          if( existingParams.has( name ) )
+          {
+            throw new Error(
+              `Cannot set URL search parameter [${name}] ` +
+              `in url [${url.href}] (already set)`);
+          }
+
+          existingParams.set( name, value );
+        } // end for
+      }
+      break;
+
+    case METHOD_POST:
+      init.method = METHOD_POST;
+
+      init.body = body || null; /* : JSON.stringify( body ) */
+      break;
+
+    default:
+      throw new Error(`Invalid value for parameter [method=${method}]`);
+  }
+
+  //
+  // Sort search params to make the url nicer
+  //
+  url.searchParams.sort();
 
   // @see https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
   // @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
@@ -161,17 +403,18 @@ export function httpGet( url, options={} )
   // eslint-disable-next-line no-undef
   const request = new Request( url, init );
 
-  if( returnAbort )
+  const controller = new AbortController();
+  const signal = controller.signal;
+
+  if( requestHandler )
   {
-    const controller = new AbortController();
-    const signal = controller.signal;
+    expectFunction( requestHandler, "Invalid parameter [requestHandler]" );
 
     const abort = controller.abort.bind( controller );
 
-    return { abort, response: fetch( request, { signal } ) };
+    requestHandler( { abort } );
   }
-  else {
-    return /* async */ fetch( request );
-  }
+
+  return /* promise */ fetch( request, { signal } );
 }
 
