@@ -127,7 +127,7 @@ import { objectGet } from "./object.js";
 
 /**
  * Compare function that can be used for sorting smallest values first
- * - undefined values are placed at the ... of the sorted array
+ * - undefined values are placed at the ...???FIXME???... of the sorted array
  *
  * @param {mixed} x - First value
  * @param {mixed} y - Second value
@@ -156,7 +156,7 @@ export function smallestFirst( x, y )
 
 /**
  * Compare function that can be used for sorting largest values first
- * - undefined values are placed at the ... of the sorted array
+ * - undefined values are placed at the ...???FIXME???... of the sorted array
  *
  * @param {mixed} x - First value
  * @param {mixed} y - Second value
