@@ -209,11 +209,7 @@ export async function jsonApiRequest(
     // Add token as HTTP header
     //
     headers["authorization"] = `Bearer ${token}`;
-    // options.headers["authorization"] = `Bearer invalid-token`;
   }
-
-  // urlSearchParams
-  // body
 
   const response =
     await httpRequest( { method, url, body, urlSearchParams, headers } );

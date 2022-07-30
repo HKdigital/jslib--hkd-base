@@ -29,6 +29,28 @@ function toURL( url )
   return url;
 }
 
+/**
+ * Throws an exception if the URL object has any search parameter set
+ *
+ * @param  {URL} url
+ *
+ * @throws Error
+ */
+// function expectNoSearchParams( url )
+// {
+//   if( !(url instanceof URL) ) {
+//     throw new Error("Missing or invalid parameter [url]");
+//   }
+
+//   for( const value of url.searchParams.values() )
+//   {
+//     if( value )
+//     {
+//       throw new Error(`Url [${url}] should not contain search parameters`);
+//     }
+//   } // end for
+// }
+
 // -----------------------------------------------------------------------------
 
 /**
@@ -337,7 +359,26 @@ export async function httpRequest(
 
       if( urlSearchParams )
       {
-        throw new Error(`Not implemented yet [urlSearchParams]`);
+        if( !(urlSearchParams instanceof URLSearchParams) )
+        {
+          throw new Error(
+            `Invalid parameter [urlSearchParams] ` +
+            `(expected instanceof URLSearchParams)`);
+        }
+
+        const existingParams = url.searchParams;
+
+        for( const [ name, value ] of urlSearchParams.entries() )
+        {
+          if( existingParams.has( name ) )
+          {
+            throw new Error(
+              `Cannot set URL search parameter [${name}] ` +
+              `in url [${url.href}] (already set)`);
+          }
+
+          existingParams.set( name, value );
+        } // end for
       }
       break;
 
@@ -350,6 +391,11 @@ export async function httpRequest(
     default:
       throw new Error(`Invalid value for parameter [method=${method}]`);
   }
+
+  //
+  // Sort search params to make the url nicer
+  //
+  url.searchParams.sort();
 
   // @see https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
   // @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort

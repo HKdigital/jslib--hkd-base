@@ -29,7 +29,8 @@ let _aheadOfReferenceTimeMs = 0;
 
 /* ------------------------------------------------------------------ Exports */
 
-export const MINUTE_MS = 60000;
+export const SECOND_MS = 1000;
+export const MINUTE_MS = 60 * SECOND_MS;
 export const HOUR_MS = 60 * MINUTE_MS;
 export const DAY_MS = 24 * HOUR_MS;
 export const WEEK_MS = 7 * DAY_MS;
@@ -148,3 +149,51 @@ export function sinceMs( sinceMs=TIME_2020_01_01 )
 {
   return Date.now() - sinceMs;
 }
+
+// -------------------------------------------------------------------- Function
+
+/**
+ * Get a string that represents the time in a readable
+ * string format: [DD:][HH:]MM:SS.mmm
+ *
+ * @param {number} timeMs [description]
+ *
+ * @returns {string} time in human readable format
+ */
+export function timeToString( timeMs )
+{
+  const days = Math.floor( timeMs / DAY_MS );
+
+  let restMs = timeMs - days * DAY_MS;
+
+  const hours = Math.floor( restMs / HOUR_MS );
+
+  restMs = restMs - hours * HOUR_MS;
+
+  const minutes = Math.floor( restMs / MINUTE_MS );
+
+  restMs = restMs - minutes * MINUTE_MS;
+
+  const seconds = Math.floor( restMs / SECOND_MS );
+
+  restMs = restMs - seconds * SECOND_MS;
+
+  let str = "";
+
+  if( days )
+  {
+    str += `${days.toString().padStart( 2, "0")}:`;
+    str += `${hours.toString().padStart( 2, "0")}:`;
+  }
+  else if( hours )
+  {
+    str += `${hours.toString().padStart( 2, "0")}:`;
+  }
+
+  str += `${minutes.toString().padStart( 2, "0")}:`;
+  str += `${seconds.toString().padStart( 2, "0")}.`;
+  str += `${restMs.toString().padEnd( 3, "0" )}`;
+
+  return str;
+}
+
