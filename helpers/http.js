@@ -6,7 +6,13 @@ import { expectNotEmptyString,
          expectObjectNoArray,
          expectFunction } from "@hkd-base/helpers/expect.js";
 
+import { ResponseError,
+         TypeOrValueError } from "@hkd-base/helpers/errors.js";
+
 /* ---------------------------------------------------------------- Internals */
+
+const METHOD_GET = "GET";
+const METHOD_POST = "POST";
 
 /**
  * Ensure to return an URL instance
@@ -21,8 +27,9 @@ function toURL( url )
   {
     return new URL( url );
   }
-  else if( !(url instanceof URL) ) {
-    throw new Error("Missing or invalid parameter [url]");
+  else if( !(url instanceof URL) )
+  {
+    throw new TypeOrValueError("Missing or invalid parameter [url]");
   }
 
   // already an URL instance
@@ -76,6 +83,7 @@ function setRequestHeaders( target, nameValuePairs )
   expectObjectNoArray( nameValuePairs,
       "Missing or invalid parameter [options.headers]" );
 
+  // eslint-disable-next-line no-undef
   if( nameValuePairs instanceof Headers )
   {
     throw new Error(
@@ -96,11 +104,6 @@ function setRequestHeaders( target, nameValuePairs )
   }
 }
 
-/* ------------------------------------------------------------------ Exports */
-
-export const METHOD_GET = "GET";
-export const METHOD_POST = "POST";
-
 // -----------------------------------------------------------------------------
 
 /**
@@ -111,7 +114,7 @@ export const METHOD_POST = "POST";
  * @throws {Error} not found
  * @throws {Error} internal server error
  */
-export function expectValidHttpStatus( response, url )
+function expectResponseOk( response, url )
 {
   expectObject( response, "Missing or invalid parameter [response]" );
 
@@ -149,26 +152,96 @@ export function expectValidHttpStatus( response, url )
       }
 
     case 403:
-      throw new Error(
+      throw new ResponseError(
         `Server returned - 403 Forbidden, [${decodeURI(url.href)}]`);
 
     case 404:
-      throw new Error(
+      throw new ResponseError(
         `Server returned - 404 Not Found, [${decodeURI(url.href)}]`);
 
     case 500:
-      throw new Error(
+      throw new ResponseError(
         `Server returned - 500 Internal server error, [${decodeURI(url.href)}]`);
 
     default: // -> ok
+      if( !response.ok )
+      {
+        throw new ResponseError(
+          `Server returned - ${response.status} [response.ok=false], ` +
+          `[${decodeURI(url.href)}]`);
+      }
       break;
   }
+}
+
+
+/* ------------------------------------------------------------------ Exports */
+
+export { METHOD_GET, METHOD_POST };
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Wait for a response and check if the response is ok
+ *
+ * @example
+ *   const response = await waitForAndCheckResponse( responsePromise );
+ *
+ * --
+ *
+ * @param {Promise<object>} responsePromise
+ * @param {URL} url - An url that is used for error messages
+ *
+ * --
+ *
+ * @throws ResponseError - A response error if something went wrong
+ *
+ * --
+ *
+ * @returns {object} response
+ */
+export async function waitForAndCheckResponse( responsePromise, url )
+{
+  if( !(responsePromise instanceof Promise) )
+  {
+    throw new TypeOrValueError(
+      "Missing or invalid parameter [responsePromise]");
+  }
+
+  if( !(url instanceof URL) )
+  {
+    throw new TypeOrValueError(
+      "Missing or invalid parameter [url]");
+  }
+
+
+  let response;
+
+  try {
+    response = await responsePromise;
+  }
+  catch( e )
+  {
+    if( e instanceof TypeError )
+    {
+      throw new ResponseError(
+        `A network error occurred for request [${decodeURI(url.href)}]`,
+        { cause: e } );
+    }
+    else {
+      throw e;
+    }
+  }
+
+  expectResponseOk( response, url );
+
+  return response;
 }
 
 // -----------------------------------------------------------------------------
 
 /**
- * Make GET request to fetch JSON encoded data
+ * Make a GET request to fetch JSON encoded data
  * - Expect JSON response from server
  *
  * @param {string|URL} url - Url string or URL object
@@ -179,6 +252,13 @@ export function expectValidHttpStatus( response, url )
  * @param {array[]} [headers]
  *   List of custom headers. Each header is an array that contains the header
  *   name and the header value. E.g. [ "content-type", "application/json" ]
+ *
+ * --
+ *
+ * @throws ResponseError
+ *   If a network error occurred or the response was not ok
+ *
+ * --
  *
  * @returns {mixed} parsed JSON response from backend server
  */
@@ -193,8 +273,8 @@ export async function jsonGet( { url, urlSearchParams, headers } )
 
   headers[ "accept" ] = "application/json";
 
-  const { responsePromise } =
-    await httpRequest(
+  const responsePromise =
+    httpRequest(
       {
         method: METHOD_GET,
         url,
@@ -202,9 +282,8 @@ export async function jsonGet( { url, urlSearchParams, headers } )
         headers
       } );
 
-  const response = await responsePromise;
 
-  expectValidHttpStatus( response, url );
+  const response = await waitForAndCheckResponse( responsePromise, url );
 
   let parsedResponse;
 
@@ -219,8 +298,9 @@ export async function jsonGet( { url, urlSearchParams, headers } )
   catch( e )
   {
     // console.log( response );
-    throw new Error(
-      `Failed to JSON decode server response from [${decodeURI(url.href)}]`);
+    throw new ResponseError(
+      `Failed to JSON decode server response from [${decodeURI(url.href)}]`,
+      { casue: e } );
   }
 
   if( parsedResponse.error )
@@ -233,7 +313,77 @@ export async function jsonGet( { url, urlSearchParams, headers } )
 
 // -----------------------------------------------------------------------------
 
-// export function jsonPost( url, body=null, options ) {}
+/**
+ * Make a POST request to fetch JSON encoded data
+ * - Expect JSON response from server
+ *
+ * @param {string|URL} url - Url string or URL object
+ *
+ * @param {*} body
+ *   Data that will be converted to a JSON encoded string and send to the server
+ *
+ * @param {object} [urlSearchParams]
+ *   Parameters that should be added to the request url.
+ *
+ *   @note
+ *   Be careful when using urlSearchParams in POST requests, it can be
+ *   confusing since the parameters usually go in the body part of the request.
+ *
+ * @param {array[]} [headers]
+ *   List of custom headers. Each header is an array that contains the header
+ *   name and the header value. E.g. [ "content-type", "application/json" ]
+ *
+ * --
+ *
+ * @throws ResponseError
+ *   If a network error occurred or the response was not ok
+ *
+ * --
+ *
+ * @returns {mixed} parsed JSON response from backend server
+ */
+export async function jsonPost(
+  {
+    url,
+    body,
+    urlSearchParams,
+    headers
+  } )
+{
+  url = toURL( url );
+
+  if( !headers )
+  {
+    headers = {};
+  }
+
+  headers[ "accept" ] = "application/json";
+  headers[ "content-type" ] = "application/json";
+
+  const responsePromise =
+    httpRequest( { METHOD_POST, url, body, urlSearchParams, headers } );
+
+  const response = await waitForAndCheckResponse( responsePromise, url );
+
+  let parsedResponse;
+
+  try {
+    //
+    // @note when security on the client side fails, an `opaque` response
+    //       is returned by the browser (empty body) -> parsing fails
+    //       (use CORS to fix this)
+    //
+    parsedResponse = await response.json();
+  }
+  catch( e )
+  {
+    // console.log( response );
+    throw new ResponseError(
+      `Failed to JSON decode server response from [${decodeURI(url.href)}]`);
+  }
+
+  return parsedResponse;
+}
 
 // -----------------------------------------------------------------------------
 
@@ -255,15 +405,18 @@ export async function jsonGet( { url, urlSearchParams, headers } )
  *
  * @returns {Promise<*>} responsePromise
  */
-export function httpGet( { url, urlSearchParams, headers } )
+export async function httpGet( { url, urlSearchParams, headers } )
 {
-  return httpRequest(
+  const responsePromise = httpRequest(
     {
       method: METHOD_GET,
       url,
       urlSearchParams,
       headers
     } );
+
+  return await waitForAndCheckResponse( responsePromise, url );
+
 }
 
 // -----------------------------------------------------------------------------
@@ -287,18 +440,22 @@ export function httpGet( { url, urlSearchParams, headers } )
  */
 export async function httpPost( { url, body=null, headers } )
 {
-  return httpRequest(
+  const responsePromise = httpRequest(
     {
       method: METHOD_POST,
       url,
       body,
       headers } );
+
+  return await waitForAndCheckResponse( responsePromise, url );
 }
 
 // -----------------------------------------------------------------------------
 
 /**
  * Make an HTTP request
+ * - This is a low level function, consider using
+ *   httpGet, httpPost, jsonGet or jsonPost instead
  *
  * @param {string} method - Request method: METHOD_GET | METHOD_POST
  *
@@ -315,6 +472,16 @@ export async function httpPost( { url, body=null, headers } )
  *
  * @param {function} [requestHandler]
  *   If defined, this function will receive the abort handler function
+ *
+ *
+ * --
+ *
+ * @throws TypeError - If a network error occurred
+ *
+ * @note Check the `ok` property of the resolved response to check if the
+ *       response was successfull (e.g. in case of a 404, ok is false)
+ *
+ * --
  *
  * @returns {Promise<*>} responsePromise
  */
@@ -415,6 +582,25 @@ export async function httpRequest(
     requestHandler( { abort } );
   }
 
-  return /* promise */ fetch( request, { signal } );
-}
+  //
+  // A fetch() promise will reject with a TypeError when a network error
+  // is encountered or CORS is misconfigured on the server-side,
+  // although this usually means permission issues or similar
+  // — a 404 does not constitute a network error, for example.
+  // An accurate check for a successful fetch() would include checking
+  // that the promise resolved, then checking that the Response.ok property
+  // has a value of true. The code would look something like this:
+  //
+  // fetch()
+  // .then( () => {
+  //   if( !response.ok ) {
+  //     throw new Error('Network response was not OK');
+  //   }
+  //   ...
+  // }
+  // .catch((error) => { .. }
+  //
 
+  return /* promise */ fetch( request, { signal } );
+
+}

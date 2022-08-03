@@ -3,9 +3,12 @@
 import { expectNotEmptyString,
          expectObject } from "@hkd-base/helpers/expect.js";
 
+import { ResponseError,
+         ExpiredError } from "@hkd-base/helpers/errors.js";
+
 import { getGlobalConfig } from "@hkd-base/helpers/global-config.js";
 
-import { expectValidHttpStatus,
+import { waitForAndCheckResponse,
          httpRequest,
          METHOD_GET,
          METHOD_POST } from "@hkd-base/helpers/http.js";
@@ -189,6 +192,10 @@ export async function jsonApiRequest(
   if( token )
   {
     //
+    // A JSON Web Token should be used for authentication
+    //
+
+    //
     // Check if token has not expired before doing a request
     //
     const decodedToken = decodePayload(token);
@@ -199,7 +206,7 @@ export async function jsonApiRequest(
 
       if( expiredMs > 0 )
       {
-        throw new Error(
+        throw new ExpiredError(
           `Token from global config [${configLabel}] has expired ` +
           `(${Math.round(expiredMs/1000)} seconds ago)`);
       }
@@ -211,10 +218,10 @@ export async function jsonApiRequest(
     headers["authorization"] = `Bearer ${token}`;
   }
 
-  const response =
-    await httpRequest( { method, url, body, urlSearchParams, headers } );
+  const responsePromise =
+    httpRequest( { method, url, body, urlSearchParams, headers } );
 
-  expectValidHttpStatus( response, url );
+  const response = await waitForAndCheckResponse( responsePromise, url );
 
   let parsedResponse;
 
@@ -229,13 +236,17 @@ export async function jsonApiRequest(
   catch( e )
   {
     // console.log( response );
-    throw new Error(
+    throw new ResponseError(
       `Failed to JSON decode server response from [${decodeURI(url.href)}]`);
   }
 
   if( parsedResponse.error )
   {
-    throw new Error( parsedResponse.error );
+    //
+    // @note this is specific for the API implementation, not all API's
+    //       return an `error` property`
+    //
+    throw new ResponseError( parsedResponse.error );
   }
 
   return parsedResponse;

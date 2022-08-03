@@ -18,7 +18,9 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-/* ---------------------------------------------------------------- Internals */
+import { TypeOrValueError } from "@hkd-base/helpers/errors.js";
+
+/* ------------------------------------------------------------------ Exports */
 
 /**
  * Returns the type of the supplied value, like "typeof", but a bit more
@@ -99,21 +101,21 @@ export function expected( errorText, expectedText, value )
   {
     // No error text => use expected text as error message
 
-    throw new Error( expectedText );
+    throw new TypeOrValueError( expectedText );
   }
 
   if( !errorText.includes("(expected") )
   {
     // Combine error text and expected text into a single error message
-    throw new Error( `${errorText} (${expectedText})` );
+    throw new TypeOrValueError( `${errorText} (${expectedText})` );
   }
   else {
     // errorText already contains and expected text part
-    throw new Error( errorText );
+    throw new TypeOrValueError( errorText );
   }
 }
 
-/* ------------------------------------------------------------------ Exports */
+/* -------------------------------------------------------- expect... exports */
 
 /**
  * Expect a value to be defined
