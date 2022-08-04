@@ -65,8 +65,12 @@ export function setTranslation( label, translation )
 
 /**
  * Get the text for the specified label and language
- * - If no language has been specified, `currentLanguage` from 
+ * - If a single translation was set for the specified labelm that value will
+ *   be used
+ * - If no language has been specified, `currentLanguage` from
  *   `@hkd-base/language.js` will be used
+ * - If no value was found for the custom or the `currentLanguage`, the
+ *   option for the default language will be returned (LANG_DEFAULT)
  * 
  * @param {string} label - Label of the text to return
  * @param {string} [lang=<currentLanguage>]

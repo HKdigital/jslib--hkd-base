@@ -38,6 +38,38 @@ export const WEEK_MS = 7 * DAY_MS;
 export const TIME_2020_01_01 = 1577836800000; // 2020-01-01T00:00:00.000Z
 export const TIME_2100_01_01 = 4102444800000; // 2100-01-01T00:00:00.000Z
 
+export const JANUARY = "January";
+export const FEBRUARY = "February";
+export const MARCH = "March";
+export const APRIL = "April";
+export const MAY = "May";
+export const JUNE = "June";
+export const JULY = "July";
+export const AUGUST = "August";
+export const SEPTEMBER = "September";
+export const OCTOBER = "October";
+export const NOVEMBER = "November";
+export const DECEMBER = "December";
+
+export const MONTH_NAME_LABELS_EN =
+  [
+    JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE,
+    JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER
+  ];
+
+export const MONDAY = "Monday";
+export const TUESDAY = "Tuesday";
+export const WEDNESDAY = "Wednesday";
+export const THURSDAY = "Thursday";
+export const FRIDAY = "Friday";
+export const SATURDAY = "Saturday";
+export const SUNDAY = "Sunday";
+
+export const DAY_NAME_LABELS_EN =
+  [
+    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+  ];
+
 // -------------------------------------------------------------------- Function
 
 /**
@@ -196,5 +228,143 @@ export function timeToString( timeMs )
   str += `${restMs.toString().padEnd( 3, "0" )}`;
 
   return str;
+}
+
+// -------------------------------------------------------------------- Function
+
+/**
+ * Returns a Date object
+ * - The input can be a Date object or a numeric timestamp
+ *
+ * @param {Date|number} dateOrTimestamp
+ *
+ * @returns {Date} date object
+ */
+export function toDate( dateOrTimestamp )
+{
+  if( dateOrTimestamp instanceof Date )
+  {
+    return dateOrTimestamp;
+  }
+
+  if( typeof dateOrTimestamp === "number" )
+  {
+    return new Date( dateOrTimestamp );
+  }
+
+  throw new Error("Missing or invalid parameter [dateOrTimestamp]");
+}
+
+// -------------------------------------------------------------------- Function
+
+/**
+ * Get the ISO 8601 week number of the specified date
+ *
+ * @see https://stackoverflow.com
+ *      /questions/6117814/get-week-of-year-in-javascript-like-in-php
+ *
+ * @param {Date|number} dateOrTimestamp
+ *
+ * @returns {number} week number
+ */
+export function getWeekNumber( dateOrTimestamp )
+{
+  let date = toDate( dateOrTimestamp );
+
+  //
+  // Create a copy of this date object
+  //
+  const target = new Date( date.valueOf() );
+
+  //
+  // ISO week date weeks start on Monday, so correct the day number
+  //
+  var dayNumber = ( date.getDay() + 6 ) % 7;
+
+  //
+  // ISO 8601 states that week 1 is the week with the first Thursday
+  // of that year.
+  //
+  // Set the target date to the Thursday in the target week
+  //
+  target.setDate( target.getDate() - dayNumber + 3 );
+
+  //
+  // Store the millisecond value of the target date
+  //
+  const firstThursday = target.valueOf();
+
+  // Set the target to the first Thursday of the year
+  // First, set the target to January 1st
+  target.setMonth( 0, 1 );
+
+  //
+  // Not a Thursday? Correct the date to the next Thursday
+  //
+  if( target.getDay() !== 4 )
+  {
+    target.setMonth( 0, 1 + ( (4 - target.getDay()) + 7) % 7 );
+  }
+
+  //
+  // The week number is the number of weeks between the first Thursday
+  // of the year and the Thursday in the target week
+  // (604800000 = 7 * 24 * 3600 * 1000)
+  //
+  return 1 + Math.ceil( (firstThursday - target) / 604800000 );
+}
+
+// -------------------------------------------------------------------- Function
+
+/**
+ * Get the name of the month
+ * - Returns the English name of the month
+ *
+ * - Use the output as label in combination with the functions
+ *   text() and translate() for international month names
+ *
+ * e.g.
+ *
+ * setTranslations()
+ * ...
+ *
+ * text( getMonthName( new Date() ) );
+ *
+ * --
+ *
+ * @param {Date|number} dateOrTimestamp
+ *
+ * @returns {string} name of the month (English)
+ */
+export function getMonthName( dateOrTimestamp )
+{
+  return MONTH_NAME_LABELS_EN[ toDate( dateOrTimestamp ).getMonth() ];
+}
+
+// -------------------------------------------------------------------- Function
+
+/**
+ * Get the name of the day
+ * - Returns the English name of the day
+ *
+ * - Use the output as label in combination with the functions
+ *   text() and translate() for international day names
+ *
+ * e.g.
+ *
+ * setTranslations()
+ * ...
+ *
+ * text( getDayName( new Date() ) );
+ *
+ * --
+ *
+ * @param {Date|number} dateOrTimestamp
+ *
+ * @returns {string} name of the day (English)
+ */
+export function getDayName( dateOrTimestamp )
+{
+  return DAY_NAME_LABELS_EN[ toDate( dateOrTimestamp ).getDay() ];
 }
 
