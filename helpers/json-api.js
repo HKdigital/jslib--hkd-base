@@ -6,6 +6,8 @@ import { expectNotEmptyString,
 import { ResponseError,
          ExpiredError } from "@hkd-base/helpers/errors.js";
 
+import { isObject } from "@hkd-base/helpers/is.js";
+
 import { getGlobalConfig } from "@hkd-base/helpers/global-config.js";
 
 import { waitForAndCheckResponse,
@@ -76,9 +78,9 @@ export function buildApiUrl( uri, config )
  * @param {object} [urlSearchParams]
  *   Parameters that should be added to the request url
  *
- * @param {string} [configLabel=CONFIG_LABEL_DEFAULT_JSON_API]
- *   Label of the global config entry that contains information about the
- *   backend
+ * @param {object|string} [config=CONFIG_LABEL_DEFAULT_JSON_API]
+ *   Config parameters or label of the global config entry that contains
+ *   the remote API configuration.
  *
  * @returns {object} { abort, jsonResponsePromise }
  */
@@ -86,7 +88,7 @@ export async function jsonApiGet(
   {
     uri,
     urlSearchParams,
-    configLabel=CONFIG_LABEL_DEFAULT_JSON_API
+    config=CONFIG_LABEL_DEFAULT_JSON_API
   } )
 {
   return jsonApiRequest(
@@ -94,7 +96,7 @@ export async function jsonApiGet(
       uri,
       urlSearchParams,
       method: METHOD_GET,
-      configLabel
+      config
     } );
 }
 
@@ -118,9 +120,9 @@ export async function jsonApiGet(
  * @param {*} body
  *   Data that will be converted to a JSON encoded and send to the server
  *
- * @param {string} [configLabel=CONFIG_LABEL_DEFAULT_JSON_API]
- *   Label of the global config entry that contains information about the
- *   backend
+ * @param {object|string} [config=CONFIG_LABEL_DEFAULT_JSON_API]
+ *   Config parameters or label of the global config entry that contains
+ *   the remote API configuration.
  *
  * @returns {mixed} parsed JSON response from backend server
  */
@@ -128,7 +130,7 @@ export async function jsonApiPost(
   {
     uri,
     body=null,
-    configLabel=CONFIG_LABEL_DEFAULT_JSON_API
+    config=CONFIG_LABEL_DEFAULT_JSON_API
   } )
 {
   return jsonApiRequest(
@@ -136,7 +138,7 @@ export async function jsonApiPost(
       uri,
       body: JSON.stringify( body ),
       method: METHOD_POST,
-      configLabel
+      config
     } );
 }
 
@@ -157,11 +159,11 @@ export async function jsonApiPost(
  *
  * @param {string} uri - uri of the API method
  *
- * @param {string} [configLabel=CONFIG_LABEL_DEFAULT_JSON_API]
- *   Label of the global config entry that contains information about the
- *   backend
+ * @param {object|string} [config=CONFIG_LABEL_DEFAULT_JSON_API]
+ *   Config parameters or label of the global config entry that contains
+ *   the remote API configuration.
  *
- * @returns {mixed} parsed JSON response from backend server
+ * @returns {mixed} response data: parsed JSON response from backend server
  */
 export async function jsonApiRequest(
   {
@@ -169,17 +171,22 @@ export async function jsonApiRequest(
     method,
     urlSearchParams,
     body,
-    configLabel=CONFIG_LABEL_DEFAULT_JSON_API
+    config=CONFIG_LABEL_DEFAULT_JSON_API
   } )
 {
   expectNotEmptyString( uri, "Missing or invalid parameter [uri]" );
 
-  expectNotEmptyString( configLabel, "Invalid parameter [configLabel]" );
+  if( !isObject( config ) )
+  {
+    expectNotEmptyString( config, "Invalid parameter [config]" );
+
+    config = getGlobalConfig( config );
+  }
 
   const { origin,
           apiPrefix,
           token,
-          /*includeSessionId=false*/ } = getGlobalConfig( configLabel );
+          /*includeSessionId=false*/ } = config;
 
   const url = buildApiUrl( uri, { origin, apiPrefix } );
 
@@ -207,7 +214,7 @@ export async function jsonApiRequest(
       if( expiredMs > 0 )
       {
         throw new ExpiredError(
-          `Token from global config [${configLabel}] has expired ` +
+          `Token from global config [${config}] has expired ` +
           `(${Math.round(expiredMs/1000)} seconds ago)`);
       }
     }

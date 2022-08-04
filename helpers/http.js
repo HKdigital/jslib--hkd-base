@@ -305,7 +305,8 @@ export async function jsonGet( { url, urlSearchParams, headers } )
 
   if( parsedResponse.error )
   {
-    throw new Error( parsedResponse.error );
+    throw new ResponseError(
+      `Server returned response error message [${parsedResponse.error}]` );
   }
 
   return parsedResponse;
@@ -380,6 +381,16 @@ export async function jsonPost(
     // console.log( response );
     throw new ResponseError(
       `Failed to JSON decode server response from [${decodeURI(url.href)}]`);
+  }
+
+  if( parsedResponse.error )
+  {
+    //
+    // @note this is API specific, but it's quite logical
+    //
+    //
+    throw new ResponseError(
+      `Server returned response error message [${parsedResponse.error}]` );
   }
 
   return parsedResponse;
@@ -501,9 +512,6 @@ export async function httpRequest(
 
   // eslint-disable-next-line no-undef
   const requestHeaders = new Headers();
-    // [
-    //   [ "accept", "application/json" ]
-    // ] );
 
   if( headers )
   {
