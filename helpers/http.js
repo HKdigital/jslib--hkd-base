@@ -7,7 +7,7 @@ import { expectNotEmptyString,
          expectFunction } from "@hkd-base/helpers/expect.js";
 
 import { ResponseError,
-         TypeOrValueError } from "@hkd-base/helpers/errors.js";
+         TypeOrValueError } from "@hkd-base/types/error-types.js";
 
 /* ---------------------------------------------------------------- Internals */
 

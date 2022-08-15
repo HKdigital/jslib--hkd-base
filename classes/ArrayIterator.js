@@ -5,7 +5,7 @@ import { expectArray } from "../helpers/expect.js";
 
 /* ------------------------------------------------------------------ Exports */
 
-export default class StdArrayIterator
+export default class ArrayIterator
 {
   /**
    * Construct an array iterator
@@ -29,15 +29,15 @@ export default class StdArrayIterator
    *
    *   const arr = [ { value: 1 }, { value: 2 }, { value: 3 } ];
    *
-   *   const it = hk.newArrayIterator( arr );
+   *   const it = new ArrayIterator( arr );
    *
-   *   const valueToLookFor = { value: 2 };
+   *   const theValue = 2;
    *
    *   let item = null;
    *
    *   for( item of it )
    *   {
-   *     if( hk.equals( item, valueToLookFor) )
+   *     if( item.value === theValue )
    *     {
    *       break;
    *     }

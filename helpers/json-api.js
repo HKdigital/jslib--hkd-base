@@ -4,7 +4,7 @@ import { expectNotEmptyString,
          expectObject } from "@hkd-base/helpers/expect.js";
 
 import { ResponseError,
-         ExpiredError } from "@hkd-base/helpers/errors.js";
+         ExpiredError } from "@hkd-base/types/error-types.js";
 
 import { isObject } from "@hkd-base/helpers/is.js";
 

@@ -24,6 +24,10 @@
 
 import log from "../helpers/log.js";
 
+// import LogStream from "@hkd-base/classes/LogStream.js";
+
+// import { systemLog } from "@hkd-base/helpers/log.js";
+
 /* ---------------------------------------------------------------- Internals */
 
 /* ------------------------------------------------------------------ Exports */
@@ -36,6 +40,8 @@ export default class LogBase
   constructor()
   {
     this.__logContext = { className: this.constructor.name };
+
+    // const systemLog = new LogStream();
 
     const self = this;
 

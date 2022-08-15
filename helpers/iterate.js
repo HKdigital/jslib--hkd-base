@@ -193,11 +193,14 @@ export function iterateObjectValues( obj, options )
 // ---------------------------------------------------------------------- Method
 
 /**
- * Get a list of objects returned by an iterator in sorted order.
- * - A [getValueFn] function is used to get the value that corresponds
- *   with the
+ * Get a list of objects returned by an iterator in sorted order
  *
- * @note Sorting requires that all values to be evaluated!
+ * --
+ *
+ * @note Sorting requires that all values are evaluated, so all items must be
+ *       iterated
+ *
+ * --
  *
  * @param {Iterable} it - Iterable items
  *
@@ -207,7 +210,8 @@ export function iterateObjectValues( obj, options )
  * @param {boolean} [reversed=false]
  *   Sort in reversed order
  *
- * @returns {Iterable} objects outputted in sorted order
+ *
+ * @returns {array} objects outputted in sorted order
  */
 export async function sortObjects(
   {

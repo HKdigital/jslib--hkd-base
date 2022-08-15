@@ -27,16 +27,309 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { DEBUG,
-         INFO,
-         WARNING,
-         ERROR } from "@hkd-base/constants/log-types.js";
+import { expectObject } from "@hkd-base/helpers/expect.js";
+import { errorCauseToArray,
+         catchUnhandledExceptions } from "@hkd-base/helpers/exceptions.js";
+
+import { DEBUG, INFO, WARNING, ERROR } from "@hkd-base/types/log-types.js";
+
+import { getOutputStream,
+         deleteOutputStream,
+         OUTPUT_LABEL_CONSOLE } from "@hkd-base/helpers/log.js";
+
+import { defer } from "@hkd-base/helpers/process.js";
+
+/* ---------------------------------------------------------------- Internals */
+
+const MAX_HEADER_CONTENT_LENGTH = 67;
+
+const CONSOLE_METHOD_LOG = "log";
+const CONSOLE_METHOD_ERROR = "error";
+const CONSOLE_METHOD_WARNING = "warn";
+
+const CONSOLE_METHODS =
+  {
+    [DEBUG]: CONSOLE_METHOD_LOG,
+    [INFO]: CONSOLE_METHOD_LOG,
+    [WARNING]: CONSOLE_METHOD_WARNING,
+    [ERROR]: CONSOLE_METHOD_ERROR
+  };
+
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Enable console logging
+ * - Outputs log events from the systemLog stream to the console
+ * - Enables catching uncaught exceptions
+ */
+export function enableConsoleLogging( eventLogPrinter=defaultEventLogPrinter )
+{
+  expectObject( eventLogPrinter,
+    "Invalid parameter for property [eventLogPrinter]");
+
+  getOutputStream( OUTPUT_LABEL_CONSOLE ).subscribe( eventLogPrinter );
+
+  catchUnhandledExceptions();
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Disable logging of system log events to the console
+ *
+ * @param {boolean} [showWarning=true]
+ */
+export function disableConsoleLogging( showWarning=true )
+{
+  disableAutoStartConsoleLogging = true;
+
+  deleteOutputStream( OUTPUT_LABEL_CONSOLE );
+
+  if( showWarning )
+  {
+    console.log("[!] Disabled system log event console messages");
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+export let disableAutoStartConsoleLogging = false;
+
+defer( () => {
+  if( !disableAutoStartConsoleLogging )
+  {
+    enableConsoleLogging();
+  }
+} );
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Convert event type to a console method name that should be used for logging
+ *
+ * @param {string} type - LogEvent type
+ *
+ * @returns {string} console method name to be used for logging
+ */
+export function typeToConsoleMethod( type )
+{
+  return CONSOLE_METHODS[ type ] || CONSOLE_METHOD_LOG;
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Format a context object a key value pairs
+ * - If context is null, an empty string is returned
+ *
+ * @param {object|null} context [description]
+ *
+ * @returns {string|null} formatted context (key value pairs)
+ */
+function formatContext( context )
+{
+  expectObject( context, "Missing or invalid parameter [context]" );
+
+  let str = "";
+
+  for( let key in context )
+  {
+    str += `,${key}=${JSON.stringify(context[key])}`;
+  }
+
+  if( str.length )
+  {
+    return `[${str.slice(1)}]`;
+  }
+
+  return "";
+}
+
+/* ------------------------------------------------------------------ Exports */
+
+/**
+ * Print logEvents to the browser console
+ *
+ * @param {object} logEvent
+ */
+export function defaultEventLogPrinter( logEvent )
+{
+  if( logEvent.data instanceof Error )
+  {
+    const error = logEvent.data;
+    const context = logEvent.context;
+
+    if( error.cause )
+    {
+      //
+      // Create a group for an Error that contains a `cause`
+      //
+      const causes = errorCauseToArray( error );
+
+      if( !context )
+      {
+        console.group( `Error: ${error.message}` );
+      }
+      else {
+        console.group( `Error: ${error.message}`, formatContext( context ) );
+      }
+
+      console.error( error );
+
+      for( const cause of causes )
+      {
+        console.error( cause );
+        // if( cause instanceof ErrorEvent )
+        // {
+        //   console.error( cause.error,
+        //     {
+        //       fileName: cause.filename,
+        //       lineNumber: cause.lineno,
+        //       colno: cause.colno
+        //     } );
+        // }
+        // else {
+        //   console.error( cause );
+        // }
+      }
+
+      console.groupEnd();
+    }
+  }
+  else {
+    //
+    // logEvent does *not* contain an Error
+    //
+    const methodName = typeToConsoleMethod( logEvent.type );
+
+    let { header, body } = splitHeaderAndBody( logEvent.data );
+
+    if( header )
+    {
+      if( DEBUG === logEvent.type )
+      {
+        header = "(debug) " + header;
+      }
+
+      if( body )
+      {
+        console.log( header, body );
+      }
+      // else if( body === undefined )
+      // {
+      //   console.trace( header );
+      // }
+      else {
+        console.log( header );
+      }
+    }
+    else {
+      //
+      // Print message without header
+      //
+      if( body ) {
+        console[ methodName ]( body );
+      }
+      else {
+        console.log("(empty message)");
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Split EventLog data into a header and body part that can be outputted
+ * to the console
+ * - This function only processes normal data types, not Error objects
+ *
+ * @param {*} eventLogData
+ *
+ * @returns {object} { header: <string|null>, body: <*|null> }
+ */
+function splitHeaderAndBody( eventLogData )
+{
+  let body = eventLogData;
+
+  if( body instanceof Error )
+  {
+    throw new Error();
+  }
+
+  let header = null;
+
+  switch( typeof body )
+  {
+    case "string":
+      if( !body.length )
+      {
+        header = "(empty string)";
+        body = null;
+      }
+      else if( body.length < MAX_HEADER_CONTENT_LENGTH ) {
+        header = JSON.stringify( body ); // add quotes
+        body = null;
+      }
+      else {
+        header = body.slice(0, MAX_HEADER_CONTENT_LENGTH) + "...";
+        // no all data in header => keep body
+      }
+      break;
+
+    case "symbol":
+      header = `Symbol(${ body.description || "" })`;
+      body = null;
+      break;
+
+    case "undefined":
+      header = "(undefined)";
+      //body = null; // leave body = undefined
+      break;
+
+    case "boolean":
+    case "number":
+    case "bigint":
+      header = `(${typeof body}) ${body}`;
+      body = null;
+      break;
+
+    case "function":
+      if( body.name )
+      {
+        header = `(function ${body.name})`;
+      }
+      else {
+        header = "(function)";
+      }
+      break;
+
+    case "object":
+      if( body === null )
+      {
+        header = "(null)";
+        body = null;
+      }
+  }
+
+  return { header, body };
+}
+
+
+
+// >>> OLD STUFF BELOW!!!
+
+
+
+
+/* ------------------------------------------------------------------ Imports */
 
 /* ---------------------------------------------------------------- Internals */
 
 /* ------------------------------------------------------------------ Exports */
 
-export { DEBUG, INFO, WARNING, ERROR };
+// export { DEBUG, INFO, WARNING, ERROR };
 
 // -------------------------------------------------------------------- Function
 

@@ -1,10 +1,228 @@
 
+
+
+/**
+ * system-events.js
+ */
+
+/* ------------------------------------------------------------------ Imports */
+
+import LogStream from "@hkd-base/classes/LogStream.js";
+
+import ValueStore from "@hkd-base/classes/ValueStore.js";
+
+import { expectNotEmptyString } from "@hkd-base/helpers/expect.js";
+
+import { isIterable } from "@hkd-base/helpers/is.js";
+
+/* ---------------------------------------------------------------- Internals */
+
+const OUTPUT_LABEL_CONSOLE = "console";
+
+const systemLog = new LogStream( /* { source: "system-log" } */ );
+
+const outputs = {};
+
+// -----------------------------------------------------------------------------
+
+/* ---------------------------------------------------------------- Externals */
+
+export { OUTPUT_LABEL_CONSOLE };
+
+export { systemLog };
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Processor that does nothing
+ * - Returns the original logEvent
+ *
+ * @param {LogEvent} logEvent
+ *
+ * @returns {LogEvent} the unchanged log event
+ */
+export function passThroughProcessor( logEvent )
+{
+  return logEvent;
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Register a processor function that converts logEvent objects to
+ * the desired format
+ * - Defines a new output if the output defined by the outputLabel
+ *   does not exist yet
+ * - Unregisters the existing processor (if any)
+ *
+ * --
+ * @callback Processor
+ * @param {object} logEvent
+ *
+ * @returns {*|null} converted data or null if no output should be generated
+ * --
+ *
+ * @param {Processor} processorFn
+ *   Function that converts logEvent to the desired output data format
+ *
+ * @param {string} [outputLabel=OUTPUT_LABEL_CONSOLE]
+ */
+export function setProcessor( processorFn, outputLabel=OUTPUT_LABEL_CONSOLE )
+{
+  expectNotEmptyString( outputLabel, "Invalid parameter [outputLabel]" );
+
+  // -- Get or create output
+
+  let output = outputs[ outputLabel ];
+
+  if( !output )
+  {
+    const stream = new ValueStore();
+
+    stream.get = () => {
+      throw new Error("Method not supported (use subscribe)");
+    };
+
+    output =
+      outputs[ outputLabel ] =
+        {
+          stream
+        };
+  }
+  else if( output.unsubscribeProcessor )
+  {
+    // Unsubscribe existing processor
+
+    output.unsubscribeProcessor();
+  }
+
+  const outputStream = output.stream;
+
+  // -- Subscribe processor
+
+  output.unsubscribeProcessor =
+    systemLog.subscribe( ( logEvent ) => {
+
+      if( !outputStream.hasSubscribers.get() )
+      {
+        // No subscribers => nothing to do
+        return;
+      }
+
+      const convertedLogEvent = processorFn( logEvent );
+
+      if( null === convertedLogEvent )
+      {
+        //
+        // No output should be set in the output stream
+        //
+        return;
+      }
+      else if( isIterable( convertedLogEvent ) )
+      {
+        //
+        // The converted event data is iterable
+        //
+        for( const current of convertedLogEvent )
+        {
+          // console.log("convertedLogEvent", current);
+
+          outputStream.set( current );
+        } // end for
+
+        return;
+      }
+
+      //
+      // convertedLogEvent is not iterable
+      //
+      outputStream.set( convertedLogEvent );
+
+      return;
+    } );
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Get the specified output stream
+ * - An output stream sends processed event data to the stream subscribers,
+ *   e.g. output that is formatted to display nicely in a browser or NodeJS
+ *   console.
+ * - Use the `setProcessor` function to install a custom processor for an
+ *   output at choice.
+ *
+ * @param {string} [outputLabel=OUTPUT_LABEL_CONSOLE]
+ *
+ * @returns {object} output stream that can be subscribed to
+ */
+export function getOutputStream( outputLabel=OUTPUT_LABEL_CONSOLE )
+{
+  expectNotEmptyString( outputLabel, "Invalid parameter [outputLabel]" );
+
+  let output = outputs[ outputLabel ];
+
+  if( !output )
+  {
+    if( OUTPUT_LABEL_CONSOLE === outputLabel )
+    {
+      //
+      // Auto create output `OUTPUT_LABEL_CONSOLE`
+      //
+      setProcessor( passThroughProcessor, OUTPUT_LABEL_CONSOLE );
+
+      output = outputs[ OUTPUT_LABEL_CONSOLE ];
+    }
+    else {
+      throw new Error(`Output stream [${outputLabel}] was not found`);
+    }
+  }
+
+  const stream = output.stream;
+
+  return { subscribe: stream.subscribe.bind( stream ) };
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Delete an output stream
+ * - Removes all subscribers
+ * - Deletes the output stream
+ *
+ * @param {string} [outputLabel=OUTPUT_LABEL_CONSOLE]
+ */
+export function deleteOutputStream( outputLabel=OUTPUT_LABEL_CONSOLE )
+{
+  expectNotEmptyString( outputLabel, "Invalid parameter [outputLabel]" );
+
+  const output = outputs[ outputLabel ];
+
+  if( !output )
+  {
+    // Nothing to do
+    return;
+  }
+
+  const stream = output.stream;
+
+  delete outputs[ outputLabel ];
+
+  stream.unsubscribeAll();
+}
+
+
+
+
+// >>> OLD STUFF BELOW >>>
+
+
 /* ------------------------------------------------------------------ Imports */
 
 import { DEBUG,
          INFO,
          WARNING,
-         ERROR } from "../constants/log-types.js";
+         ERROR } from "../types/log-types.js";
 
 import { getGlobalConfig } from "./global-config.js";
 

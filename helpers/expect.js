@@ -18,7 +18,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { TypeOrValueError } from "@hkd-base/helpers/errors.js";
+import { TypeOrValueError } from "@hkd-base/types/error-types.js";
 
 /* ------------------------------------------------------------------ Exports */
 

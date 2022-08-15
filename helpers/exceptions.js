@@ -11,129 +11,110 @@
  * raise( "Something went wrong!" )
  */
 
+/* ------------------------------------------------------------------ Imports */
+
+import { isObject } from "@hkd-base/helpers/is.js";
+
 /* ------------------------------------------------------------------ Exports */
 
 /**
  * Throw an exception
  * - Allows adding custom attributes
- * - Extends the original Error if supplied or creates a new one
+ * - Sets the originating Error as Error property `cause`
  *
- * @param {string} errorText - Error message text
+ * @param {string} message - Error message text
  *
  * @param {object} [attibutes] - Additional error attributes
  *
- * @param {Error} [exception]
- *   If not supplied, a new Error object will be created and thrown.
- *   If supplied, the original error instance will be enhanced with the
- *   supplied errorText and additional information
+ * @param {Error} [cause]
+ *   An Error instance that caused the new exception to be thrown
  */
-export function raise( errorText, /* attributes, exception */ )
+export function raise( message, /* attributes, cause */ )
 {
-  let attributes;
   let exception;
 
-  if( typeof errorText !== "string" || !errorText.length )
+  if( typeof message !== "string" || !message )
   {
-    throw new Error("Invalid parameter [errorText]");
+    throw new Error("Missing or invalid parameter [message]");
   }
 
   switch( arguments.length )
   {
-    case 0:
-      throw new Error( "Missing parameter [errorText]" );
-
     case 1:
       {
         //
-        // Only parameter `errorText` has been supplied
+        // Only parameter `message` has been supplied
         //
 
         // No attributes or original exception -> throw new Error
-        throw new Error( errorText );
+        throw new Error( message );
       }
 
     case 2:
     {
-      //
-      // Parameters `errorText` and `attributes` have been supplied
-      //
-      //   -- OR --
-      //
-      // Parameters `errorText` and `exception` have been supplied
-      //
+      const attributesOrCause = arguments[1];
 
-      const param2 = arguments[1];
-
-      if( param2 instanceof Error )
+      if( attributesOrCause instanceof Error )
       {
-        exception = param2;
+        //
+        // Parameters `message` and `cause` have been supplied
+        //
+        const cause = attributesOrCause;
 
-        //
-        // Convert exception to an ExtendedError
-        //
-        exception = new ExtendedError( errorText, exception );
+        throw new Error( message, { cause } );
       }
       else {
-        // Create exception (Error instance)
-        exception = new Error( errorText );
+        //
+        // Parameters `message` and `attributes` have been supplied
+        //
+        exception = new Error( message );
 
-        attributes = param2;
+        exception.attributes = attributesOrCause;
       }
-      break;
+
+      throw exception;
     }
+
     case 3:
     {
       //
-      // Parameters `errorText`, `attributes` and `exception` have been supplied
+      // Parameters `errorText`, `attributes` and `cause` have been supplied
       //
-      attributes = arguments[1];
-      exception = arguments[2];
+      const attributes = arguments[1];
+      const cause = arguments[2];
 
       if( !(attributes instanceof Object) )
       {
         throw new Error(
-          "Invalid value for parameter [attributes] (expected object)");
+          "Invalid value for parameter [attributes] (expected object)",
+          { cause: new Error( message ) } );
       }
 
       if( !(exception instanceof Error) )
       {
         throw new Error(
-          "Invalid value for parameter [exception] (expected Error)");
+          "Invalid value for parameter [exception] (expected Error)",
+          { cause: new Error( message ) } );
       }
 
-      //
-      // Convert exception to an ExtendedError
-      //
-      exception = new ExtendedError( errorText, exception );
-      break;
+      exception = new Error( message, { cause } );
+
+      exception.attributes = attributes;
+
+      throw exception;
     }
-    default:
-      throw new Error( "Too many parameters supplied" );
-  }
+  } // end switch
 
-  let historyItem = { errorText };
-
-  if( attributes )
-  {
-    historyItem.attributes = attributes;
-  }
-
-  if( !exception.history )
-  {
-    exception.history = [ historyItem ];
-  }
-  else {
-    exception.history.push( historyItem );
-  }
-
-  throw exception;
+  throw new Error(
+    "Too many parameters supplied", { cause: new Error( message ) } );
 }
 
 // -----------------------------------------------------------------------------
 
 /**
- * Rethrow an existing error (usually caught in a try...catch block) with an
- * additional message prepended
+ * Creates a new Error from the error message and throws it with a reference
+ * to the originating Error
+ * - The originating Error is set as `cause` property
  *
  * @param {string} [message] - Additional message to prepend
  * @param {Error} error - Original error
@@ -142,133 +123,321 @@ export function raise( errorText, /* attributes, exception */ )
  */
 export function rethrow( message, error )
 {
-  // TODO: use raise internally
-
   if( !(error instanceof Error) )
   {
     throw new Error(`Invalid parameter [error] (expected Error)`);
   }
 
-  // if( message )
-  // {
-  //   if( typeof message === "string" )
-  //   {
-  //     // Prefix the new message to the existing error message
-  //     error.message = `${message}\n<- ${error.message}`;
-  //   }
-  //   else {
-  //     throw new Error("Missing parameter [errorText] or [expectedText]");
-  //   }
-  // }
-
-  // throw error;
-
-  throw new ExtendedError( message, error );
+  throw new Error( message, { cause: error } );
 }
 
 // -----------------------------------------------------------------------------
 
-// class ExtendedError extends Error {
-//   constructor( message )
-//   {
-//     if( typeof message !== "string" || !message.length )
-//     {
-//       throw new Error("Missing of invalid parameter [message]");
-//     }
+/**
+ * Catches all uncaught exceptions and unhandled promise rejections
+ * and creates events in the systemLog stream
+ */
+export function catchUnhandledExceptions()
+{
+  if( typeof process !== "undefined" )
+  {
+    /**
+     * Register listeners to catch uncaught errors and unhandled exceptions in
+     * a NodeJS environment
+     */
 
-//     super( message );
+    /* eslint-disable no-undef */
 
-//     this.name = this.constructor.name;
-//     this.message = message;
+    if( typeof process.on === "function" )
+    {
+      process.on('uncaughtException', (error) => {
 
-//     if( typeof Error.captureStackTrace === 'function' )
-//     {
-//       Error.captureStackTrace( this, this.constructor );
-//     }
-//     else {
-//       this.stack = (new Error(message)).stack;
-//     }
-//   }
-// }
+        // Does this catch unhandled rejection too?
 
-// // -----------------------------------------------------------------------------
+        // console.log('process.on("uncaughtException"):', error );
 
-// export class RethrownError extends ExtendedError
+        systemLog.error( error );
+      } );
+
+      process.on('unhandledRejection', (reason, promise) =>
+        {
+
+          // FIXME: send to systemLog!!!
+
+          console.log(
+            'process.on("unhandledRejection"):',
+             promise, 'reason:', reason);
+        } );
+    }
+  }
+
+  if( typeof window !== "undefined" )
+  {
+    /**
+     * Register listeners to catch uncaught errors and unhandled exceptions in
+     * a browser environment
+     */
+
+    /* eslint-disable no-undef */
+    if( typeof window.addEventListener === "function" )
+    {
+      window.addEventListener("error", ( errorEvent ) =>
+        {
+          // function windowError(message, url, line)
+          // {
+          //   console.log( message, url, line );
+          // }
+
+          //console.log( 123, errorEvent );
+
+          systemLog.error( errorEvent.error );
+
+          // console.log('Uncaught exception:', errorEvent );
+
+          errorEvent.stopPropagation();
+
+          return false;
+        } );
+
+      window.addEventListener("unhandledrejection",
+        function( promiseRejectionEvent )
+        {
+
+          // FIXME: send to systemLog!!!
+
+          const { reason } = promiseRejectionEvent;
+
+          console.log( reason );
+
+          // reason.message?
+
+          if( reason.cause )
+          {
+            console.log( reason.cause );
+          }
+        } );
+    }
+
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Instance that contains the properties of an Error object
+ * - Only default and direct properties are copied
+ * - The `cause` property is ignored
+ * - The `stack` property is ignored
+ *
+ * @param {Error} error
+ *
+ * @returns {object} properties
+ */
+// export class ErrorProperties
 // {
-//   constructor( message, error )
+//   constructor( error )
 //   {
-//     if( typeof message !== "string" || !message.length )
-//     {
-//       throw new Error("Missing of invalid parameter [message]");
-//     }
-
 //     if( !(error instanceof Error) )
 //     {
-//       throw new Error(
-//         "Invalid value for parameter [error] (expected Error)");
+//       throw new Error("Missing or invalid parameter [error]");
 //     }
 
-//     super( message );
+//     // Copy direct object properties
 
-//     // this.original = error;
+//     for( const key in error )
+//     {
+//       this[ key ] = error[ key ];
+//     }
 
-//     this.new_stack = this.stack;
+//     // Copy default properties (that were skipped by the for loop)
 
-//     let message_lines =  (this.message.match(/\n/g)||[]).length + 1;
+//     this.name = error.name;
+//     this.message = error.message;
 
-//     this.stack =
-//       this.stack
-//         .split('\n').slice( 0, message_lines + 1 )
-//         .join('\n') + '\n' + error.stack;
+//     // @see https://developer.mozilla.org/
+//     //      en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+//     if( error.fileName )
+//     {
+//       this.fileName = error.fileName;
+//     }
+
+//     if( error.lineNumber )
+//     {
+//       this.lineNumber = error.lineNumber;
+//     }
+
+//     if( error.columnNumber )
+//     {
+//       this.columnNumber = error.columnNumber;
+//     }
+
+//     // if( error.stack )
+//     // {
+//     //   this.columnNumber = error.stack;
+//     // }
+
+//     // if( error.cause )
+//     // {
+//     //   this.columnNumber = error.cause;
+//     // }
 //   }
+// }
+
+// ----
+
+// function errorData( error )
+// {
+//   if( !(error instanceof Error) )
+//   {
+//     throw new Error(`Invalid parameter [error] (expected Error)`);
+//   }
+
+//   const out = {};
+
+//   // Copy direct object properties
+
+//   for( const key in error )
+//   {
+//     out[ key ] = error[ key ];
+//   }
+
+//   // Copy default properties (that were skipped by the for loop)
+
+//   out.name = error.name;
+//   out.message = error.message;
+
+//   // @see https://developer.mozilla.org/
+//   //      en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+//   if( error.fileName )
+//   {
+//     out.fileName = error.fileName;
+//   }
+
+//   if( error.lineNumber )
+//   {
+//     out.lineNumber = error.lineNumber;
+//   }
+
+//   if( error.columnNumber )
+//   {
+//     out.columnNumber = error.columnNumber;
+//   }
+
+//   // if( error.stack )
+//   // {
+//   //   this.columnNumber = error.stack;
+//   // }
+
+//   // if( error.cause )
+//   // {
+//   //   this.columnNumber = error.cause;
+//   // }
+
+//   return out;
 // }
 
 // -----------------------------------------------------------------------------
 
-export class ExtendedError extends Error
-{
-  /**
-   * Construct a new Error instance that
-   * - This class can be used if an Error should be `stacked`:
-   *   to create a new error, with a new error message, while keeping
-   *   a reference to the error that caused the error to occur
-   *
-   * - A reference to the previous error instance will be stored
-   *   as property `cause`
-   *
-   * @param {string} message
-   * @param {Error} cause - Error that cause this error
-   */
-  constructor( message, cause=null )
-  {
-    super( message ); // super must be called
+/**
+ * Converts an Error to an array
+ * - The first item of the array contains the properties of the supplied error
+ * - The following items in the array contain the properties of the errors
+ *   that caused the error. Causing errors are token from the `cause` property
+ *   of the Errors.
+ *
+ * @param {Error} error
+ *
+ * @returns {object} array that contains objects with properties of the error
+ *   and the errors that caused the error (if any).
+ */
+// export function errorToPropertiesArray( error )
+// {
+//   if( !(error instanceof Error) )
+//   {
+//     throw new Error(`Invalid parameter [error] (expected Error)`);
+//   }
 
-    // TODO: unique error id?
+//   const output = [];
 
-    this.name = "ExtendedError";
+//   output.push( new ErrorProperties( error ) );
 
-    //
-    // @see https://developer.mozilla.org/
-    //      en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause
-    //
-    this.cause = cause;
-  }
+//   let cause = error.cause;
 
-  /**
-   * Export error data
-   *
-   * TODO: export options
-   */
-  export()
-  {
-    return {
-      message: this.message /* TODO: internal error, more details */
-    };
-  }
-}
+//   while( cause )
+//   {
+//     output.push( new ErrorProperties( cause ) );
+
+//     cause = cause.cause;
+//   }
+
+//   return output;
+// }
 
 // -----------------------------------------------------------------------------
 
-export { getStack } from "@platform/helpers/trace.js";
+/**
+ * Creates an EventError instance from an ErrorEvent instance
+ * - An EventError is an Error
+ * - An ErrorEvent is an Event
+ *
+ * @param {ErrorEvent} errorEvent
+ *
+ * @returns {EventError} error
+ */
+// export function toEventError( errorEvent )
+// {
+//   if( !(errorEvent instanceof ErrorEvent) )
+//   {
+//     throw new Error("Invalid parameter [errorEvent] (expected ErrorEvent)");
+//   }
 
+//   console.log( 456, errorEvent );
+
+//   const error = new EventError( errorEvent.message );
+
+//   if( errorEvent.fileName )
+//   {
+//     error.fileName = errorEvent.fileName;
+//   }
+
+//   if( errorEvent.lineNumber )
+//   {
+//     error.lineNumber = errorEvent.lineNumber;
+//   }
+
+//   return error;
+// }
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Converts the cause property that may contain a chain of errors to an array
+ *
+ * @param {Error} error
+ *
+ * @returns {object} list of errors that caused the error (if any)
+ */
+export function errorCauseToArray( error )
+{
+  if( !isObject( error ) )
+  {
+    throw new Error(`Invalid parameter [error] (expected object)`);
+  }
+
+  const out = [];
+
+  let cause = error.cause;
+
+  while( cause )
+  {
+
+    out.push( cause );
+
+    cause = cause.cause;
+  }
+
+  return out;
+}
 

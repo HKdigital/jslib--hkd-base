@@ -10,7 +10,18 @@ import { sinceMs } from "./time.js";
 
 function vars() {} /* use function as object for hoisting */
 
-function bootTimePrefix()
+import { TIME_2020_01_01 } from "@hkd-base/helpers/time.js";
+
+export const BOOT_STAMP = ( Date.now() - TIME_2020_01_01 ).toString(36);
+
+/* ------------------------------------------------------------------ Exports */
+
+/**
+ * Returns a three character prefix that is calculated at boot
+ *
+ * @returns {string} boot time prefix
+ */
+export function bootTimePrefix()
 {
   if( !vars.bootTimePrefix )
   {
@@ -19,8 +30,6 @@ function bootTimePrefix()
 
   return vars.bootTimePrefix;
 }
-
-/* ------------------------------------------------------------------ Exports */
 
 /**
  * Create a string that contains random characters from the base58 alphabet

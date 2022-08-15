@@ -10,7 +10,7 @@
 
 /* ------------------------------------------------------------------ Exports */
 
-export * from "../constants/service-states.js";
+export * from "../helpers/service-states.js";
 
 export { default as Base } from "../classes/ServiceBase.js";
 

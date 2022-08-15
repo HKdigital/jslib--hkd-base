@@ -22,7 +22,7 @@ import {
   expectNotEmptyString,
   expectSymbolOrString,
   expectObject,
-  expectFunction } from "../helpers/expect.js";
+  expectFunction } from "@hkd-base/helpers/expect.js";
 
 import DedupValueStore from "./DedupValueStore.js";
 
@@ -32,17 +32,17 @@ import {
   STOPPED,
   // STARTING,
   RUNNING,
-  STOPPING,
+  // STOPPING,
   UNAVAILABLE,
   ERROR,
   stateLabel,
-  displayState } from "../constants/service-states.js";
+  displayState } from "@hkd-base/helpers/service-states.js";
 
-import { LogBase } from "../helpers/log.js";
+import { LogBase } from "@hkd-base/helpers/log.js";
 
 // import { SystemLogger } from "@platform/system.js";
 
-import InitService from "../services/InitService.js";
+import InitService from "@hkd-base/services/InitService.js";
 
 /* ---------------------------------------------------------------- Internals */
 

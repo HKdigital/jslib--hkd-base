@@ -7,6 +7,8 @@ import { expectNotEmptyString,
 import { currentLanguage,
          LANG_DEFAULT } from "@hkd-base/stores/language.js";
 
+import { systemLog } from "@hkd-base/helpers/log.js";
+
 /* ---------------------------------------------------------------- Internals */
 
 const translations_ = {};
@@ -81,7 +83,7 @@ export function text( label, lang )
 {
   if( lang )
   {
-    expectNotEmptyString( lang, "Missing or invalid parameter [lang]" );
+    expectNotEmptyString( lang, "Invalid parameter [lang]" );
   }
   else {
     lang = currentLanguage.get();
@@ -114,7 +116,7 @@ export function text( label, lang )
     }
   }
   else {
-    throw new Error(`No text found for [label=${label}]`);
+    systemLog.warning( `No text found for [label=${label}]` );
   }
 
   return text;
