@@ -120,13 +120,29 @@ function formatContext( context )
 export function defaultEventLogPrinter( logEvent )
 {
   // console.log("@@@@print", logEvent);
+  // console.log("@@@@print", logEvent.data instanceof Error);
 
   console.log(); // newline
 
-  if( logEvent.data instanceof Error )
+  if( logEvent.data instanceof Error || ERROR === logEvent.type )
   {
-    const error = logEvent.data;
+    let error = logEvent.data;
+
     const context = logEvent.context;
+
+    if( !(error instanceof Error) )
+    {
+      const messageOrAttributes = error;
+
+      if( typeof messageOrAttributes === "string" )
+      {
+        error = new Error( messageOrAttributes );
+      }
+      else {
+        error = new Error("Unknown error");
+        error.attributes = messageOrAttributes;
+      }
+    }
 
     if( error.cause )
     {
@@ -163,6 +179,16 @@ export function defaultEventLogPrinter( logEvent )
       }
 
       console.groupEnd();
+    }
+    else {
+      // const stack = error.stack.split("\n");
+      // error.stack = stack.slice( 3 ).join("\n");
+      // console.log( JSON.stringify( error.stack ) );
+
+      //
+      // Error without `cause`
+      //
+      console.error( error );
     }
   }
   else {
@@ -255,10 +281,13 @@ export function defaultEventLogPrinter( logEvent )
  *
  * @returns {string} header
  */
-function createMetaHeader( {sequenceId, /*type,*/ at, context} )
+function createHeader( logEvent, message )
 {
-  let header;
+  const { sequenceId, at, context } = logEvent;
 
+  let header = "";
+
+  // eslint-disable-next-line no-undef
   const isNodeJs = (typeof process !== "undefined" && process.env);
 
   if( isNodeJs )
@@ -313,6 +342,17 @@ function createMetaHeader( {sequenceId, /*type,*/ at, context} )
     header += ` at ${d.toISOString()}`;
   }
 
+  if( message )
+  {
+    if( header.length )
+    {
+      return `${header} ${message}`;
+    }
+    else {
+      return `${message}`;
+    }
+  }
+
   return header;
 }
 
@@ -334,7 +374,6 @@ function createMetaHeader( {sequenceId, /*type,*/ at, context} )
 function getHeaderAndParts( logEvent )
 {
   const type = logEvent.type;
-  const methodName = typeToConsoleMethod( type );
 
   let data = logEvent.data;
 
@@ -354,7 +393,7 @@ function getHeaderAndParts( logEvent )
     case "string":
       if( !data.length )
       {
-        metaHeader = createMetaHeader( logEvent );
+        metaHeader = createHeader( logEvent );
         header = `${metaHeader} (empty string)`;
       }
       else if( INFO === type )
@@ -362,7 +401,7 @@ function getHeaderAndParts( logEvent )
         //
         // We're outputting an info message
         //
-        metaHeader = createMetaHeader( logEvent );
+        metaHeader = createHeader( logEvent );
         header = `${metaHeader}`;
         parts.push( data );
       }
@@ -371,14 +410,13 @@ function getHeaderAndParts( logEvent )
         //
         // data is a short string
         //
-        metaHeader = createMetaHeader( logEvent );
-        header = `${metaHeader} ${data}`;
+        header = createHeader( logEvent, data );
+        // header = `${metaHeader} ${data}`;
       }
       else {
-        metaHeader = createMetaHeader( logEvent );
+        const message = `${data.slice(0, MAX_HEADER_CONTENT_LENGTH)}...`;
 
-        header =
-          `${metaHeader} ${data.slice(0, MAX_HEADER_CONTENT_LENGTH)}...`;
+        header = createHeader( logEvent, message );
 
         // no all data in header => also add complete string
         parts.push( data );
@@ -386,44 +424,41 @@ function getHeaderAndParts( logEvent )
       break;
 
     case "symbol":
-      metaHeader = createMetaHeader( logEvent );
-      header = `${metaHeader} Symbol(${ data.description || "" })`;
+      {
+        const message = `Symbol(${ data.description || "" })`;
+
+        header = createHeader( logEvent, message );
+      }
       break;
 
     case "undefined":
-      metaHeader = createMetaHeader( logEvent );
-      header = `${metaHeader} (undefined)`;
+      header = createHeader( logEvent, "(undefined)" );
       break;
 
     case "boolean":
     case "number":
     case "bigint":
-      metaHeader = createMetaHeader( logEvent );
-      header = `${metaHeader} (${typeof data}) ${data}`;
+      header = createHeader( logEvent, `(${typeof data}) ${data}` );
       break;
 
     case "function":
       if( data.name )
       {
-        metaHeader = createMetaHeader( logEvent );
-        header = `${metaHeader} (function ${data.name})`;
+        header = createHeader( logEvent, `(function ${data.name})` );
       }
       else {
-        metaHeader = createMetaHeader( logEvent );
-        header = `${metaHeader} (function)`;
+        header = createHeader( logEvent, "(function)" );
       }
       break;
 
     case "object":
       if( data === null )
       {
-        metaHeader = createMetaHeader( logEvent );
-        header = `${metaHeader} (null)`;
+        header = createHeader( logEvent, "(null)" );
       }
       else if( data instanceof ArgumentsArray )
       {
-        metaHeader = createMetaHeader( logEvent );
-        header = metaHeader;
+        header = createHeader( logEvent );
 
         for( let j = 0, n = data.length; j < n; j = j + 1 )
         {
@@ -431,20 +466,18 @@ function getHeaderAndParts( logEvent )
         }
       }
       else {
-        metaHeader = createMetaHeader( logEvent );
-        header = metaHeader;
+        header = createHeader( logEvent );
         parts.push( data );
       }
       break;
 
     default:
       // everything else?
-      metaHeader = createMetaHeader( logEvent );
-      header = metaHeader;
+      header = createHeader( logEvent );
       parts.push( data );
   }
 
-  return { methodName, header, parts };
+  return { header, parts };
 }
 
 // -----------------------------------------------------------------------------

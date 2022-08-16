@@ -292,15 +292,10 @@ export function deleteOutputStream( outputLabel=OUTPUT_LABEL_CONSOLE )
 
 export let disableAutoStartConsoleLogging = false;
 
-console.log("JENS1");
-
 defer( () => {
-  console.log("JENS2");
-
-
   if( !disableAutoStartConsoleLogging )
   {
-    console.log("enableConsoleLogging");
+    console.log("[!] Automatically enabled console logging");
     enableConsoleLogging();
   }
 } );
