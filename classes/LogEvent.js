@@ -5,7 +5,7 @@ import { DEBUG, INFO, WARNING, ERROR } from "@hkd-base/types/log-types.js";
 
 import { BOOT_STAMP } from "@hkd-base/helpers/unique.js";
 
-let eventCounter = 1;
+let sequenceCounter = 1;
 
 /* ------------------------------------------------------------- Export class */
 
@@ -14,12 +14,12 @@ export default class LogEvent
   /**
    * Construct an LogEvent instance
    *
-   * @param {string} [type=DEBUG|ERROR]
+   * @param {string} [type=DEBUG|INFO|WARNING|ERROR]
    * @param {object} [context=null]
    *
-   * @param {data} data
-   *   Event data, can be a message, an object or an Error object. If the
-   *   data is an Error object, the event type is changed to Error
+   * @param {*|Error} data
+   *   Event data, can be anything, e.g. a message, an object or an Error
+   *   object.
    */
   constructor( { type=DEBUG, context=null, data } )
   {
@@ -36,8 +36,9 @@ export default class LogEvent
     }
 
     this.type = type;
-    this.id = this._generateId();
-    this.at = Date.now();
+    this.systemId = BOOT_STAMP;
+    this.sequenceId = this._generateSequenceId();
+    this.at = Date.now(); // OR.. dateTimeString: '2022-08-15T13:03:15.949Z'
     this.context = context || null;
 
     this.data = data;
@@ -46,14 +47,18 @@ export default class LogEvent
   /* ------------------------------------------------------- Internal methods */
 
   /**
-   * Generate id
+   * Generate a sequence id
    * - Uses boot timestamp and internal counter
    */
-  _generateId()
+  _generateSequenceId()
   {
-    let counterValue = (eventCounter++).toString(36); // base36
+    return String(sequenceCounter++);
 
-    return `${BOOT_STAMP}:${counterValue}`;
+    // return (sequenceCounter++).toString(36); // encoded as base36
+
+    // let countBase36 = (sequenceCounter++).toString(36); // base36
+
+    // return `${BOOT_STAMP}.${countBase36}`;
   }
 
 } // end class

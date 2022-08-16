@@ -3,13 +3,13 @@
 
 import { expectObjectOrNull } from "@hkd-base/helpers/expect.js";
 
-import { isObject } from "@hkd-base/helpers/is.js";
-
 import { InternalEventOrLogError } from "@hkd-base/types/error-types.js";
 
 import ValueStore from "@hkd-base/classes/ValueStore.js";
 
-import { getTwoChar10ms } from "@hkd-base/helpers/unique.js";
+import { ArgumentsArray } from "@hkd-base/types/array-types.js";
+
+// import { getTwoChar10ms } from "@hkd-base/helpers/unique.js";
 
 import { DEBUG, INFO, WARNING, ERROR } from "@hkd-base/types/log-types.js";
 
@@ -49,16 +49,39 @@ export default class LogStream extends ValueStore
         enumerable: false
       } );
 
-    this.count = 1;
-    this.meta = { boot: getTwoChar10ms() };
+    // this.sequenceId = 1;
+    // this.meta = { boot: getTwoChar10ms() };
 
-    Object.defineProperty(
-      this, "meta",
-        {
-          value: { boot: getTwoChar10ms() },
-          enumerable: false
-        } );
+    // Object.defineProperty(
+    //   this, "meta",
+    //     {
+    //       value: { boot: getTwoChar10ms() },
+    //       enumerable: false
+    //     } );
 
+  }
+
+  // -------------------------------------------------------------------- Method
+
+  /**
+   * Register another LogStream instance that will receive all
+   */
+  sendTo( logStream )
+  {
+    if( !(logStream instanceof LogStream) )
+    {
+      throw new Error("Missing or invalid parameter [logStream]");
+    }
+
+    return this.subscribe( ( logEvent ) =>
+      {
+        // console.log( "sendTo", logEvent );
+
+        //
+        // Set raw value, skip higher level methods debug, info, ...
+        //
+        logStream.set( logEvent );
+      } );
   }
 
   // -------------------------------------------------------------------- Method
@@ -66,11 +89,11 @@ export default class LogStream extends ValueStore
   /**
    * Sets `informative event data` in the log stream
    *
-   * @param {object|string} messageOrLogEvent
+   * @param {...*} data
    */
-  info( messageOrLogEvent )
+  info( /* ...data */ )
   {
-    const logEvent = this._normalizeLogEvent( INFO, messageOrLogEvent );
+    const logEvent = this._toLogEvent( INFO, arguments );
 
     this.set( logEvent );
   }
@@ -80,11 +103,13 @@ export default class LogStream extends ValueStore
   /**
    * Sets `debug event data` in the log stream
    *
-   * @param {object|string} messageOrLogEvent
+   * @param {...*} data
    */
-  debug( messageOrLogEvent )
+  debug( /* ...data */ )
   {
-    const logEvent = this._normalizeLogEvent( DEBUG, messageOrLogEvent );
+    const logEvent = this._toLogEvent( DEBUG, arguments );
+
+    // console.log("***DEBUG", logEvent);
 
     this.set( logEvent );
   }
@@ -94,11 +119,11 @@ export default class LogStream extends ValueStore
   /**
    * Sets `warning event data` in the log stream
    *
-   * @param {object|string} messageOrLogEvent
+   * @param {...*} data
    */
-  warning( messageOrLogEvent )
+  warning( /* ...data */ )
   {
-    const logEvent = this._normalizeLogEvent( WARNING, messageOrLogEvent );
+    const logEvent = this._toLogEvent( WARNING, arguments );
 
     this.set( logEvent );
   }
@@ -108,11 +133,11 @@ export default class LogStream extends ValueStore
   /**
    * Sets `warning event data` in the log stream
    *
-   * @param {object|string} messageOrLogEvent
+   * @param {...*} data
    */
-  error( messageOrLogEvent )
+  error( /* ...data */ )
   {
-    const logEvent = this._normalizeLogEvent( ERROR, messageOrLogEvent );
+    const logEvent = this._toLogEvent( ERROR, arguments );
 
     this.set( logEvent );
   }
@@ -128,18 +153,43 @@ export default class LogStream extends ValueStore
    * - Throws an Error
    *
    * @param {string} type
-   * @param {object|string} messageOrLogEvent
+   * @param {object|string} args
    *
    * @throws InternalEventOrLogError
    */
-  _normalizeLogEvent( type, messageOrLogEvent )
+  _toLogEvent( type, args )
   {
+    let data;
+
+    switch( args.length )
+    {
+      case 1:
+        data = args[0];
+        break;
+
+      case 0:
+        data = "(empty)";
+        // throw new Error("Expected at least one argument");
+        break;
+
+      default:
+        data = new ArgumentsArray(...args);
+        break;
+    }
+
+    if( 1 === args.length )
+    {
+      data = args[0];
+    }
+
     let logEvent;
 
     const context = this.context;
 
+    // console.log( "####_toLogEvent", messageOrLogEvent );
+
     try {
-      logEvent = new LogEvent( { type, context, data: messageOrLogEvent } );
+      logEvent = new LogEvent( { type, context, data } );
     }
     catch( e )
     {
@@ -198,7 +248,7 @@ export default class LogStream extends ValueStore
   //     {
   //       ...this.meta,
   //       type: INTERNAL_LOG_OR_EVENT_ERROR,
-  //       count: this.count++
+  //       sequenceId: this.sequenceId++
   //     };
 
   //   if( this.context )

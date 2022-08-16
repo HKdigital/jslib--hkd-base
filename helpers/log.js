@@ -1,8 +1,6 @@
 
-
-
 /**
- * system-events.js
+ * log.js
  */
 
 /* ------------------------------------------------------------------ Imports */
@@ -15,6 +13,14 @@ import { expectNotEmptyString } from "@hkd-base/helpers/expect.js";
 
 import { isIterable } from "@hkd-base/helpers/is.js";
 
+// import { DEBUG, INFO, WARNING, ERROR } from "@hkd-base/types/log-types.js";
+
+import { defer } from "@hkd-base/helpers/process.js";
+
+import { enableConsoleLogging } from "@hkd-base/helpers/console.js";
+
+import { catchUnhandledExceptions } from "@hkd-base/helpers/exceptions.js";
+
 /* ---------------------------------------------------------------- Internals */
 
 const OUTPUT_LABEL_CONSOLE = "console";
@@ -23,13 +29,55 @@ const systemLog = new LogStream( /* { source: "system-log" } */ );
 
 const outputs = {};
 
-// -----------------------------------------------------------------------------
+// let logLevelWarning = false;
 
 /* ---------------------------------------------------------------- Externals */
 
 export { OUTPUT_LABEL_CONSOLE };
 
 export { systemLog };
+
+// -----------------------------------------------------------------------------
+// Export friendlier names for lazy debuggers
+
+export { systemLog as log };
+
+export const debug = systemLog.debug.bind( systemLog );
+
+// -----------------------------------------------------------------------------
+// - Turn on console logging by default
+
+defer( () => {
+  //
+  // TODO: add flag to disabled auto start
+  //
+
+  // console.log("Auto start console log");
+
+  catchUnhandledExceptions();
+  enableConsoleLogging();
+} );
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Silence (drop) all console.log messages that are not of type `warning` or
+ * `error`
+ */
+// export function setLogLevelWarning()
+// {
+//   logLevelWarning = true;
+// }
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Unsilence all global console.log messages
+ */
+// export function restoreLogLevelDefault()
+// {
+//   logLevelWarning = false;
+// }
 
 // -----------------------------------------------------------------------------
 
@@ -45,6 +93,35 @@ export function passThroughProcessor( logEvent )
 {
   return logEvent;
 }
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Processor that passes through log events unless a minimum log level has
+ * been set (see setLogLevelWarning)
+ * set.
+ *
+ * @param {LogEvent} logEvent
+ *
+ * @returns {LogEvent} the unchanged log event
+ */
+// export function logLevelProcessor( logEvent )
+// {
+//   if( !logLevelWarning )
+//   {
+//     return logEvent;
+//   }
+
+//   switch( logEvent.type )
+//   {
+//     case DEBUG:
+//     case INFO:
+//       // silence all log levels below "warning"
+//       return null;
+//   }
+
+//   return logEvent;
+// }
 
 // -----------------------------------------------------------------------------
 
@@ -211,7 +288,22 @@ export function deleteOutputStream( outputLabel=OUTPUT_LABEL_CONSOLE )
   stream.unsubscribeAll();
 }
 
+// -----------------------------------------------------------------------------
 
+export let disableAutoStartConsoleLogging = false;
+
+console.log("JENS1");
+
+defer( () => {
+  console.log("JENS2");
+
+
+  if( !disableAutoStartConsoleLogging )
+  {
+    console.log("enableConsoleLogging");
+    enableConsoleLogging();
+  }
+} );
 
 
 // >>> OLD STUFF BELOW >>>
@@ -219,245 +311,258 @@ export function deleteOutputStream( outputLabel=OUTPUT_LABEL_CONSOLE )
 
 /* ------------------------------------------------------------------ Imports */
 
-import { DEBUG,
-         INFO,
-         WARNING,
-         ERROR } from "../types/log-types.js";
+// import { DEBUG,
+//          INFO,
+//          WARNING,
+//          ERROR } from "../types/log-types.js";
 
-import { getGlobalConfig } from "./global-config.js";
+// import { getGlobalConfig } from "./global-config.js";
 
-// import Console from "@platform/helpers/console.js";
+// // import Console from "@platform/helpers/console.js";
 
-import { getStack } from "@platform/helpers/trace.js";
+// // import { getStack } from "@platform/helpers/trace.js";
 
-export { default as LogBase } from "../classes/LogBase.js";
+// export { default as LogBase } from "../classes/LogBase.js";
 
-//
-// Import default console logger as default log facility
-//
-import Console from "./console.js";
+// //
+// // Import default console logger as default log facility
+// //
+// import Console from "./console.js";
 
-/* ---------------------------------------------------------------- Internals */
+// /* ---------------------------------------------------------------- Internals */
 
-let originalConsole = null;
+// let originalConsole = null;
 
-// let sequenceId = 1n; // not yet supported in all browsers
-let sequenceId = 1;
+// // let sequenceId = 1n; // not yet supported in all browsers
+// let sequenceId = 1;
 
-/**
- * Get the log facity that should be used to log
- *
- * @returns {object} log facility
- */
-function _getLogFacility()
-{
-  let config = getGlobalConfig("log", { facility: Console } );
+// /**
+//  * Get the log facity that should be used to log
+//  *
+//  * @returns {object} log facility
+//  */
+// function _getLogFacility()
+// {
+//   let config = getGlobalConfig("log", { facility: Console } );
 
-  if( config && config.facility )
-  {
-    return config.facility;
-  }
+//   if( config && config.facility )
+//   {
+//     return config.facility;
+//   }
 
-  throw new Error(
-    "No log facility has been configured.\n" +
-    "Use e.g. setGlobalConfig( 'log', { facility: Console } );");
-}
+//   throw new Error(
+//     "No log facility has been configured.\n" +
+//     "Use e.g. setGlobalConfig( 'log', { facility: Console } );");
+// }
 
-/**
- * Get a string that represents the current date and time
- *
- * @returns {string} data time string
- */
-function _dateTimeString()
-{
-  const date = new Date();
+// /**
+//  * Get a string that represents the current date and time
+//  *
+//  * @returns {string} data time string
+//  */
+// function _dateTimeString()
+// {
+//   const date = new Date();
 
-  return date.toISOString();
-}
+//   return date.toISOString();
+// }
 
 /* ------------------------------------------------------------------ Exports */
 
-export { DEBUG, INFO, WARNING, ERROR };
+// export { DEBUG, INFO, WARNING, ERROR };
 
-/**
- * Creates a log event that contains the fields
- * - type
- * - sequenceId
- * - dateTimeString
- * - fileName
- * - lineNumber
- * - [functionName]
- * - [className]
- * - args
- * - stack
- *
- * @param {string} type - Log item type
- * @param {mixed} args - List of things to log
- * @param {object} context - Additional event context (e.g. class name)
- *
- * @returns {Object} event
- */
-export function createEvent( type, args, context )
-{
-  const stack = getStack();
-  const stack0 = stack[0];
+// /**
+//  * Creates a log event that contains the fields
+//  * - type
+//  * - sequenceId
+//  * - dateTimeString
+//  * - fileName
+//  * - lineNumber
+//  * - [functionName]
+//  * - [className]
+//  * - args
+//  * - stack
+//  *
+//  * @param {string} type - Log item type
+//  * @param {mixed} args - List of things to log
+//  * @param {object} context - Additional event context (e.g. class name)
+//  *
+//  * @returns {Object} event
+//  */
+// export function createEvent( type, args, context )
+// {
+//   // console.log( "****createEvent", { type, args, context } );
 
-  // const baseFileName = pathTool.basename( stack0.fileName );
-  const fileName =
-    stack0.getFileName ? stack0.getFileName() : null;
+//   const stack = getStack();
+//   const stack0 = stack[0];
 
-  const lineNumber =
-    stack0.getLineNumber ? stack0.getLineNumber() : null;
+//   // const baseFileName = pathTool.basename( stack0.fileName );
+//   const fileName =
+//     stack0.getFileName ? stack0.getFileName() : null;
 
-  let functionName =
-    stack0.getFunctionName ? stack0.getFunctionName() : null;
+//   const lineNumber =
+//     stack0.getLineNumber ? stack0.getLineNumber() : null;
 
-  const dateTimeString = _dateTimeString();
+//   let functionName =
+//     stack0.getFunctionName ? stack0.getFunctionName() : null;
 
-  const event =
-    {
-      type,
-      sequenceId: sequenceId.toString(),
-      dateTimeString,
-      fileName,
-      lineNumber,
-      args,
-      stack
-    };
+//   const dateTimeString = _dateTimeString();
 
-  if( functionName )
-  {
-    event.functionName = functionName;
-  }
+//   const event =
+//     {
+//       type,
+//       sequenceId: sequenceId.toString(),
+//       dateTimeString,
+//       fileName,
+//       lineNumber,
+//       args,
+//       stack
+//     };
 
-  if( context && context.className )
-  {
-    event.className = context.className;
-  }
+//   if( functionName )
+//   {
+//     event.functionName = functionName;
+//   }
 
-  sequenceId++;
+//   if( context && context.className )
+//   {
+//     event.className = context.className;
+//   }
 
-  return event;
-}
+//   sequenceId++;
 
-/**
- * Log a debug message or data
- */
-export function debug()
-{
-  const logEvent = _getLogFacility().logEvent;
+//   return event;
+// }
 
-  const event = createEvent( DEBUG, arguments );
+// /**
+//  * Log a debug message or data
+//  */
+// export function debug()
+// {
+//   // const logEvent = _getLogFacility().logEvent;
 
-  logEvent( event );
-}
+//   const event = createEvent( DEBUG, arguments );
 
-/**
- * Log an info message or data
- */
-export function logInfo()
-{
-  const logEvent = _getLogFacility().logEvent;
+//   // logEvent( event );
+//   systemLog.debug( event );
+// }
 
-  const event = createEvent( INFO, arguments );
+// /**
+//  * Log an info message or data
+//  */
+// export function logInfo()
+// {
+//   // const logEvent = _getLogFacility().logEvent;
 
-  logEvent( event );
-}
+//   // const event = createEvent( INFO, arguments );
 
-/**
- * Log a warning message or data
- */
-export function logWarning()
-{
-  const logEvent = _getLogFacility().logEvent;
+//   // logEvent( event );
 
-  const event = createEvent( WARNING, arguments );
+//   systemLog.info.apply( systemLog, arguments );
+// }
 
-  logEvent( event );
-}
+// /**
+//  * Log a warning message or data
+//  */
+// export function logWarning()
+// {
+//   // const logEvent = _getLogFacility().logEvent;
 
-/**
- * Log an error message or data
- */
-export function logError()
-{
-  const logEvent = _getLogFacility().logEvent;
+//   const event = createEvent( WARNING, arguments );
 
-  const event = createEvent( ERROR, arguments );
+//   // logEvent( event );
 
-  // console.log( 123, (arguments[0] instanceof Error) ? arguments[0].message : null );
-  // console.log( 456, JSON.stringify( arguments, null, 2 ) );
-  // console.log( 789, event );
+//   systemLog.warning( event );
+// }
 
-  logEvent( event );
-}
+// /**
+//  * Log an error message or data
+//  */
+// export function logError()
+// {
+//   // const logEvent = _getLogFacility().logEvent;
 
-/**
- * Log an event
- *
- * @param {object} event
- */
-export function logEvent( event )
-{
-  const logEvent = _getLogFacility().logEvent;
+//   const event = createEvent( ERROR, arguments );
 
-  logEvent( event );
-}
+//   // console.log( 123, (arguments[0] instanceof Error) ? arguments[0].message : null );
+//   // console.log( 456, JSON.stringify( arguments, null, 2 ) );
+//   // console.log( 789, event );
 
-// -----------------------------------------------------------------------------
+//   // logEvent( event );
 
-/**
- * Silence (drop) all console.log messages that are not of type `warning` or
- * `error`
- */
-export function setLogLevelWarning()
-{
-  if( !originalConsole )
-  {
-    originalConsole =
-      {
-        log: console.log,
-        group: console.group,
-        groupCollapsed: console.groupCollapsed
-      };
-  }
+//   systemLog.error( event );
+// }
 
-  const noop = () => {};
+// /**
+//  * Log an event
+//  *
+//  * @param {object} event
+//  */
+// export function logEvent( event )
+// {
+//   // console.log( event );
 
-  global.console.log = noop;
-  global.console.group = noop;
-  global.console.groupCollapsed = noop;
-}
+//   // const logEvent = _getLogFacility().logEvent;
 
-// -----------------------------------------------------------------------------
+//   // logEvent( event );
 
-/**
- * Unsilence all global console.log messages
- */
-export function restoreLogLevelDefault()
-{
-  if( !originalConsole )
-  {
-    // Nothing silenced => nothing to do
-    return;
-  }
+//   systemLog.debug( event );
+// }
 
-  global.console.log = originalConsole.log;
-  global.console.group = originalConsole.group;
-  global.console.groupCollapsed = originalConsole.groupCollapsed;
-}
+// // -----------------------------------------------------------------------------
 
-// -------------------------------------------------------------- Export default
+// /**
+//  * Silence (drop) all console.log messages that are not of type `warning` or
+//  * `error`
+//  */
+// export function setLogLevelWarning()
+// {
+//   if( !originalConsole )
+//   {
+//     originalConsole =
+//       {
+//         log: console.log,
+//         group: console.group,
+//         groupCollapsed: console.groupCollapsed
+//       };
+//   }
 
-export default {
-  debug,
-  info: logInfo,
-  warning: logWarning,
-  error: logError,
-  event: logEvent,
-  createEvent,
-  DEBUG, INFO, WARNING, ERROR,
+//   const noop = () => {};
 
-  setLogLevelWarning,
-  restoreLogLevelDefault
-};
+//   global.console.log = noop;
+//   global.console.group = noop;
+//   global.console.groupCollapsed = noop;
+// }
+
+// // -----------------------------------------------------------------------------
+
+// /**
+//  * Unsilence all global console.log messages
+//  */
+// export function restoreLogLevelDefault()
+// {
+//   if( !originalConsole )
+//   {
+//     // Nothing silenced => nothing to do
+//     return;
+//   }
+
+//   global.console.log = originalConsole.log;
+//   global.console.group = originalConsole.group;
+//   global.console.groupCollapsed = originalConsole.groupCollapsed;
+// }
+
+// // -------------------------------------------------------------- Export default
+
+// export default {
+//   debug,
+//   info: logInfo,
+//   warning: logWarning,
+//   error: logError,
+//   event: logEvent,
+//   createEvent,
+//   DEBUG, INFO, WARNING, ERROR,
+
+//   setLogLevelWarning,
+//   restoreLogLevelDefault
+// };

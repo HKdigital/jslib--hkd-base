@@ -22,11 +22,9 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import log from "../helpers/log.js";
+import { systemLog } from "@hkd-base/helpers/log.js";
 
-// import LogStream from "@hkd-base/classes/LogStream.js";
-
-// import { systemLog } from "@hkd-base/helpers/log.js";
+import LogStream from "@hkd-base/classes/LogStream.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -39,42 +37,9 @@ export default class LogBase
    */
   constructor()
   {
-    this.__logContext = { className: this.constructor.name };
+    this.log = new LogStream( { className: this.constructor.name } );
 
-    // const systemLog = new LogStream();
-
-    const self = this;
-
-    this.log =
-      {
-        debug: function() {
-          const event =
-            log.createEvent( log.DEBUG, arguments, self.__logContext );
-
-          log.event( event );
-        },
-
-        info: function()  {
-          const event =
-            log.createEvent( log.INFO, arguments, self.__logContext );
-
-          log.event( event );
-        },
-
-        warning: function()  {
-          const event =
-            log.createEvent( log.WARNING, arguments, self.__logContext );
-
-          log.event( event );
-        },
-
-        error: function()  {
-          const event =
-            log.createEvent( log.ERROR, arguments, self.__logContext );
-
-          log.event( event );
-        }
-      };
+    this.log.sendTo( systemLog );
   }
 
 } // end class

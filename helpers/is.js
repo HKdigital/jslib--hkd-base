@@ -6,6 +6,7 @@
 //    en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction
 //
 const AsyncFunction = Object.getPrototypeOf( async function(){} ).constructor;
+const objectToString = Object.prototype.toString;
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -31,6 +32,20 @@ export function isArrayLike( item )
   }
 
   return false;
+}
+
+// ---------------------------------------------------------------------- Method
+
+/**
+ * Check if a value is an Arguments object
+ *
+ * @param {*} value
+ *
+ * @returns {boolean} true if the value is an Arguments object
+ */
+export function isArguments( value )
+{
+  return objectToString.call( value ) === '[object Arguments]';
 }
 
 // ---------------------------------------------------------------------- Method
@@ -110,34 +125,6 @@ export function isAsyncFunction( value )
 // ---------------------------------------------------------------------- Method
 
 /**
- * Returns true if x is greater than y
- *
- * @param {mixed} x - First value
- * @param {mixed} y - Second value
- */
-export function isGreaterThan( x, y )
-{
-  if( typeof x === "undefined" )
-  {
-    if( typeof y === "undefined" )
-    {
-      return false;
-    }
-
-    return true;
-  }
-
-  if( typeof y === "undefined" )
-  {
-    return false;
-  }
-
-  return (x > y);
-}
-
-// ---------------------------------------------------------------------- Method
-
-/**
  * Check if the supplied value is iterable
  * - Iterable objects must implement the "@@iterator" method
  * - Generators are also iterable
@@ -155,34 +142,6 @@ export function isIterable( value )
   }
 
  return true;
-}
-
-// ---------------------------------------------------------------------- Method
-
-/**
- * Returns true if x is less than y
- *
- * @param {mixed} x - First value
- * @param {mixed} y - Second value
- */
-export function isLessThan( x, y )
-{
-  if( typeof x === "undefined" )
-  {
-    if( typeof y === "undefined" )
-    {
-      return false;
-    }
-
-    return false;
-  }
-
-  if( typeof y === "undefined" )
-  {
-    return true;
-  }
-
-  return (x < y);
 }
 
 // ---------------------------------------------------------------------- Method

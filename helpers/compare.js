@@ -126,6 +126,62 @@ import { objectGet } from "./object.js";
 // ---------------------------------------------------------------------- Method
 
 /**
+ * Returns true if x is greater than y
+ *
+ * @param {mixed} x - First value
+ * @param {mixed} y - Second value
+ */
+export function isGreaterThan( x, y )
+{
+  if( typeof x === "undefined" )
+  {
+    if( typeof y === "undefined" )
+    {
+      return false;
+    }
+
+    return true;
+  }
+
+  if( typeof y === "undefined" )
+  {
+    return false;
+  }
+
+  return (x > y);
+}
+
+// ---------------------------------------------------------------------- Method
+
+/**
+ * Returns true if x is less than y
+ *
+ * @param {mixed} x - First value
+ * @param {mixed} y - Second value
+ */
+export function isLessThan( x, y )
+{
+  if( typeof x === "undefined" )
+  {
+    if( typeof y === "undefined" )
+    {
+      return false;
+    }
+
+    return false;
+  }
+
+  if( typeof y === "undefined" )
+  {
+    return true;
+  }
+
+  return (x < y);
+}
+
+// ---------------------------------------------------------------------- Method
+
+/**
  * Compare function that can be used for sorting smallest values first
  * - undefined values are placed at the ...???FIXME???... of the sorted array
  *

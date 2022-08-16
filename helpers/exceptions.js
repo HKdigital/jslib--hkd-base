@@ -139,6 +139,9 @@ export function rethrow( message, error )
  */
 export function catchUnhandledExceptions()
 {
+  // TODO: return unsubscribe function (removeEventListener)
+  // TODO: prevent subscribing more than once
+
   if( typeof process !== "undefined" )
   {
     /**
@@ -441,3 +444,84 @@ export function errorCauseToArray( error )
   return out;
 }
 
+// -----------------------------------------------------------------------------
+
+/**
+ * Get a program stack(trace) for the current execution point
+ *
+ * @param {number} [skipFirst=3]
+ *   Number of entries to skip from the beginning of the returned stack
+ *
+ * @param {number} [skipLast=1]
+ *   Number of entries to skip from the end of the returned stack
+ *
+ * @returns {object[]} stack(trace)
+ */
+export function getStack( skipFirst=3, skipLast=0 )
+{
+  // let orig = Error.prepareStackTrace;
+
+  // eslint-disable-next-line no-unused-vars
+  Error.prepareStackTrace = function( _, stack )
+    {
+      return stack;
+    };
+
+  let err = new Error();
+
+  // Error.captureStackTrace( err );
+
+  let stack = err.stack;
+
+  let j = skipFirst;
+  let n = stack.length - skipLast;
+
+  const result = [];
+
+  for( ; j < n; j = j + 1 )
+  {
+    const CallSite = stack[j];
+
+    result.push(
+      {
+        lineNumber: CallSite.getLineNumber(),
+        fileName: CallSite.getFileName()
+      } );
+  }
+
+  return result;
+
+  // -> stack of formatted strings
+
+  // const myError = {};
+
+  // Error.captureStackTrace( myError );
+
+  // return myError.stack;
+
+
+  // return stack.slice( skipFirst, -skipLast );
+
+  // Error.prepareStackTrace = orig;
+
+  // if( !sourceMapConsumer )
+  // {
+  //   return stack;
+  // }
+
+  // const sourceMappedStack = [];
+
+  // let j = skipFirst;
+  // let n = stack.length - skipLast;
+
+  // for( ; j < n; j = j + 1 )
+  // {
+  //   const CallSite = stack[j];
+
+  //   const item = new SourceMappedCallSite( sourceMapConsumer, CallSite );
+
+  //   sourceMappedStack.push( item );
+  // }
+
+  // return sourceMappedStack;
+}

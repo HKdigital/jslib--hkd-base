@@ -38,7 +38,7 @@ import {
   stateLabel,
   displayState } from "@hkd-base/helpers/service-states.js";
 
-import { LogBase } from "@hkd-base/helpers/log.js";
+import LogBase from "@hkd-base/classes/LogBase.js";
 
 // import { SystemLogger } from "@platform/system.js";
 
