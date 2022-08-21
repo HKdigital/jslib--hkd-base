@@ -1,7 +1,8 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectObjectOrNull } from "@hkd-base/helpers/expect.js";
+import { expectObject,
+         expectObjectOrNull } from "@hkd-base/helpers/expect.js";
 
 import { InternalEventOrLogError } from "@hkd-base/types/error-types.js";
 
@@ -16,6 +17,8 @@ import { DEBUG, INFO, WARNING, ERROR } from "@hkd-base/types/log-types.js";
 import LogEvent from "@hkd-base/classes/LogEvent.js";
 
 /* ---------------------------------------------------------------- Internals */
+
+const isNodeJs = (typeof process !== "undefined" && process.env);
 
 const INTERNAL_LOG_OR_EVENT_ERROR = "internal-log-or-event-error";
 
@@ -75,13 +78,22 @@ export default class LogStream extends ValueStore
 
     return this.subscribe( ( logEvent ) =>
       {
+        if( !logEvent )
+        {
+          // Somehow wrong data hase been set in the stream
+          return;
+        }
+
+        expectObject( logEvent, "Invalid parameter [logEvent]" );
+
         // console.log( "sendTo", logEvent );
 
         //
         // Set raw value, skip higher level methods debug, info, ...
         //
         logStream.set( logEvent );
-      } );
+      },
+      /* callOnRegistration */ false );
   }
 
   // -------------------------------------------------------------------- Method
@@ -184,11 +196,16 @@ export default class LogStream extends ValueStore
 
     let logEvent;
 
-    const context = this.context;
+    let context = this.context;
 
     // console.log( "####_toLogEvent", messageOrLogEvent );
 
     try {
+      if( undefined === data )
+      {
+        throw new Error("The data to log should not be undefined");
+      }
+
       logEvent = new LogEvent( { type, context, data } );
     }
     catch( e )

@@ -14,6 +14,7 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { isObject } from "@hkd-base/helpers/is.js";
+import { systemLog } from "@hkd-base/helpers/log.js";
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -137,7 +138,7 @@ export function rethrow( message, error )
  * Catches all uncaught exceptions and unhandled promise rejections
  * and creates events in the systemLog stream
  */
-export function catchUnhandledExceptions()
+export function catchUncaughtExceptions()
 {
   // TODO: return unsubscribe function (removeEventListener)
   // TODO: prevent subscribing more than once
@@ -153,24 +154,19 @@ export function catchUnhandledExceptions()
 
     if( typeof process.on === "function" )
     {
-      process.on('uncaughtException', (error) => {
+      process.on('uncaughtException',
+        // eslint-disable-next-line no-unused-vars
+        function handleUnCaughtException(error, origin)
+          {
+            //
+            // @note origin = 'uncaughtException' or 'unhandledRejection'
+            //
 
-        // Does this catch unhandled rejection too?
+            // console.log('process.on("uncaughtException")', error );
+            console.log('[!] process.on("uncaughtException")' );
 
-        // console.log('process.on("uncaughtException"):', error );
-
-        systemLog.error( error );
-      } );
-
-      process.on('unhandledRejection', (reason, promise) =>
-        {
-
-          // FIXME: send to systemLog!!!
-
-          console.log(
-            'process.on("unhandledRejection"):',
-             promise, 'reason:', reason);
-        } );
+            systemLog.error( error );
+          } );
     }
   }
 

@@ -18,7 +18,7 @@ import { expectObject } from "@hkd-base/helpers/expect.js";
 
 import { errorCauseToArray } from "@hkd-base/helpers/exceptions.js";
 
-import { DEBUG, INFO, WARNING, ERROR } from "@hkd-base/types/log-types.js";
+import { DEBUG, INFO, WARNING,ERROR } from "@hkd-base/types/log-types.js";
 
 import { getOutputStream,
          OUTPUT_LABEL_CONSOLE } from "@hkd-base/helpers/log.js";
@@ -39,6 +39,57 @@ const CONSOLE_METHODS =
     [INFO]: CONSOLE_METHOD_LOG,
     [WARNING]: CONSOLE_METHOD_WARNING,
     [ERROR]: CONSOLE_METHOD_ERROR
+  };
+
+const LOG_FUNCTION_NAMES = new Set( DEBUG, INFO, WARNING, ERROR );
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Terminal Markup codes
+ *
+ * printing-colorful-text-in-terminal-when-run-node-js-script
+ *
+ * @see https://coderwall.com/p/yphywg/
+ * @see https://en.wikipedia.org/wiki/ANSI_escape_code
+ */
+const MARKUP =
+  {
+    reset: "\x1b[0m",
+
+
+    cyan: "\x1b[36m",
+    magenta: "\x1b[35m",
+    yellow: "\x1b[33m",
+    red: "\x1b[31m",
+
+    green: "\x1b[32m",
+
+    white: "\x1b[37m",
+    black: "\x1b[30m",
+
+    brightWhite: "\x1b[97m",
+    brightBlack: "\x1b[90m",
+
+    bgWhite: "\x1b[47m",
+
+    bgBrightBlack: "\x1b[100m",
+    bgBlack: "\x1b[40m",
+    bgRed: "\x1b[41m",
+    bgGreen: "\x1b[42m",
+    //bgYellow: "\x1b[43m",
+    bgBrightYellow: "\x1b[103m",
+    bgCyan: "\x1b[46m",
+    bgBrightCyan: "\x1b[106m",
+    bgMagenta: "\x1b[45m",
+    bgBlue: "\x1b[44m",
+
+    bold: "\x1b[1m",
+    dim: "\x1b[2m",
+    italic: "\x1b[3m",
+    underline: "\x1b[4m",
+
+    newline: "\n"
   };
 
 
@@ -83,32 +134,32 @@ export function typeToConsoleMethod( type )
 
 // -----------------------------------------------------------------------------
 
-/**
- * Format a context object a key value pairs
- * - If context is null, an empty string is returned
- *
- * @param {object|null} context [description]
- *
- * @returns {string|null} formatted context (key value pairs)
- */
-function formatContext( context )
-{
-  expectObject( context, "Missing or invalid parameter [context]" );
+// /**
+//  * Format a context object a key value pairs
+//  * - If context is null, an empty string is returned
+//  *
+//  * @param {object|null} context [description]
+//  *
+//  * @returns {string|null} formatted context (key value pairs)
+//  */
+// function formatContext( context )
+// {
+//   expectObject( context, "Missing or invalid parameter [context]" );
 
-  let str = "";
+//   let str = "";
 
-  for( let key in context )
-  {
-    str += `,${key}=${JSON.stringify(context[key])}`;
-  }
+//   for( let key in context )
+//   {
+//     str += `,${key}=${JSON.stringify(context[key])}`;
+//   }
 
-  if( str.length )
-  {
-    return `[${str.slice(1)}]`;
-  }
+//   if( str.length )
+//   {
+//     return `[${str.slice(1)}]`;
+//   }
 
-  return "";
-}
+//   return "";
+// }
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -119,7 +170,13 @@ function formatContext( context )
  */
 export function defaultEventLogPrinter( logEvent )
 {
-  // console.log("@@@@print", logEvent);
+  expectObject( logEvent, "Missing or invalid parameter [logEvent]" );
+
+  // if( logEvent.type === DEBUG )
+  // {
+  //   console.log("@@@@print", JSON.stringify( logEvent, null, 2 ) );
+  // }
+
   // console.log("@@@@print", logEvent.data instanceof Error);
 
   console.log(); // newline
@@ -130,6 +187,8 @@ export function defaultEventLogPrinter( logEvent )
 
     const context = logEvent.context;
 
+    let errorHeader = createHeader( logEvent );
+
     if( !(error instanceof Error) )
     {
       const messageOrAttributes = error;
@@ -138,7 +197,20 @@ export function defaultEventLogPrinter( logEvent )
       {
         error = new Error( messageOrAttributes );
       }
-      else {
+
+      if( messageOrAttributes instanceof ArgumentsArray )
+      {
+        if( typeof messageOrAttributes[0] === "string" )
+        {
+          const message = messageOrAttributes.shift();
+
+          error = new Error( message );
+          error.attributes = messageOrAttributes;
+        }
+      }
+
+      if( !(error instanceof Error) )
+      {
         error = new Error("Unknown error");
         error.attributes = messageOrAttributes;
       }
@@ -151,19 +223,42 @@ export function defaultEventLogPrinter( logEvent )
       //
       const causes = errorCauseToArray( error );
 
-      if( !context )
+      console.group( errorHeader );
+
+      // if( !context )
+      // {
+      //   console.group( `Error: ${error.message}` );
+      // }
+      // else {
+      //   console.group( `Error: ${error.message}`, formatContext( context ) );
+      // }
+
+      // console.error( 123, error );
+      console.log( error.message );
+
+      if( error.attributes )
       {
-        console.group( `Error: ${error.message}` );
-      }
-      else {
-        console.group( `Error: ${error.message}`, formatContext( context ) );
+        console.log();
+        console.log("Attributes:");
+        console.log( error.attributes );
       }
 
-      console.error( error );
+      console.log( error.stack );
 
-      for( const cause of causes )
+
+      for( let j = 0, n = causes.length; j < n; j = j + 1 )
       {
-        console.error( cause );
+        if( j > 0 )
+        {
+          console.log();
+        }
+
+        const cause = causes[j];
+
+        console.log( "Cause:" );
+        console.log( cause.message );
+        console.log( cause.stack );
+
         // if( cause instanceof ErrorEvent )
         // {
         //   console.error( cause.error,
@@ -178,6 +273,13 @@ export function defaultEventLogPrinter( logEvent )
         // }
       }
 
+      if( context )
+      {
+        console.log();
+        console.log( "Context:" );
+        console.log( context );
+      }
+
       console.groupEnd();
     }
     else {
@@ -188,7 +290,16 @@ export function defaultEventLogPrinter( logEvent )
       //
       // Error without `cause`
       //
-      console.error( error );
+      console.log( errorHeader );
+      console.error( error.message );
+
+      if( error.attributes )
+      {
+        console.log("Attributes:");
+        console.log( error.attributes );
+      }
+
+      console.log( error.stack );
     }
   }
   else {
@@ -270,6 +381,11 @@ export function defaultEventLogPrinter( logEvent )
   }
 }
 
+// eslint-disable-next-line no-undef
+const isNodeJs = (typeof process !== "undefined" && process.env);
+
+const enableMarkup = isNodeJs && ("development" === process.env.NODE_ENV);
+
 // -----------------------------------------------------------------------------
 
 /**
@@ -283,77 +399,176 @@ export function defaultEventLogPrinter( logEvent )
  */
 function createHeader( logEvent, message )
 {
-  const { sequenceId, at, context } = logEvent;
+  const { sequenceId, type, at, context } = logEvent;
 
   let header = "";
 
-  // eslint-disable-next-line no-undef
-  const isNodeJs = (typeof process !== "undefined" && process.env);
+  let functionName;
 
   if( isNodeJs )
   {
-    // if( "development" === process.env.NODE_ENV )
-    // {
-    //
-    // }
-
     const getSourceMappedStack = global.getSourceMappedStack;
 
     if( !getSourceMappedStack )
     {
-      header = `#${sequenceId}`;
+      // header = `#${sequenceId} (${type})`;
+      header = `${sequenceId} (${type})`;
     }
     else {
-      const stack = getSourceMappedStack();
+      const data = logEvent.data;
 
-      if( !stack.length )
+      let error = (data instanceof Error) ? data : null;
+
+      if( !error )
       {
-        header = `#${sequenceId}`;
+        if( context.e )
+        {
+          error = context.e;
+        }
+      }
+
+      const stack = getSourceMappedStack( { error } );
+
+      let stackItemOfInterest;
+
+      for( let j = 0, n = stack.length; j < n; j = j + 1 )
+      {
+        stackItemOfInterest = stack[j];
+
+        const functionName = stackItemOfInterest.getFunctionName();
+
+        if( functionName === type ) /* type=debug, info, warning, error */
+        {
+          //
+          // The next stack item is the one we need
+          //
+          stackItemOfInterest = stack[ j+1 ];
+
+          // console.log("FOUND", stackItemOfInterest, functionName);
+          break;
+        }
+
+        // if( LOG_FUNCTION_NAMES.has(functionName) )
+        // {
+        //   //
+        //   // The next stack item is the one we need
+        //   //
+        //   stackItemOfInterest = stack[ j+1 ];
+
+        //   console.log("FOUND", stackItemOfInterest, functionName);
+        //   break;
+        // }
+      } // end for
+
+      // console.log( 123, stack.toString() );
+
+      if( !stackItemOfInterest )
+      {
+        // header = `#${sequenceId} (${type})`;
+        header = `${sequenceId} (${type})`;
       }
       else {
-        const stack0 = stack[0];
+        const fileName = stackItemOfInterest.getFileName();
+        const lineNumber = stackItemOfInterest.getLineNumber();
 
-        const fileName = stack0.getFileName();
-        const lineNumber = stack0.getLineNumber();
+        functionName = stackItemOfInterest.getFunctionName();
 
-        header = `#${sequenceId} ${fileName}:line ${lineNumber}`;
+        // header = `#${sequenceId} ${fileName}:${lineNumber}`;
+        header = `${sequenceId} ${fileName}:${lineNumber}`;
       }
     }
-  }
 
-  if( context )
+  } // end: if( isNodeJs )
+
+  if( context && context.className )
   {
-    if( context.className )
+    const className = context.className;
+
+    if( functionName )
     {
+      if( functionName === className )
+      {
+        header += ` (${context.className}.constructor)`;
+      }
+      else {
+        header += ` (${context.className}.${functionName})`;
+      }
+    }
+    else {
       header += ` (${context.className})`;
     }
-    else if( context.functionName )
+  }
+  else {
+    if( functionName )
     {
-      header += ` (${context.functionName})`;
+      header += ` (${functionName})`;
     }
   }
 
-  //console.log( context );
+  //
+  // TODO: other contexts?
+  //
 
   if( isNodeJs )
   {
     const d = new Date(at);
 
-    header += ` at ${d.toISOString()}`;
+    const isoStr = d.toISOString();
+
+    header += ` ${isoStr.slice(0, isoStr.length - 6)}Z`;
   }
 
-  if( message )
+  if( !isNodeJs && message !== undefined )
   {
+    //
+    // Do not add message to header on NodeJs
+    // (should be added to data by function caller)
+    //
     if( header.length )
     {
-      return `${header} ${message}`;
+      header = `${header} ${message}`;
     }
     else {
-      return `${message}`;
+      header = message;
     }
   }
 
-  return header;
+  if( enableMarkup )
+  {
+    let headerStyle = "";
+
+    switch( logEvent.type )
+    {
+      case INFO:
+        // headerStyle = MARKUP.brightWhite + MARKUP.bgCyan;
+        headerStyle = MARKUP.dim;
+        break;
+
+      case DEBUG:
+        headerStyle = MARKUP.brightWhite + MARKUP.bgMagenta;
+        break;
+
+      case WARNING:
+        headerStyle =MARKUP.black + MARKUP.bgBrightYellow;
+        break;
+
+      case ERROR:
+        headerStyle = MARKUP.brightWhite + MARKUP.bgRed;
+        break;
+
+      default:
+        headerStyle = MARKUP.brightWhite + MARKUP.bgBlack;
+        break;
+    }
+
+
+    return MARKUP.reset +
+          `${headerStyle} ${header} ` +
+          MARKUP.reset;
+  }
+  else {
+    return `${header} (${type})`;
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -384,7 +599,6 @@ function getHeaderAndParts( logEvent )
       "(eventLog.data should not be an Error object)");
   }
 
-  let metaHeader = null;
   let header = null;
   let parts = [];
 
@@ -393,16 +607,21 @@ function getHeaderAndParts( logEvent )
     case "string":
       if( !data.length )
       {
-        metaHeader = createHeader( logEvent );
-        header = `${metaHeader} (empty string)`;
+        const message = "(empty string)";
+
+        header = createHeader( logEvent, message );
+
+        if( isNodeJs )
+        {
+          parts.push( message );
+        }
       }
       else if( INFO === type )
       {
         //
         // We're outputting an info message
         //
-        metaHeader = createHeader( logEvent );
-        header = `${metaHeader}`;
+        header = createHeader( logEvent );
         parts.push( data );
       }
       else if( data.length < MAX_HEADER_CONTENT_LENGTH)
@@ -410,8 +629,14 @@ function getHeaderAndParts( logEvent )
         //
         // data is a short string
         //
-        header = createHeader( logEvent, data );
-        // header = `${metaHeader} ${data}`;
+        const message = data;
+
+        header = createHeader( logEvent, message );
+
+        if( isNodeJs )
+        {
+          parts.push( message );
+        }
       }
       else {
         const message = `${data.slice(0, MAX_HEADER_CONTENT_LENGTH)}...`;
@@ -428,33 +653,77 @@ function getHeaderAndParts( logEvent )
         const message = `Symbol(${ data.description || "" })`;
 
         header = createHeader( logEvent, message );
+
+        if( isNodeJs )
+        {
+          parts.push( message );
+        }
       }
       break;
 
     case "undefined":
-      header = createHeader( logEvent, "(undefined)" );
+      {
+        const message = "(undefined)";
+
+        header = createHeader( logEvent, message );
+
+        if( isNodeJs )
+        {
+          parts.push( message );
+        }
+      }
       break;
 
     case "boolean":
     case "number":
     case "bigint":
-      header = createHeader( logEvent, `(${typeof data}) ${data}` );
+      {
+        const message = `(${typeof data}) ${data}`;
+
+        header = createHeader( logEvent, message );
+
+        if( isNodeJs )
+        {
+          parts.push( message );
+        }
+      }
       break;
 
     case "function":
       if( data.name )
       {
-        header = createHeader( logEvent, `(function ${data.name})` );
+        const message = `(function ${data.name})`;
+
+        header = createHeader( logEvent, message );
+
+        if( isNodeJs )
+        {
+          parts.push( message );
+        }
       }
       else {
-        header = createHeader( logEvent, "(function)" );
+        const message = `(function)`;
+
+        header = createHeader( logEvent, message );
+
+        if( isNodeJs )
+        {
+          parts.push( message );
+        }
       }
       break;
 
     case "object":
       if( data === null )
       {
-        header = createHeader( logEvent, "(null)" );
+        const message = `(null)`;
+
+        header = createHeader( logEvent, message );
+
+        if( isNodeJs )
+        {
+          parts.push( message );
+        }
       }
       else if( data instanceof ArgumentsArray )
       {

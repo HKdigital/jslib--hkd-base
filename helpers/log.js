@@ -19,7 +19,7 @@ import { defer } from "@hkd-base/helpers/process.js";
 
 import { enableConsoleLogging } from "@hkd-base/helpers/console.js";
 
-import { catchUnhandledExceptions } from "@hkd-base/helpers/exceptions.js";
+import { catchUncaughtExceptions } from "@hkd-base/helpers/exceptions.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -54,7 +54,7 @@ defer( () => {
 
   // console.log("Auto start console log");
 
-  catchUnhandledExceptions();
+  catchUncaughtExceptions();
   enableConsoleLogging();
 } );
 
@@ -91,6 +91,35 @@ defer( () => {
  */
 export function passThroughProcessor( logEvent )
 {
+  return logEvent;
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Processor that adds an Error instance to the context that can be used for
+ * printing the program trace
+ *
+ * @param {LogEvent} logEvent
+ *
+ * @returns {LogEvent} the unchanged log event
+ */
+export function consoleLogProcessor( logEvent )
+{
+  if( !logEvent.context )
+  {
+    logEvent.context = {};
+  }
+
+  const context = logEvent.context;
+
+  context.e = new Error();
+
+  Object.defineProperty( context, "e",
+    {
+      enumerable: false
+    } );
+
   return logEvent;
 }
 
@@ -246,7 +275,7 @@ export function getOutputStream( outputLabel=OUTPUT_LABEL_CONSOLE )
       //
       // Auto create output `OUTPUT_LABEL_CONSOLE`
       //
-      setProcessor( passThroughProcessor, OUTPUT_LABEL_CONSOLE );
+      setProcessor( consoleLogProcessor, OUTPUT_LABEL_CONSOLE );
 
       output = outputs[ OUTPUT_LABEL_CONSOLE ];
     }
