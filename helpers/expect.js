@@ -406,6 +406,28 @@ export function expectNotEmptyString( value, errorText )
   }
 }
 
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Expect a value to be a not-empty string or null
+ *
+ * @param {mixed} value - Value to check
+ * @param {string} errorText - Text of the error to throw
+ */
+export function expectNotEmptyStringOrNull( value, errorText )
+{
+  if( typeof value !== "string" && null !== value )
+  {
+    expected( errorText, "expected not empty string or null", value );
+  }
+
+  if( !value.length )
+  {
+    expected( errorText, "expected not empty string or null, got empty string");
+  }
+}
+
 // -----------------------------------------------------------------------------
 
 /**

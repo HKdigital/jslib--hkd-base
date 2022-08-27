@@ -7,18 +7,19 @@ import { objectGet, PATH_SEPARATOR } from "@hkd-base/helpers/object.js";
 
 /* ---------------------------------------------------------------- Internals */
 
-class Logic {}
+/**
+ * Base class for all logic components
+ * - Can be used to check if a variable is a "Logic" object (use instanceof)
+ */
+class Logic {
 
-class TruthyOrSelector extends Logic
-{
   /**
-   * Create an instance that holds a list of paths that should contain
-   * truthy values when applied to a test object
+   * Creates a Logic instance
+   * - The arguments are converted into a Set of paths that should be checked
+   *   by the class that inherits from the Logic instance
    */
   constructor()
   {
-    super();
-
     if( 1 === arguments &&
         Array.isArray( arguments[0] ) )
     {
@@ -29,6 +30,40 @@ class TruthyOrSelector extends Logic
     }
   }
 
+  /* ------------------------------------------------------- Internal methods */
+
+  /**
+   * Returns a Set that contains all paths
+   * - Paths that contain *the smallest number of path parts* are added first
+   *   to the Set. The first paths in the Set are evaluated first. Paths with
+   *   a smaller amount of path parts should be faster to evaluate.
+   *
+   *
+   * @param {string[]} paths
+   *
+   * @returns {Set} set of paths
+   */
+  _createPathsSet( listOfPaths )
+  {
+    let tmp = [];
+
+    for( let j = 0, n = listOfPaths.length; j < n; j = j + 1 )
+    {
+      const path = toArrayPath( listOfPaths[ j ] );
+
+      tmp.push( path);
+    }
+
+    tmp.sort( compareUsingKey.bind( null, smallestFirst, "length" ) );
+
+    return new Set( tmp );
+  }
+}
+
+/* -------------------------------------------------- class: TruthyOrSelector */
+
+class TruthyOrSelector extends Logic
+{
   /**
    * Test if one of the values at the selector paths is truthy
    *
@@ -57,6 +92,8 @@ class TruthyOrSelector extends Logic
     return false;
   }
 
+  // ---------------------------------------------------------------------------
+
   /**
    * Returns a human friendly string that explains the logic applied by
    * this object.
@@ -73,30 +110,60 @@ class TruthyOrSelector extends Logic
     return str.slice( 4 ); // remove " OR " from start of string
   }
 
+}
+
+/* ------------------------------------------------- class: TruthyAndSelector */
+
+class TruthyAndSelector extends Logic
+{
   /**
-   * Returns a Set that contains all paths
-   * - Paths that contain the least mumber of path parts are added first
-   *   to the Set
+   * Test if all the values at the selector paths are truthy
    *
-   * @param {string[]} paths
+   * @param {object} obj
    *
-   * @returns {Set} set of paths
+   * @returns {boolean}
+   *   true if one of the selected values in the object is truthy
    */
-  _createPathsSet( listOfPaths )
+  test( obj )
   {
-    let tmp = [];
+    const paths = this.paths;
 
-    for( let j = 0, n = listOfPaths.length; j < n; j = j + 1 )
+    if( typeof obj !== "object" )
     {
-      const path = toArrayPath( listOfPaths[ j ] );
-
-      tmp.push( path);
+      throw new Error("Invalid parameter [obj]");
     }
 
-    tmp.sort( compareUsingKey.bind( null, smallestFirst, "length" ) );
+    for( let path of paths.values() )
+    {
+      if( /* not truthy */ !objectGet( obj, path ) )
+      {
+        return false;
+      }
+    } // end for
 
-    return new Set( tmp );
+    // All values at all selector paths are thruthy
+
+    return true;
   }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Returns a human friendly string that explains the logic applied by
+   * this object.
+   */
+  explain()
+  {
+    let str = "";
+
+    for( const path of this.paths.values() )
+    {
+      str += ` AND "${path.join( PATH_SEPARATOR )}"`;
+    }
+
+    return str.slice( 5 ); // remove " AND " from start of string
+  }
+
 }
 
 /* ------------------------------------------------------------------ Exports */
@@ -125,7 +192,8 @@ export function OR()
  *
  * @returns {object} logic AND element
  */
-// export function AND()
-// {
-//   return new AndValues( ...arguments );
-// }
+export function AND()
+{
+  return new TruthyAndSelector( ...arguments );
+}
+

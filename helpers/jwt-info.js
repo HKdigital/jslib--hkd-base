@@ -1,7 +1,8 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectNotEmptyString } from "@hkd-base/helpers/expect.js";
+import { expectNotEmptyString,
+         expectObject } from "@hkd-base/helpers/expect.js";
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -42,4 +43,26 @@ export function decodePayload( token )
   // console.log( { payload } );
 
   return JSON.parse( atob( payload ) );
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Returns the "exp" (expiresAt) property of a token to an UTC string
+ *
+ * @param {object} token
+ *
+ * @returns {string} "expires at" as UTC string
+ */
+export function expiresAtUTC( token )
+{
+  expectObject( token, "Missing or invalid parameter [token]");
+
+  if( "exp" in token )
+  {
+    return (new Date( 1000 * token.exp ).toUTCString() );
+  }
+  else {
+    return null;
+  }
 }

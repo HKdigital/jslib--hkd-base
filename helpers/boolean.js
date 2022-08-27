@@ -1,12 +1,17 @@
 
 /**
- * Returns true if the value is truthy
+ * Returns a boolean.
+ * - Returns true if the value is truthy, false otherwise
+ * - A return value can be specified in case an "empty string" is supplied as
+ *   value
  *
  * @param {*} value
  *
+ * @param {boolean} [returnValueForEmptyString=false]
+ *
  * @returns {boolean} true if the value is truthy
  */
-export function isTruthy( value, emptyIsTrue=true )
+export function toBoolean( value, returnValueForEmptyString=false )
 {
   switch( typeof value )
   {
@@ -17,10 +22,9 @@ export function isTruthy( value, emptyIsTrue=true )
           return true;
 
         default:
-          if( !value.length && emptyIsTrue )
+          if( !value.length )
           {
-            // empty is true
-            return true;
+            return returnValueForEmptyString;
           }
 
           return false;

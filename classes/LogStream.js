@@ -18,7 +18,7 @@ import LogEvent from "@hkd-base/classes/LogEvent.js";
 
 /* ---------------------------------------------------------------- Internals */
 
-const isNodeJs = (typeof process !== "undefined" && process.env);
+// const isNodeJs = (typeof process !== "undefined" && process.env);
 
 const INTERNAL_LOG_OR_EVENT_ERROR = "internal-log-or-event-error";
 
@@ -145,10 +145,15 @@ export default class LogStream extends ValueStore
   /**
    * Sets `warning event data` in the log stream
    *
-   * @param {...*} data
+   * @param {Error|string} An Error instance or an Error message
    */
   error( /* ...data */ )
   {
+    if( arguments.length !== 1 )
+    {
+      throw new Error("Method [error] expects a single argument");
+    }
+
     const logEvent = this._toLogEvent( ERROR, arguments );
 
     this.set( logEvent );

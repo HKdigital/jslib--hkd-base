@@ -428,7 +428,7 @@ export function objectGet( obj, path, defaultValue )
 
   const value = parentNode[ lastKey ];
 
-  if( typeof value === "undefined" )
+  if( value === undefined )
   {
     return defaultValue;  // @note may be undefined
   }

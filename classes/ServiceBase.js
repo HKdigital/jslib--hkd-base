@@ -44,13 +44,13 @@ import LogBase from "@hkd-base/classes/LogBase.js";
 
 import InitService from "@hkd-base/services/InitService.js";
 
+import Offs from "@hkd-base/classes/Offs.js";
+
 /* ---------------------------------------------------------------- Internals */
 
 const WAIT_FOR_DEPENDENCIES_TIMEOUT = 30 * 1000;
 
 const customServiceName$ = Symbol("customServiceName");
-
-const logContext$ = Symbol("logContext");
 
 const allDependenciesAvailable$ = Symbol("availabilityStore");
 
@@ -83,9 +83,6 @@ export default class ServiceBase extends LogBase
 
     // -- Setup this.log
 
-    // const context =
-    //   this[ logContext$ ] = { className: this.serviceName() };
-
     this.__logContext = { className: this.serviceName() };
 
     // -- Object where `on stop functions` can be registered
@@ -110,6 +107,10 @@ export default class ServiceBase extends LogBase
     }
 
     this[ configured$ ] = false;
+
+    // -- Property `offs` can be used to register unsubscribe functions
+
+    this.__offs = new Offs();
   }
 
   // -------------------------------------------------------------------- Method
@@ -150,7 +151,7 @@ export default class ServiceBase extends LogBase
       "Missing or invalid parameter [serviceName]" );
 
     this[ customServiceName$ ] = serviceName;
-    this[ logContext$ ].className = this.serviceName();
+    this.__logContext.className = this.serviceName();
   }
 
   // -------------------------------------------------------------------- Method

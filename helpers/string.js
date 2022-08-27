@@ -1,27 +1,13 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-// let expect;
-// let object_get;
-// let proc;
-
-// export function stdModuleInit()
-// {
-//   expect = std.expect;
-//   object_get = std.object_get;
-//   proc = std.proc;
-
-//   proc.arrayToStringPathWeakMap = new WeakMap();
-//   proc.safeArrayPathsWeakMap = new WeakMap();
-// }
+import { objectGet } from "@hkd-base/helpers/object.js";
 
 /* ---------------------------------------------------------------- Internals */
 
-// const EXPRESSION_REGEXP = /\$\{([^${}]*)\}/g;
+const EXPRESSION_REGEXP = /\$\{([^${}]*)\}/g;
 
 /* ------------------------------------------------------------------ Exports */
-
-// ---------------------------------------------------------------------- Method
 
 /**
  * Captizalize the first letter of a string
@@ -50,76 +36,33 @@ export function capitalizeFirstLetter( str )
  * @param {string} template - Template string to interpolate
  * @param {object} templateData - Template data to use for interpolation
  */
-// export function interpolate( template, templateData )
-// {
-//   expect.string( template, "Missing or invalid variable [template]" );
-//   expect.object( templateData, "Missing or invalid variable [values]" );
+export function interpolate( template, templateData )
+{
+  expect.string( template, "Missing or invalid variable [template]" );
+  expect.object( templateData, "Missing or invalid variable [values]" );
 
-//   return template.replace( EXPRESSION_REGEXP,
-//     function( match, expression )
-//     {
-//       let replacement;
+  return template.replace( EXPRESSION_REGEXP,
 
-//       // std.debug( { match, expression});
+    // eslint-disable-next-line no-unused-vars
+    function( match, expression )
+    {
+      let replacement;
 
-//       let path = expression;
-//       replacement = object_get( templateData, path, undefined);
+      let path = expression;
+      replacement = objectGet( templateData, path, undefined);
 
-//       // if( RE_VARIABLE_ONLY.test( expression ) )
-//       // {
-//       //   let path = expression;
-//       //   replacement = hk.objectGet( templateData, path, undefined);
-//       // }
-//       // else {
-//       //   // Expression is more that just a single variable
-//       //
-//       //   replacement = "TODO";
-//       //
-//       //   //
-//       //   // // Replace all variables in the expression by values
-//       //   //
-//       //   // // let tmp =
-//       //   // //   expression.replace(/[[a-zA-Z_$][0-9a-zA-Z_$]*/g,
-//       //   // //     function( path )
-//       //   // //   {
-//       //   // //     std.debug( { path, templateData } );
-//       //   // //     return hk.objectGet( templateData, path, undefined);
-//       //   // //   } );
-//       //   // //
-//       //   // // std.debug( { tmp } );
-//       //   // //
-//       //   // // replacement = tmp;
-//       //   //
-//       //   // if( expression.indexOf("&&") !== -1 )
-//       //   // {
-//       //   //   // std.debug( expression );
-//       //   //   // replacement = looseJsonParse( "1 + 1" );
-//       //   //
-//       //   //   replacement = looseJsonParse( expression, templateData );
-//       //   //
-//       //   //   std.debug("JENS2", { replacement });
-//       //   // }
-//       //   // else {
-//       //   //   let path = expression;
-//       //   //   replacement = hk.objectGet( templateData, path, undefined);
-//       //   // }
-//       // }
+      if( typeof replacement !== "string" &&
+          typeof replacement !== "number" &&
+          typeof replacement !== "boolean" )
+      {
+        throw new Error(
+          `Failed to interpolate template: Missing or invalid value for ` +
+          `expression ${expression} (expected string, number or boolean)`);
+      }
 
-//       // std.debug("Replace:", expression + " -> " + replacement, templateData);
-
-//       if( typeof replacement !== "string" &&
-//           typeof replacement !== "number" &&
-//           typeof replacement !== "boolean" )
-//       {
-//         throw new Error(
-//           "Template interpolation: Missing or invalid value for "+
-//           "template expression ["+expression+"] "+
-//           "(expected string, number or boolean)");
-//       }
-
-//       return replacement;
-//     } );
-// }
+      return replacement;
+    } );
+}
 
 // ---------------------------------------------------------------------- Method
 

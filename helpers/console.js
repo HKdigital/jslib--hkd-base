@@ -25,6 +25,8 @@ import { getOutputStream,
 
 import { ArgumentsArray } from "@hkd-base/types/array-types.js";
 
+import { isIterable } from "@hkd-base/helpers/is.js";
+
 /* ---------------------------------------------------------------- Internals */
 
 const MAX_HEADER_CONTENT_LENGTH = 47;
@@ -216,91 +218,7 @@ export function defaultEventLogPrinter( logEvent )
       }
     }
 
-    if( error.cause )
-    {
-      //
-      // Create a group for an Error that contains a `cause`
-      //
-      const causes = errorCauseToArray( error );
-
-      console.group( errorHeader );
-
-      // if( !context )
-      // {
-      //   console.group( `Error: ${error.message}` );
-      // }
-      // else {
-      //   console.group( `Error: ${error.message}`, formatContext( context ) );
-      // }
-
-      // console.error( 123, error );
-      console.log( error.message );
-
-      if( error.attributes )
-      {
-        console.log();
-        console.log("Attributes:");
-        console.log( error.attributes );
-      }
-
-      console.log( error.stack );
-
-
-      for( let j = 0, n = causes.length; j < n; j = j + 1 )
-      {
-        if( j > 0 )
-        {
-          console.log();
-        }
-
-        const cause = causes[j];
-
-        console.log( "Cause:" );
-        console.log( cause.message );
-        console.log( cause.stack );
-
-        // if( cause instanceof ErrorEvent )
-        // {
-        //   console.error( cause.error,
-        //     {
-        //       fileName: cause.filename,
-        //       lineNumber: cause.lineno,
-        //       colno: cause.colno
-        //     } );
-        // }
-        // else {
-        //   console.error( cause );
-        // }
-      }
-
-      if( context )
-      {
-        console.log();
-        console.log( "Context:" );
-        console.log( context );
-      }
-
-      console.groupEnd();
-    }
-    else {
-      // const stack = error.stack.split("\n");
-      // error.stack = stack.slice( 3 ).join("\n");
-      // console.log( JSON.stringify( error.stack ) );
-
-      //
-      // Error without `cause`
-      //
-      console.log( errorHeader );
-      console.error( error.message );
-
-      if( error.attributes )
-      {
-        console.log("Attributes:");
-        console.log( error.attributes );
-      }
-
-      console.log( error.stack );
-    }
+    printError( { errorHeader, context, error } );
   }
   else {
     //
@@ -380,6 +298,145 @@ export function defaultEventLogPrinter( logEvent )
     // }
   }
 }
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Print a formatted Error to the console
+ *
+ * @param {string} _.errorHeader
+ * @param {string} _.context
+ * @param {string} _.error
+ */
+function printError( { errorHeader, context, error }  )
+{
+  expectObject( error, "Missing or invalid parameter [error]");
+
+  if( error.cause )
+  {
+    //
+    // Create a group for an Error that contains a `cause`
+    //
+    const causes = errorCauseToArray( error );
+
+    if( errorHeader )
+    {
+      console.group( errorHeader );
+    }
+
+    // if( !context )
+    // {
+    //   console.group( `Error: ${error.message}` );
+    // }
+    // else {
+    //   console.group( `Error: ${error.message}`, formatContext( context ) );
+    // }
+
+    // console.error( 123, error );
+    console.log( error.message );
+
+    if( error.attributes )
+    {
+      console.log();
+      console.log("Attributes:");
+      console.log( error.attributes );
+    }
+
+    console.log( error.stack );
+
+
+    for( let j = 0, n = causes.length; j < n; j = j + 1 )
+    {
+      if( j > 0 )
+      {
+        console.log();
+      }
+
+      const cause = causes[j];
+
+      console.log( "Cause:" );
+      console.log( cause.message );
+      console.log( cause.stack );
+
+      // if( cause instanceof ErrorEvent )
+      // {
+      //   console.error( cause.error,
+      //     {
+      //       fileName: cause.filename,
+      //       lineNumber: cause.lineno,
+      //       colno: cause.colno
+      //     } );
+      // }
+      // else {
+      //   console.error( cause );
+      // }
+    }
+
+    if( context )
+    {
+      console.log();
+      console.log( "Context:" );
+      console.log( context );
+    }
+
+    if( errorHeader )
+    {
+      console.groupEnd();
+    }
+  }
+  else {
+    // const stack = error.stack.split("\n");
+    // error.stack = stack.slice( 3 ).join("\n");
+    // console.log( JSON.stringify( error.stack ) );
+
+    //
+    // Error without `cause`
+    //
+    console.log( errorHeader );
+    console.error( error.message );
+
+    if( error.attributes )
+    {
+      console.log("Attributes:");
+
+      const attributes = error.attributes;
+
+      if( attributes instanceof ArgumentsArray )
+      {
+        for( const current of attributes )
+        {
+          if( current instanceof Error )
+          {
+            printError( { error: current } );
+          }
+        }
+      }
+
+      if( isIterable( attributes ) )
+      {
+        for( const current of attributes )
+        {
+          if( current instanceof Error )
+          {
+            printError( { error: current } );
+          }
+          else {
+            console.log( current );
+          }
+        }
+      }
+      else {
+        console.log( error.attributes );
+      }
+    }
+
+    console.log("Stack:");
+    console.log( error.stack );
+  }
+}
+
+
+// -----------------------------------------------------------------------------
 
 // eslint-disable-next-line no-undef
 const isNodeJs = (typeof process !== "undefined" && process.env);

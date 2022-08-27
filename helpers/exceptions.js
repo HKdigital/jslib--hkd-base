@@ -16,6 +16,10 @@
 import { isObject } from "@hkd-base/helpers/is.js";
 import { systemLog } from "@hkd-base/helpers/log.js";
 
+/* ---------------------------------------------------------------- Internals */
+
+const EXIT_CODE_FATAL = 1;
+
 /* ------------------------------------------------------------------ Exports */
 
 /**
@@ -137,8 +141,10 @@ export function rethrow( message, error )
 /**
  * Catches all uncaught exceptions and unhandled promise rejections
  * and creates events in the systemLog stream
+ *
+ * @param {boolean} [exitProcess=true]
  */
-export function catchUncaughtExceptions()
+export function catchUncaughtExceptions( exitProcess=true )
 {
   // TODO: return unsubscribe function (removeEventListener)
   // TODO: prevent subscribing more than once
@@ -162,10 +168,28 @@ export function catchUncaughtExceptions()
             // @note origin = 'uncaughtException' or 'unhandledRejection'
             //
 
-            // console.log('process.on("uncaughtException")', error );
-            console.log('[!] process.on("uncaughtException")' );
+            try {
+              systemLog
+                .error( new Error( "Uncaught exception", { cause: error } ) );
+            }
+            catch( e )
+            {
+              console.log( "Failed to log uncaught exception" );
+              console.log( e );
+
+              console.log( "Original error" );
+              console.log( err );
+            }
 
             systemLog.error( error );
+
+            if( exitProcess )
+            {
+              //
+              // The system encounted a fatal exception, exit immediately
+              //
+              process.exit( EXIT_CODE_FATAL );
+            }
           } );
     }
   }
