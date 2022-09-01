@@ -15,7 +15,8 @@ import {
   /*compareUsingKey,
   compareUsingPath*/ } from "./compare.js";
 
-import { objectGet, PATH_SEPARATOR } from "./object.js";
+import { objectGet,
+         PATH_SEPARATOR } from "./object.js";
 
 import Selector from "../classes/Selector.js";
 
@@ -300,79 +301,6 @@ export function pathValues( items, path, options={} )
 // ---------------------------------------------------------------------- Method
 
 /**
- * Generic sort function
- * - Sorts array inline (no new array is returned)
- *
- * @see methods `sortByKeyValue` and `sortByPathValue`
- *      for simple sort operations
- *
- * @param {function} comparator_fn
- *   Comparator function (e.g. compareUsingPath)
- *
- * @param {Array} arr - Array to sort
- * @param {string} path - Path to use for sorting
- *
- * @param {object} [options] - Options
- * @param {function} [options.customCompareFn] - Custom compare function
- * @param {function} [options.reversed=false] - Sort in reversed order
- * @param {function} [options.natsort=false] - Use natural sort for strings
- */
-// export function sort( comparator_fn, arr, path, options )
-// {
-//   expectFunction( comparator_fn,
-//     "Missing or invalid parameter [comparator_fn]" );
-
-//   expectArray( arr, "Invalid or missing parameter [arr]" );
-
-//   expectString( path, "Invalid or missing parameter [path]");
-
-//   if( options )
-//   {
-//     expectObject( options, "Invalid parameter [options]");
-//   }
-
-//   let compareFn;
-
-//   options =
-//     Object.assign( { customCompareFn: null, reversed: false }, options );
-
-//   if( options.customCompareFn )
-//   {
-//     compareFn = options.customCompareFn;
-//   }
-//   else if( options.reversed )
-//   {
-//     if( !options.natsort )
-//     {
-//       compareFn = largestFirst;
-//     }
-//     else {
-//       // new Intl.Collator('nl').compare);
-
-//       throw new Error("Not implemented yet");
-//     }
-//   }
-//   else {
-//     if( !options.natsort )
-//     {
-//       compareFn = smallestFirst;
-//     }
-//     else {
-//       throw new Error("Not implemented yet");
-//     }
-//   }
-
-//   // if( path )
-//   // {
-
-//   // }
-
-//   arr.sort( comparator_fn.bind( null, compareFn, path ) );
-// }
-
-// ---------------------------------------------------------------------- Method
-
-/**
  * Sort function that sorts a list of objects by values encountered at the
  * specified key values of the object.
  * - Sorts array inline (no new array is returned)
@@ -468,46 +396,6 @@ export function sortByPathValue( items, path, compareFn=smallestFirst )
 
   cache.clear();
 }
-
-// ---------------------------------------------------------------------- Method
-
-/**
- * Sort an array of objects by a single key value
- * - The sort operation changes the original object
- * - The default order is 'smallest value' first
- *
- * @param {Array} arr - Array to sort
- * @param {string} key - Key to use for sorting
- *
- * @param {object} [options] - Options
- * @param {function} [options.customCompareFn] - Custom compare function
- * @param {function} [options.reversed=false] - Sort in reversed order
- * @param {function} [options.natsort=false] - Use natural sort for strings
- */
-// export function sortByKeyValue()
-// {
-//   return sort( compareUsingKey, ...arguments );
-// }
-
-// ---------------------------------------------------------------------- Method
-
-/**
- * Sort an array of objects by a their value at the specified path
- * - The sort operation changes the original object
- * - The default order is 'smallest value' first
- *
- * @param {Array} arr - Array to sort
- * @param {string} path - Path to use for sorting
- *
- * @param {object} [options] - Options
- * @param {function} [options.customCompareFn] - Custom compare function
- * @param {function} [options.reversed=false] - Sort in reversed order
- * @param {function} [options.natsort=false] - Use natural sort for strings
- */
-// export function sortByPathValue()
-// {
-//   return sort( compareUsingPath, ...arguments );
-// }
 
 // ---------------------------------------------------------------------- Method
 

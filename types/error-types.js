@@ -9,4 +9,4 @@ export class InternalError extends Error {}
 
 export class InternalEventOrLogError extends Error {}
 
-// export class EventError extends Error {}
+export class AuthenticationError extends Error {}

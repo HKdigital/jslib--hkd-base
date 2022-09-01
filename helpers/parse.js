@@ -1,94 +1,25 @@
 
 /* ------------------------------------------------------------------ Imports */
 
+import { expectDefined,
+         expectObject } from "@hkd-base/helpers/expect.js";
+
 import { raise } from "./exceptions.js";
 
 import { equals } from "./compare.js";
 
+import { RE_EMAIL,
+         RE_PHONE,
+         RE_POSTAL_CODE_DUTCH,
+         RE_NAME,
+         RE_FANTASY_NAME,
+         RE_ADDRESS,
+         RE_HAS_A_LETTER_OR_NUMBER,
+         RE_MULTIPLE_SPACES } from "@hkd-base/constants/regexp.js";
+
 /* ---------------------------------------------------------------- Internals */
 
 const invalid$ = Symbol("invalid");
-
-//
-// EXT_LATIN_TOKENS_LC
-// - Extended list of latin tokens, works for most latin languages
-//
-// @note
-//   Both upper- and lower case extended latin tokens are:
-//   "ŠŒŽšœžŸñÑÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðòóôõöøùúûüýþÿ"
-//
-// TODO:
-//   Replace with unicode property escapes when supported ES2018
-//   (not yet supported by MS Edge 12)
-//   https://github.com/tc39/proposal-regexp-unicode-property-escapes
-//   http://unicode.org/Public/UNIDATA/PropertyValueAliases.txt
-//   https://www.fileformat.info/info/unicode/category/index.htm
-//   https://github.com/danielberndt/babel-plugin-utf-8-regex/
-//     blob/master/src/transformer.js
-//
-const EXT_LATIN_TOKENS_LC = "šœžÿñàáâãäåæçèéêëìíîïðòóôõöøùúûüýþß";
-
-// RegExp and RegExp part constants
-
-// TODO:
-//   regexAstralSymbols = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
-//   "-~.,`'\"‘’“”„±€$@%&¡¿©®"
-//   REP_PUNCTUATION = ",.¡!¿?;:-";
-
-const C =
-  {
-    EXT_LATIN_TOKENS_LC,
-    REP_NUMBER: "0-9",
-    REP_LETTER_LC: `a-z${EXT_LATIN_TOKENS_LC}`,
-    REP_LETTER_NUMBER_LC: `0-9a-z${EXT_LATIN_TOKENS_LC}`
-  };
-
-const RE =
-  {
-    EMAIL: new RegExp(
-      '^(([^<>()[\\]\\.,;:\\s@"]+(.[^<>()[\\]\\.,;:\\s@"]+)*)|(".+"))@((([' +
-      '\\-' + C.REP_LETTER_NUMBER_LC +
-      ']+\\.)+[' + C.REP_LETTER_LC + ']{2,}))$', 'i' ),
-
-    // PHONE: new RegExp(
-    //   '(^\\+[0-9]{2}|^\\+[0-9]{2}\\(0\\)|^\\(\\+[0-9]{2}\\)\\(0\\)'+
-    //   '|^00[0-9]{2}|^0)([0-9]{9}$|[0-9\\-\\s]{10}$)'),
-
-    PHONE:
-      /(^\+[0-9]{2}|^\+[0-9]{2}\(0\)|^\(\+[0-9]{2}\)\(0\)|^00[0-9]{2}|^0)([0-9]{9}$|[0-9\-\s]{10}$)/,
-
-    // URL: // << TODO
-
-    POSTAL_CODE_DUTCH: /^[1-9]{1}[0-9]{3} ?[A-Za-z]{2}$/,
-
-    NAME: new RegExp( "^[" + C.REP_LETTER_LC + "\\s-]{2,}$", "i" ),
-
-    FANTASY_NAME: new RegExp(
-      "^[" + C.REP_LETTER_NUMBER_LC + "\\s-_&|,./\\\\]{2,}$", "i" ),
-
-    ADDRESS:
-      new RegExp( "^[" + C.REP_LETTER_NUMBER_LC + ".,°\\s-]{2,}$", "i" ),
-
-    HAS_A_LETTER_OR_NUMBER: new RegExp( "[a-z0-9]+", "i" ),
-
-    MULTIPLE_SPACES: /  +/g,
-
-    TABLE_PATH: new RegExp('^[a-z0-9_]+[.]{0,1}[a-z0-9_]*$')
-  };
-
-// var RE_URL = "TODO";
-
-// @see http://regexlib.com/Search.aspx?k=phone%20number
-// const RE.PHONE =
-//   stdConst.RE.PHONE =
-// /(^\+[0-9]{2}|^\+[0-9]{2}\(0\)|^\(\+[0-9]{2}\)\(0\)|^00[0-9]{2}|^0)([0-9]{9}$|[0-9\-\s]{10}$)/;
-
-// const RE.POSTAL_CODE_DUTCH =
-//   stdConst.RE.POSTAL_CODE_DUTCH = /^[1-9]{1}[0-9]{3} ?[A-Za-z]{2}$/;
-
-//
-// @see https://usefulshortcuts.com/alt-codes/accents-alt-codes.php
-//
 
 const metaTypeCache = {};
 
@@ -105,7 +36,7 @@ const StringParserSettings =
       toLowerCase: true,
       singleSpaces: true
     },
-    test: ( value ) => RE.EMAIL.test( value )
+    test: ( value ) => RE_EMAIL.test( value )
   },
 
   phone:
@@ -114,7 +45,7 @@ const StringParserSettings =
       trim: true,
       singleSpaces: true
     },
-    test: ( value ) => RE.PHONE.test( value )
+    test: ( value ) => RE_PHONE.test( value )
   },
 
   name:
@@ -125,7 +56,7 @@ const StringParserSettings =
     },
     test: ( value ) =>
     {
-      if( value.length >= 2 && RE.NAME.test( value ) )
+      if( value.length >= 2 && RE_NAME.test( value ) )
       {
         return true;
       }
@@ -142,8 +73,8 @@ const StringParserSettings =
     test: ( value ) =>
     {
       if( value.length >= 2 &&
-          RE.FANTASY_NAME.test(value) &&
-          RE.HAS_A_LETTER_OR_NUMBER.test( value ) )
+          RE_FANTASY_NAME.test(value) &&
+          RE_HAS_A_LETTER_OR_NUMBER.test( value ) )
       {
         return true;
       }
@@ -159,7 +90,7 @@ const StringParserSettings =
     },
     test: ( value ) =>
     {
-      if( value.length >= 2 && RE.ADDRESS.test( value ) )
+      if( value.length >= 2 && RE_ADDRESS.test( value ) )
       {
         return true;
       }
@@ -174,7 +105,7 @@ const StringParserSettings =
       toUpperCase: true,
       singleSpaces: true
     },
-    regexp: RE.POSTAL_CODE_DUTCH
+    regexp: RE_POSTAL_CODE_DUTCH
   }
 };
 
@@ -183,6 +114,33 @@ const StringParserSettings =
 StringParserSettings["phone-number"] = StringParserSettings["phone"];
 
 /* ------------------------------------------------------------------ Exports */
+
+/**
+ * Parse a value using a schema
+ *
+ * @param {object} schema - Schema, e.g. a Joi schema
+ * @param {function} schema.validate
+ *   A function that returns and object { error: <Error>, value: <*> }
+ *
+ * @param {*} value
+ *
+ * @returns {*} parsed value
+ */
+export function parse( schema, value )
+{
+  expectObject( schema, "Missing or invalid parameter [schema]" );
+  expectDefined( value, "Missing or invalid parameter [value]" );
+
+  const { error,
+          value: parsedValue } = schema.validate( value );
+
+  if( error )
+  {
+    throw error;
+  }
+
+  return parsedValue;
+}
 
 // ---------------------------------------------------------------------- Method
 
@@ -197,7 +155,7 @@ StringParserSettings["phone-number"] = StringParserSettings["phone"];
 // {
 //   if( !value ||
 //       typeof value !== "string" ||
-//       false === RE.TABLE_PATH.test( value ) )
+//       false === RE_TABLE_PATH.test( value ) )
 //   {
 //     return false;
 //   }
@@ -1135,7 +1093,7 @@ function _parseString( value, expectedType, parseInfo )
 
   if( singleSpaces )
   {
-    value.replace( RE.MULTIPLE_SPACES, ' ' );
+    value.replace( RE_MULTIPLE_SPACES, ' ' );
   }
 
   if( toLowerCase )

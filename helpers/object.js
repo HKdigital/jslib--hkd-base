@@ -14,7 +14,8 @@ import { toArrayPath } from "./array.js";
 
 import { isIterable } from "./is.js";
 
-import { iterateObjectPaths, iterateObjectEntries } from "./iterate.js";
+import { iterateObjectPaths,
+         iterateObjectEntries } from "./iterate.js";
 
 // ------------------------------------------------------------------- Internals
 
@@ -124,6 +125,39 @@ export function exportNotNull( obj )
   } // end for
 
   return newObj;
+}
+
+// ---------------------------------------------------------------------- Method
+
+// export function removeNull()
+
+// ---------------------------------------------------------------------- Method
+
+/**
+ * Keep only the specified keys in the object
+ * - deletes all other key-value pairs in the object
+ *
+ * @param {object} obj
+ * @param {string[]} keys
+ *
+ * @returns {object} object that only contains the specified keys
+ */
+export function keep( obj, keys )
+{
+  expectObject( obj, "Invalid parameter [obj]" );
+  expectArray( obj, "Invalid parameter [properties]" );
+
+  const keep = new Set( keys );
+
+  for( const key in obj )
+  {
+    if( !keep.has( key ) )
+    {
+      delete obj[ key ];
+    }
+  }
+
+  return obj;
 }
 
 // ---------------------------------------------------------------------- Method

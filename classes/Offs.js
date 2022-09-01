@@ -24,7 +24,7 @@ export default class Offs
    * @param {string} [label]
    * @param {function} unsubscribeFn
    */
-  register( /* label, unsubscribeFn */ )
+  register( /* [label], unsubscribeFn */ )
   {
     let label;
     let unsubscribeFn;

@@ -90,7 +90,7 @@ export default class ValueStoreMap extends Map
 
     // -- Create new store
 
-    const newStore = new ValueStorage();
+    const newStore = new ValueStore();
 
     super.set( key, newStore );
 

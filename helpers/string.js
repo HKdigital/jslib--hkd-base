@@ -1,6 +1,9 @@
 
 /* ------------------------------------------------------------------ Imports */
 
+import { expectString,
+         expectObject } from "@hkd-base/helpers/expect.js";
+
 import { objectGet } from "@hkd-base/helpers/object.js";
 
 /* ---------------------------------------------------------------- Internals */
@@ -30,16 +33,23 @@ export function capitalizeFirstLetter( str )
 
 /**
  * Interpolate: substitute variables in a string
- * - Uses es6 template style expression substitution
- * - Variables and expressions are surrounded by ${...}
+ *
+ * - Uses es6 template style expression substitution:
+ *   Variables and expressions are surrounded by ${...}
+ *
+ * --
+ *
+ * @eg const template = `Hello ${name}`;
+ *
+ * --
  *
  * @param {string} template - Template string to interpolate
  * @param {object} templateData - Template data to use for interpolation
  */
 export function interpolate( template, templateData )
 {
-  expect.string( template, "Missing or invalid variable [template]" );
-  expect.object( templateData, "Missing or invalid variable [values]" );
+  expectString( template, "Missing or invalid variable [template]" );
+  expectObject( templateData, "Missing or invalid variable [templateData]" );
 
   return template.replace( EXPRESSION_REGEXP,
 
@@ -49,6 +59,7 @@ export function interpolate( template, templateData )
       let replacement;
 
       let path = expression;
+
       replacement = objectGet( templateData, path, undefined);
 
       if( typeof replacement !== "string" &&
@@ -57,7 +68,7 @@ export function interpolate( template, templateData )
       {
         throw new Error(
           `Failed to interpolate template: Missing or invalid value for ` +
-          `expression ${expression} (expected string, number or boolean)`);
+          `expression [${expression}] (expected string, number or boolean)`);
       }
 
       return replacement;

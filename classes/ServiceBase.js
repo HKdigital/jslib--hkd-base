@@ -46,6 +46,8 @@ import InitService from "@hkd-base/services/InitService.js";
 
 import Offs from "@hkd-base/classes/Offs.js";
 
+import ValueStore from "@hkd-base/classes/ValueStore.js";
+
 /* ---------------------------------------------------------------- Internals */
 
 const WAIT_FOR_DEPENDENCIES_TIMEOUT = 30 * 1000;
@@ -108,9 +110,13 @@ export default class ServiceBase extends LogBase
 
     this[ configured$ ] = false;
 
-    // -- Property `offs` can be used to register unsubscribe functions
+    // -- Property `__offs` can be used to register unsubscribe functions
 
     this.__offs = new Offs();
+
+    // -- Property `__events` can be used to send out service events
+
+    this.__events = new ValueStore();
   }
 
   // -------------------------------------------------------------------- Method
@@ -170,6 +176,32 @@ export default class ServiceBase extends LogBase
     }
 
     return this.constructor.name;
+  }
+
+  // -------------------------------------------------------------------- Method
+
+  /**
+   * Set an event in the service's event stream
+   *
+   * @param {string|object} messageOrEvent
+   */
+  emitEvent( messageOrEvent )
+  {
+    let event;
+
+    if( typeof messageOrEvent === "string" )
+    {
+      event = { message: messageOrEvent };
+    }
+    else {
+      event = messageOrEvent;
+
+      expectObject( event,
+        "Missing or invalid parameter [messageOrEvent] " +
+        "(expected object or string)" );
+    }
+
+    this.__events.set( event );
   }
 
   // -------------------------------------------------------------------- Method

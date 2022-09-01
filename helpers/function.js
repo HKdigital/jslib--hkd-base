@@ -16,9 +16,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectNotEmptyString,
-         expectObject,
-         expectFunction } from "./expect.js";
+import { expectFunction } from "@hkd-base/helpers/expect.js";
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -53,7 +51,7 @@ export function once( callback )
  *   specified interval
  *
  * @param {function} fn
- * @param {number} [intervalMs=100]
+ * @param {number} [intervalMs=200]
  *
  * @returns {function} debounced function
  */
@@ -113,39 +111,39 @@ export function debounce( fn, intervalMs=200 )
  *
  * @returns {function} not null wrapper function
  */
-export function ifNotNull( /* object, functionOrMethodName */ )
-{
-  let fn;
+// export function ifNotNull( /* object, functionOrMethodName */ )
+// {
+//   let fn;
 
-  switch( arguments.length )
-  {
-    case 1:
-      fn = arguments[0];
-      expectFunction( fn, "Missing or invalid parameter [fn]" );
-      break;
+//   switch( arguments.length )
+//   {
+//     case 1:
+//       fn = arguments[0];
+//       expectFunction( fn, "Missing or invalid parameter [fn]" );
+//       break;
 
-    case 2:
-      {
-        const object = arguments[0];
-        const methodName = arguments[1];
+//     case 2:
+//       {
+//         const object = arguments[0];
+//         const methodName = arguments[1];
 
-        expectObject( object, "Invalid parameter [object]" );
-        expectNotEmptyString( methodName, "Invalid parameter [methodName]" );
+//         expectObject( object, "Invalid parameter [object]" );
+//         expectNotEmptyString( methodName, "Invalid parameter [methodName]" );
 
-        fn = object[ methodName ].bind( object );
+//         fn = object[ methodName ].bind( object );
 
-        expectFunction( fn, `Invalid method [<object>.${methodName}]` );
-      }
-      break;
+//         expectFunction( fn, `Invalid method [<object>.${methodName}]` );
+//       }
+//       break;
 
-    default:
-      throw new Error("Invalid number of arguments");
-  }
+//     default:
+//       throw new Error("Invalid number of arguments");
+//   }
 
-  return async ( value ) => {
-    if( null !== value )
-    {
-      await fn();
-    }
-  };
-}
+//   return async ( value ) => {
+//     if( null !== value )
+//     {
+//       await fn( value );
+//     }
+//   };
+// }
