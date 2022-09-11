@@ -46,17 +46,10 @@ export const debug = systemLog.debug.bind( systemLog );
 
 // -----------------------------------------------------------------------------
 // - Turn on console logging by default
+// - Enable catch uncaught exceptions and forward to console log
 
-defer( () => {
-  //
-  // TODO: add flag to disabled auto start
-  //
-
-  // console.log("Auto start console log");
-
-  catchUncaughtExceptions();
-  enableConsoleLogging();
-} );
+catchUncaughtExceptions();
+enableConsoleLogging();
 
 // -----------------------------------------------------------------------------
 
@@ -319,15 +312,33 @@ export function deleteOutputStream( outputLabel=OUTPUT_LABEL_CONSOLE )
 
 // -----------------------------------------------------------------------------
 
-export let disableAutoStartConsoleLogging = false;
+// export let disableAutoStartConsoleLogging = false;
 
-defer( () => {
-  if( !disableAutoStartConsoleLogging )
-  {
-    console.log("[!] Automatically enabled console logging");
-    enableConsoleLogging();
-  }
-} );
+// defer( () => {
+//   if( !disableAutoStartConsoleLogging )
+//   {
+//     console.log("[!] Automatically enabled console logging");
+//     enableConsoleLogging();
+//   }
+// } );
+
+// -----------------------------------------------------------------------------
+// - Turn on console logging by default
+
+// defer( () => {
+//   //
+//   // TODO: add flag to disabled auto start
+//   //
+
+//   // console.log("Auto start console log");
+
+//   catchUncaughtExceptions();
+//   enableConsoleLogging();
+// } );
+
+catchUncaughtExceptions();
+enableConsoleLogging();
+
 
 
 // >>> OLD STUFF BELOW >>>

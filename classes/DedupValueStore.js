@@ -68,10 +68,11 @@ export default class DedupValueStore extends ValueStore
 
     if( this[ value$ ] === value )
     {
+      //
+      // *** FIXME: make this also work for not primitive values using equals?
+      //
       return;
     }
-
-    // *** FIXME: make this also work for not primitive values using equals
 
     this[ value$ ] = value;
 

@@ -812,7 +812,6 @@ export function expectSymbol( value, errorText )
   }
 }
 
-
 // -----------------------------------------------------------------------------
 
 /**
@@ -827,5 +826,21 @@ export function expectSymbolOrString( value, errorText )
   if( typeof value !== "symbol" && typeof value !== "string" )
   {
     expected( errorText, "expected symbol or string", value );
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Expect a value to be an Error instance
+ *
+ * @param {mixed} value - Value to check
+ * @param {string} errorText - Text of the error to throw
+ */
+export function expectError( value, errorText )
+{
+  if( !(value instanceof Error) )
+  {
+    expected( errorText, "expected an Error instance" );
   }
 }
