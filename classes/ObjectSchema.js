@@ -21,12 +21,14 @@ export default class ObjectSchema
 {
   _schemaProperties = {};
 
-  _required = [];
+  _required = [];   // list of required keys
+
+  _keys = {};
 
   _allowUnknown = false;
   _stripUnknown = false;
 
-  _breakOnFirstError = true;
+  // _breakOnFirstError = true;
 
   /**
    * Construct an ObjectSchema instance
@@ -35,6 +37,17 @@ export default class ObjectSchema
    *   Object that contains key => ObjectSchema~Property entries
    *
    * @param {object} options
+   *
+   * --
+   *
+   * @eg
+   *
+   * properties =
+   *   {
+   *     name: { type: TYPE_STRING },
+   *     age: { type: TYPE_NUMBER }
+   *   }
+   *
    */
   constructor( properties, options={} )
   {
@@ -44,17 +57,20 @@ export default class ObjectSchema
 
     for( let key in properties )
     {
-      const value = properties[ key ];
+      const property = properties[ key ];
 
-      expectObject( value,
+      expectObject( property,
         `Invalid parameter [properties]. Property [${key}] is not an object`);
 
-      if( !parsers[ value.type ] )
+      const parser = parsers[ property.type ];
+
+      if( !parser )
       {
-        if( typeof value.type === "string" )
+        if( typeof property.type === "string" )
         {
           throw new Error(
-            `Invalid property [${key}]. No parser found for type [${value.type}]`);
+            `Invalid property [${key}]. ` +
+            `No parser found for type [${property.type}]`);
         }
         else {
           throw new Error(
@@ -62,10 +78,12 @@ export default class ObjectSchema
         }
       }
 
-      if( !value.optional )
+      if( !property.optional )
       {
         this._required.push( key );
       }
+
+      this._keys[ key ] = property;
 
     } // end for
 
@@ -87,7 +105,6 @@ export default class ObjectSchema
         this.stripUnknown( options.stripUnknown );
       }
     }
-
   }
 
   // ---------------------------------------------------------------------------
@@ -126,23 +143,27 @@ export default class ObjectSchema
    *
    * @param {boolean} [breakOnFirst=true]
    */
-  breakOnFirstError( breakOnFirst=true )
-  {
-    expectBoolean( breakOnFirst, "Invalid parameter [breakOnFirst]" );
+  // breakOnFirstError( breakOnFirst=true )
+  // {
+  //   expectBoolean( breakOnFirst, "Invalid parameter [breakOnFirst]" );
 
-    this._breakOnFirstError = breakOnFirst;
-  }
+  //   this._breakOnFirstError = breakOnFirst;
+  // }
 
   // ---------------------------------------------------------------------------
 
   /**
    * Validate (and parse) an object
+   * - Returns the parsed value (object)
+   * - Returns an error or errors of the object validation failed
    *
    * @param {object} obj
+   * @param {string} [options.abortEarly]
+   *   If true, the validate function will stop on the first error
    *
-   * @returns {object} { error, value }
+   * @returns {object} { value [, error] }
    */
-  validate( obj )
+  validate( obj, { abortEarly=true }={} )
   {
     expectObject( obj, "Missing or invalid parameter [obj]" );
 
@@ -154,45 +175,34 @@ export default class ObjectSchema
 
     for( const key in obj )
     {
-      const originalValue = obj[ key ];
-
-      const property = properties[ key ];
-
-      if( !property )
-      {
-        if( !this._allowUnknown )
-        {
-          throw new Error(`Unknown property [${key}] is not allowed`);
-        }
-      }
-
-      const type = property.type;
-
-      const parser = parsers[ type ];
-
-      expectFunction( parser,
-        `Parser for type [${type}] was not found`);
-
-      let { error, value } = parser( originalValue );
+      let { error, value } = this.validateProperty( obj, key );
 
       if( error )
       {
+        const type = properties[ key ].type;
+
         expectError( error,
           `Parser [${type}] did not return a valid error property` );
 
         error =
           new Error(
-            `Failed to parse value for property [${key}] using parser [${type}]`,
+            `Failed to parse value for property [${key}] ` +
+            `using parser for type [${type}]`,
             { cause: error } );
 
-        // -- Break on first error
+        // -- Abort on first error
 
-        if( this._breakOnFirstError )
+        if( abortEarly )
         {
           return { error, value: null };
         }
 
         // -- Collect all errors
+
+        //
+        // FIXME: return errors by key? errors = { key: ... };
+        //        what is the Joi standard?
+        //
 
         if( !errors )
         {
@@ -204,7 +214,7 @@ export default class ObjectSchema
             key,
             value: new Error(
               `Failed to parse value for property [${key}] ` +
-              `using parser [${type}]`,
+              `using parser for type [${type}]`,
               { cause: error } )
           } );
       }
@@ -224,7 +234,8 @@ export default class ObjectSchema
       if( 1 === missing.size )
       {
         return {
-          error: new Error(`Missing property [${missing.values()[0]}]`),
+          error: new Error(
+            `Missing property [${missing.values().next().value}]`),
           value: null
         };
       }
@@ -249,6 +260,87 @@ export default class ObjectSchema
     // -- Parsing was ok: return parsed object
 
     return { value: obj  };
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Validate a single object property
+   *
+   * @param {object} obj
+   * @param {string} key - Name of hte property to validate
+   *
+   * @returns {object} { value: <*> [, error: <Error>] [, finalValue: <*>] }
+   */
+  validateProperty( obj, key )
+  {
+    expectObject( obj, "Missing or invalid parameter [obj]" );
+
+    const properties = this._schemaProperties;
+
+    const originalValue = obj[ key ];
+
+    const property = properties[ key ];
+
+    if( !property )
+    {
+      if( !this._allowUnknown )
+      {
+        throw new Error(`Unknown property [${key}] is not allowed`);
+      }
+      else {
+        //
+        // Unknown property is allowed => return unchanged
+        //
+        return { value: originalValue };
+      }
+    }
+
+    const type = property.type;
+
+    const parser = parsers[ type ];
+
+    const parseOptions = property; // parseOptions === property
+
+    expectFunction( parser,
+      `Parser for type [${type}] was not found`);
+
+    const output = parser( originalValue, parseOptions );
+
+    // let { value,
+    //       error,
+    //       finalValue } = output;
+
+    // console.log("ObjectSchema:validateProperty", obj, key, { error, value } );
+
+    return output;
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Describe the schema
+   * - Trying to keep output identical to [Joi](https://joi.dev)
+   */
+  describe()
+  {
+    const description =
+      {
+        type: "object",
+        keys: this._keys
+
+        //
+        // @see Joi.describe()
+        //
+        // flags: { default: '' }
+        // rules: [ { name: "email" } ]
+        // rules: [
+        //  { name: 'trim', args: { enabled: true } },
+        //  { name: 'case', args: { direction: 'lower' } }
+        // ]
+      };
+
+    return description;
   }
 
   /* ------------------------------------------------------- Internal methods */

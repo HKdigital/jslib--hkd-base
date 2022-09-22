@@ -58,7 +58,8 @@ export const RE_ADDRESS =
 
 export const RE_HAS_A_LETTER_OR_NUMBER = new RegExp( "[a-z0-9]+", "i" );
 
-export const RE_MULTIPLE_SPACES = /  +/g;
+export const RE_MULTIPLE_SPACES = new RegExp("[\\s]{2,}", "g");
+// export const RE_MULTIPLE_SPACES = /  +/g
 
 export const RE_LABEL = new RegExp('^[a-z0-9_-]{2,}$');
 
