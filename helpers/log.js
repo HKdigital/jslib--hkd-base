@@ -15,7 +15,7 @@ import { isIterable } from "@hkd-base/helpers/is.js";
 
 // import { DEBUG, INFO, WARNING, ERROR } from "@hkd-base/types/log-types.js";
 
-import { defer } from "@hkd-base/helpers/process.js";
+// import { defer } from "@hkd-base/helpers/process.js";
 
 import { enableConsoleLogging } from "@hkd-base/helpers/console.js";
 
@@ -43,6 +43,28 @@ export { systemLog };
 export { systemLog as log };
 
 export const debug = systemLog.debug.bind( systemLog );
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Get a logger instance that logs event with the specified moduleName as
+ * context
+ *
+ * @param {string} moduleName
+ *
+ * @returns {object} logger instance
+ */
+export function getModuleLogger( moduleName )
+{
+  expectNotEmptyString( moduleName,
+    "Missing or invalid parameter [moduleName]" );
+
+  const log = new LogStream( { className: moduleName } );
+
+  log.sendTo( systemLog );
+
+  return log;
+}
 
 // -----------------------------------------------------------------------------
 // - Turn on console logging by default

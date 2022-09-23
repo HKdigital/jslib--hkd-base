@@ -57,7 +57,7 @@ export default class ObjectSchema
 
     for( let key in properties )
     {
-      const property = properties[ key ];
+      let property = properties[ key ];
 
       expectObject( property,
         `Invalid parameter [properties]. Property [${key}] is not an object`);
@@ -82,6 +82,8 @@ export default class ObjectSchema
       {
         this._required.push( key );
       }
+
+      property = this._toJoiProperty( property );
 
       this._keys[ key ] = property;
 
@@ -161,21 +163,27 @@ export default class ObjectSchema
    * @param {string} [options.abortEarly]
    *   If true, the validate function will stop on the first error
    *
+   * @param {boolean} [useFinalValue=false]
+   *   If true, the `finalValue` property of the parser will be used
+   *   (if available)
+   *
    * @returns {object} { value [, error] }
    */
-  validate( obj, { abortEarly=true }={} )
+  validate( obj, { abortEarly=true, useFinalValue=false }={} )
   {
     expectObject( obj, "Missing or invalid parameter [obj]" );
 
     const properties = this._schemaProperties;
 
-    let errors = null;
+    let details = null;
 
     let missing = new Set( this._required );
 
     for( const key in obj )
     {
-      let { error, value } = this.validateProperty( obj, key );
+      let { error,
+            value,
+            finalValue } = this.validateProperty( obj, key );
 
       if( error )
       {
@@ -200,26 +208,48 @@ export default class ObjectSchema
         // -- Collect all errors
 
         //
-        // FIXME: return errors by key? errors = { key: ... };
-        //        what is the Joi standard?
+        // Example output from Joi:
         //
+        // [Error [ValidationError]: "firstName" must be a string. "lastName" must be a string] {
+        //   _original: { firstName: 1, lastName: 2 },
+        //   details: [
+        //     {
+        //       message: '"firstName" must be a string',
+        //       path: [Array],
+        //       type: 'string.base',
+        //       context: [Object]
+        //     },
+        //     {
+        //       message: '"lastName" must be a string',
+        //       path: [Array],
+        //       type: 'string.base',
+        //       context: [Object]
+        //     }
+        //   ]
+        // }
 
-        if( !errors )
+        if( !details )
         {
-          errors = [];
+          details = [];
         }
 
-        errors.push(
+        const message =
+          `Failed to parse value for property [${key}] ` +
+          `using parser for type [${type}]`;
+
+        details.push(
           {
             key,
-            value: new Error(
-              `Failed to parse value for property [${key}] ` +
-              `using parser for type [${type}]`,
-              { cause: error } )
+            error: new Error( message, { cause: error } )
           } );
       }
 
       // -- Parsing was ok: update value
+
+      if( useFinalValue && finalValue !== undefined )
+      {
+        value = finalValue;
+      }
 
       obj[ key ] = value;
 
@@ -249,11 +279,21 @@ export default class ObjectSchema
       }
     }
 
-    if( errors )
+    if( details )
     {
+      // let message;
+
+      // for( const current of details )
+      // {
+      //   message = message + current.error.message + " ";
+      // }
+
+      const error = new Error(`Encountered [${details.length}] parse errors`);
+
+      error.details = details;
+
       return {
-        error: new Error(`Encountered [${errors.length}] parse errors`),
-        errors, /* <- additional property */
+        error: new Error(`Encountered [${details.length}] parse errors`),
         value: null };
     }
 
@@ -344,5 +384,38 @@ export default class ObjectSchema
   }
 
   /* ------------------------------------------------------- Internal methods */
+
+  /**
+   * Convert a property to a JOI property as outputted by the
+   * Joi describe method
+   *
+   * @param {object} property
+   */
+  _toJoiProperty( property )
+  {
+    expectObject( property, "Missin gor invalid parameter [property]" );
+
+    if( !property.flags )
+    {
+      property.flags = {};
+    }
+
+    if( !property.rules )
+    {
+      property.rules = [];
+    }
+
+    const flags = property.flags;
+
+    if( "default" in property )
+    {
+      flags.default = property.default;
+      delete property.default;
+    }
+
+    // const rules = property.rules;
+
+    return property;
+  }
 
 } // end class
