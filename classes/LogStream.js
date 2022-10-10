@@ -203,7 +203,7 @@ export default class LogStream extends ValueStore
 
     let context = this.context;
 
-    console.log( "####_toLogEvent", args, context );
+    // console.log( "####_toLogEvent", args, context );
 
     try {
       if( undefined === data )
