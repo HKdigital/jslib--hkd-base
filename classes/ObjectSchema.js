@@ -45,7 +45,7 @@ export default class ObjectSchema
    * properties =
    *   {
    *     name: { type: TYPE_STRING },
-   *     age: { type: TYPE_NUMBER }
+   *     age: { type: TYPE_NUMBER, optional: true }
    *   }
    *
    */
@@ -411,6 +411,12 @@ export default class ObjectSchema
     {
       flags.default = property.default;
       delete property.default;
+    }
+
+    if( property.optional )
+    {
+      flags.presence = "optional";
+      delete property.optional;
     }
 
     // const rules = property.rules;
