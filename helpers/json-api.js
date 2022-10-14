@@ -1,6 +1,7 @@
 /* ------------------------------------------------------------------ Imports */
 
-import { expectNotEmptyString,
+import { expectString,
+         expectNotEmptyString,
          expectObject } from "@hkd-base/helpers/expect.js";
 
 import { ResponseError,
@@ -52,7 +53,7 @@ export function buildApiUrl( uri, config )
   expectNotEmptyString( origin,
     `Missing or invalid parameter [config.origin]` );
 
-  expectNotEmptyString( apiPrefix,
+  expectString( apiPrefix,
     `Invalid parameter [config.apiPrefix]` );
 
   return new URL( apiPrefix + uri, origin );
@@ -224,6 +225,8 @@ export async function jsonApiRequest(
     //
     headers["authorization"] = `Bearer ${token}`;
   }
+
+  // console.log( "json-api", { method, url, body, urlSearchParams, headers } );
 
   const responsePromise =
     httpRequest( { method, url, body, urlSearchParams, headers } );
