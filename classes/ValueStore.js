@@ -18,14 +18,13 @@
 
 import { expectFunction } from "../helpers/expect.js";
 
-// import { HkPromise } from "../promises.js";
-
 /* ---------------------------------------------------------------- Internals */
 
 // @note export internal property symbols for inheritance
 
 export const value$ = Symbol("value");
-export const subscribers$ = Symbol("subscribers");
+export const callbacks$ = Symbol("callbacks");
+export const unsubscribers$ = Symbol("unsubscribers");
 
 //
 // async iterator support
@@ -63,7 +62,8 @@ export default class ValueStore
    */
   constructor( initialValue, enableHasSubscribers=true )
   {
-    this[ subscribers$ ] = new Set();
+    this[ callbacks$ ] = new Set();
+    this[ unsubscribers$ ] = new Map();
 
     if( undefined !== initialValue )
     {
@@ -127,9 +127,8 @@ export default class ValueStore
    */
   unsubscribeAll()
   {
-    for( const unsubscribe of this[ subscribers$ ].values() )
+    for( const unsubscribe of this[ unsubscribers$ ].values() )
     {
-      this[ subscribers$ ].delete( unsubscribe );
       unsubscribe();
     }
   }
@@ -150,14 +149,14 @@ export default class ValueStore
   {
     expectFunction( callback, "Missing or invalid parameter [callback]" );
 
-    if( this[ subscribers$ ].has( callback ) )
+    if( this[ callbacks$ ].has( callback ) )
     {
       throw new Error("Callback has already been registered");
     }
 
-    this[ subscribers$ ].add( callback );
+    this[ callbacks$ ].add( callback );
 
-    if( 1 === this[ subscribers$ ].size )
+    if( 1 === this[ callbacks$ ].size )
     {
       // First subscriber -> set hasSubscribers
       if( this.hasSubscribers )
@@ -170,9 +169,10 @@ export default class ValueStore
 
     const unsubscribe = () =>
     {
-      this[ subscribers$ ].delete( callback );
+      this[ callbacks$ ].delete( callback );
+      this[ unsubscribers$ ].delete( callback );
 
-      if( 0 === this[ subscribers$ ].size )
+      if( 0 === this[ callbacks$ ].size )
       {
         // Last subscriber
         if( this.hasSubscribers )
@@ -181,6 +181,8 @@ export default class ValueStore
         }
       }
     };
+
+    this[ unsubscribers$ ].set( callback, unsubscribe );
 
     // -- Call callback directly upon registration (if value was set)
 
@@ -194,6 +196,32 @@ export default class ValueStore
     // -- Return unsubscribe function
 
     return unsubscribe;
+  }
+
+  // -------------------------------------------------------------------- Method
+
+  /**
+   * Subscribe and automatically unsubscribe once the callback has been called
+   *
+   * @param {function} callback
+   *
+   * @param {boolean} [callOnRegistration=true]
+   *   Call the callback directly (send an initial value)
+   *
+   * @returns {ValueStore~subscribeCallback} unsubscribe function
+   */
+  once( callback, callOnRegistration=true )
+  {
+    expectFunction( callback, "Missing or invalid parameter [callback]" );
+
+    function once( value, unsubscribe )
+    {
+      unsubscribe();
+
+      callback( value, unsubscribe );
+    }
+
+    return this.subscribe( once, callOnRegistration );
   }
 
   // -------------------------------------------------------------------- Method
@@ -279,18 +307,11 @@ export default class ValueStore
   {
     const value = this[ value$ ];
 
-    for( const callback of this[ subscribers$ ].values() )
+    for( const callback of this[ callbacks$ ].values() )
     {
-      callback( value );
+      const unsubscribe = this[ unsubscribers$ ].get( callback );
 
-      // try {
-      //   callback( value );
-      // }
-      // catch( e )
-      // {
-      //   TODO: push to error-log
-      //   console.log( e );
-      // }
+      callback( value, unsubscribe );
     }
   }
 
