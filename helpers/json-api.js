@@ -215,8 +215,7 @@ export async function jsonApiRequest(
       if( expiredMs > 0 )
       {
         throw new ExpiredError(
-          `Token from global config [${config}] has expired ` +
-          `(${Math.round(expiredMs/1000)} seconds ago)`);
+          `Token has expired (${Math.round(expiredMs/1000)} seconds ago)`);
       }
     }
 

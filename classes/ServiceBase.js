@@ -76,6 +76,18 @@ export default class ServiceBase extends LogBase
    *
    * @param {function} configureFn
    *   Callback that should be called to configure the service
+   *
+   * --
+   *
+   * The confgureFn function is useful when using inheritance.
+   *
+   * In normal javascript, the super() call in a constructor must be before
+   * all other code in the constructor. This means that constructore code
+   * in the extended classes will be executed fist. This is not always what
+   * you want.
+   *
+   * The configureFn function is executes bt the "ServiceBase" constructor,
+   * so will be executed before all other constructor code.
    */
   constructor( configureFn )
   {
