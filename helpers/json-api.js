@@ -5,7 +5,7 @@ import { expectString,
          expectObject } from "@hkd-base/helpers/expect.js";
 
 import { ResponseError,
-         ExpiredError } from "@hkd-base/types/error-types.js";
+         TokenExpiredError } from "@hkd-base/types/error-types.js";
 
 import { isObject } from "@hkd-base/helpers/is.js";
 
@@ -214,7 +214,7 @@ export async function jsonApiRequest(
 
       if( expiredMs > 0 )
       {
-        throw new ExpiredError(
+        throw new TokenExpiredError(
           `Token has expired (${Math.round(expiredMs/1000)} seconds ago)`);
       }
     }
