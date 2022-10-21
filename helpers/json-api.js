@@ -193,7 +193,8 @@ export async function jsonApiRequest(
 
   const headers =
     {
-      "accept": "application/json",
+      /* Added `accept "text/html"` to prevent 406 Not Acceptable issues */
+      "accept": "text/html,application/json",
       "content-type": "application/json"
     };
 
