@@ -8,9 +8,12 @@ import { objectGet } from "@hkd-base/helpers/object.js";
 
 /* ---------------------------------------------------------------- Internals */
 
-const EXPRESSION_REGEXP = /\$\{([^${}]*)\}/g;
-
 /* ------------------------------------------------------------------ Exports */
+
+export const RE_JS_EXPRESSION = /\$\{([^${}]*)\}/g;
+export const RE_MUSTACHE = /\{\{([^{}]*)\}\}/g;
+
+// ---------------------------------------------------------------------- Method
 
 /**
  * Captizalize the first letter of a string
@@ -46,12 +49,15 @@ export function capitalizeFirstLetter( str )
  * @param {string} template - Template string to interpolate
  * @param {object} templateData - Template data to use for interpolation
  */
-export function interpolate( template, templateData )
+export function interpolate(
+  template,
+  templateData,
+  expressionRegexp=RE_MUSTACHE )
 {
   expectString( template, "Missing or invalid variable [template]" );
   expectObject( templateData, "Missing or invalid variable [templateData]" );
 
-  return template.replace( EXPRESSION_REGEXP,
+  return template.replace( expressionRegexp,
 
     // eslint-disable-next-line no-unused-vars
     function( match, expression )
