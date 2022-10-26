@@ -844,3 +844,21 @@ export function expectError( value, errorText )
     expected( errorText, "expected an Error instance" );
   }
 }
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Expect a value to be an Error instance or an error message (string)
+ *
+ * @param {mixed} value - Value to check
+ * @param {string} errorText - Text of the error to throw
+ */
+// export function expectErrorOrMessage( value, errorText )
+// {
+//   if( !(value instanceof Error) &&
+//       !(typeof value === "string" && value.length !== 0) )
+//   {
+//     expected( errorText,
+//       "expected an Error instance or error message (string)" );
+//   }
+// }
