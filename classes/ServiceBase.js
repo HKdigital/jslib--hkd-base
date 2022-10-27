@@ -614,10 +614,10 @@ export default class ServiceBase extends LogBase
 
     // Call state transition handler to initiate one or more state transitions
 
-    this.log.info(
-      `Target state changed of service [${this.serviceName()}]. ` +
-      `Transition [${displayState(currentState)}] ` +
-      `-> [${displayState(targetState)}]` );
+    // this.log.info(
+    //   `Target state changed of service [${this.serviceName()}]. ` +
+    //   `Transition [${displayState(currentState)}] ` +
+    //   `-> [${displayState(targetState)}]` );
 
     await this._transitionToState( targetState );
   }
