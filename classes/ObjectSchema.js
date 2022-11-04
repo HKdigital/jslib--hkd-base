@@ -6,7 +6,7 @@ import { expectBoolean,
          expectFunction,
          expectError } from "@hkd-base/helpers/expect.js";
 
-import { parsers } from "@hkd-base/helpers/parse.js";
+import { registeredParsers } from "@hkd-base/helpers/parse.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -62,7 +62,7 @@ export default class ObjectSchema
       expectObject( property,
         `Invalid parameter [properties]. Property [${key}] is not an object`);
 
-      const parser = parsers[ property.type ];
+      const parser = registeredParsers[ property.type ];
 
       if( !parser )
       {
@@ -338,7 +338,7 @@ export default class ObjectSchema
 
     const type = property.type;
 
-    const parser = parsers[ type ];
+    const parser = registeredParsers[ type ];
 
     const parseOptions = property; // parseOptions === property
 

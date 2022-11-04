@@ -47,6 +47,13 @@ export const RE_PHONE =
 export const RE_POSTAL_CODE_DUTCH =
    /^[1-9]{1}[0-9]{3} ?[A-Za-z]{2}$/;
 
+export const RE_PLACE_DUTCH =
+   new RegExp( "^['`]{0,1}" +
+               "[" + C.REP_LETTER_LC + "]{0,}" +
+               "[-\\s]{0,1}" +
+               "[" + C.REP_LETTER_LC + "]{2,}$",
+               "i" );
+
 export const RE_NAME =
   new RegExp( "^[" + C.REP_LETTER_LC + "\\s-]{2,}$", "i" );
 
