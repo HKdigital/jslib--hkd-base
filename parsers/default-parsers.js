@@ -14,9 +14,11 @@ import {
   TYPE_OBJECT,
   TYPE_ARRAY,
   TYPE_NAME,
+  TYPE_FANTASY_NAME,
   TYPE_EMAIL } from "@hkd-base/types/schema-types.js";
 
 import { RE_NAME,
+         RE_FANTASY_NAME,
          RE_EMAIL,
          RE_MULTIPLE_SPACES } from "@hkd-base/constants/regexp.js";
 
@@ -122,11 +124,14 @@ export const rulesByName =
  */
 export const parsers =
   {
-    [ TYPE_STRING ]: function( value, flags={}, rules=[] )
+    [ TYPE_STRING ]: function( value, { flags={}, rules=[] }={} )
       {
         //
         // TODO parse options (to check if options are valid)
         //
+
+        // console.log( "flags", flags );
+        // console.log( "rules", rules );
 
         if( undefined === value )
         {
@@ -180,6 +185,28 @@ export const parsers =
       if( !RE_NAME.test( finalValue ) )
       {
         return { error: new Error("Value should be a valid 'name'") };
+      }
+
+      //
+      // @note trimEnd() not possible while typing e.g. fullname
+      //       because typing spaces between names is not possible
+      //
+      value = value.trimStart();
+
+      return { value, finalValue };
+    },
+
+    [ TYPE_FANTASY_NAME ]: function( value, options )
+    {
+      if( typeof value !== "string" ) {
+        return { error: new Error("Value should be a string") };
+      }
+
+      const finalValue = value.trim(); // trim value before test
+
+      if( !RE_FANTASY_NAME.test( finalValue ) )
+      {
+        return { error: new Error("Value should be a valid 'fantasy name'") };
       }
 
       //
