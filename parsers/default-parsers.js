@@ -3,9 +3,7 @@
 
 import { expectString,
          expectNotEmptyString,
-         expectPositiveNumber,
-         expectDefined,
-         expectObject } from "@hkd-base/helpers/expect.js";
+         expectPositiveNumber } from "@hkd-base/helpers/expect.js";
 
 import {
   TYPE_STRING,
@@ -30,6 +28,20 @@ let registered = false;
 
 /* ------------------------------------------------------------------ Exports */
 
+/**
+ * Rules can be used in a schema
+ *
+ * e.g.
+ *
+ * let schema =
+ *  {
+ *    name:
+ *      { type: TYPE_STRING,
+ *        rules: [ { name: "trim" },
+ *                 { name: "min", limit: 2 } ]
+ *      }
+ *  }
+ */
 export const rulesByName =
   {
     /**
@@ -145,6 +157,8 @@ export const parsers =
           return { error: new Error("Value should be a string") };
         }
 
+        let finalValue = value;
+
         for( const rule of rules )
         {
           const name = rule.name;
@@ -159,22 +173,23 @@ export const parsers =
             throw new Error(`Rule [${name}] does not exist`);
           }
 
-          const output = ruleFn( value, rule );
+          const output = ruleFn( finalValue, rule );
 
           if( output.error )
           {
             return output;
           }
-          else if( output.value ) {
-            value = output.value;
+          else if( output.finalValue )
+          {
+            finalValue = output.finalValue;
           }
 
         } // end for
 
-        return { value };
+        return { value, finalValue };
       },
 
-    [ TYPE_NAME ]: function( value, options )
+    [ TYPE_NAME ]: function( value /* , { flags={}, rules=[] }={} */ )
     {
       if( typeof value !== "string" ) {
         return { error: new Error("Value should be a string") };
@@ -196,7 +211,7 @@ export const parsers =
       return { value, finalValue };
     },
 
-    [ TYPE_FANTASY_NAME ]: function( value, options )
+    [ TYPE_FANTASY_NAME ]: function( value /* , { flags={}, rules=[] }={} */ )
     {
       if( typeof value !== "string" ) {
         return { error: new Error("Value should be a string") };
@@ -218,7 +233,7 @@ export const parsers =
       return { value, finalValue };
     },
 
-    [ TYPE_EMAIL ]: function( value, options )
+    [ TYPE_EMAIL ]: function( value /* , { flags={}, rules=[] }={} */ )
     {
       // return { error: new Error("Test failure") };
 
@@ -236,7 +251,7 @@ export const parsers =
       return { value };
     },
 
-    [ TYPE_NUMBER ]: function( value, options )
+    [ TYPE_NUMBER ]: function( value /* , { flags={}, rules=[] }={} */ )
       {
         if( typeof value !== "number" ) {
           return { error: new Error("Value should be a number") };
@@ -245,7 +260,7 @@ export const parsers =
         return { value };
       },
 
-    [ TYPE_BOOLEAN ]: function( value, options )
+    [ TYPE_BOOLEAN ]: function( value /* , { flags={}, rules=[] }={} */ )
       {
         if( typeof value !== "boolean" ) {
           return { error: new Error("Value should be a boolean") };
@@ -254,7 +269,7 @@ export const parsers =
         return { value };
       },
 
-    [ TYPE_OBJECT ]: function( value, options )
+    [ TYPE_OBJECT ]: function( value /* , { flags={}, rules=[] }={} */ )
       {
         if( typeof value !== "object" || value === null ) {
           return { error: new Error("Value should be an object") };
@@ -263,7 +278,7 @@ export const parsers =
         return { value };
       },
 
-    [ TYPE_ARRAY ]: function( value, options )
+    [ TYPE_ARRAY ]: function( value /* , { flags={}, rules=[] }={} */ )
       {
         if( !Array.isArray(value) ) {
           return { error: new Error("Value should be an array") };

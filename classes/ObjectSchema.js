@@ -251,7 +251,16 @@ export default class ObjectSchema
         value = finalValue;
       }
 
-      obj[ key ] = value;
+      const existingValue = obj[ key ];
+
+      if( existingValue instanceof Object &&
+          typeof existingValue.get === "function" )
+      {
+        obj[ key ].set( value );
+      }
+      else {
+        obj[ key ] = value;
+      }
 
       // -- Keep track of `missing required properties`
 
@@ -299,7 +308,25 @@ export default class ObjectSchema
 
     // -- Parsing was ok: return parsed object
 
-    return { value: obj  };
+    // Convert stores to values in returned output
+
+    const output = {};
+
+    for( const key in obj )
+    {
+      const value = obj[ key ];
+
+      if( value instanceof Object &&
+          typeof value.get === "function" )
+      {
+        output[ key ] = value.get();
+      }
+      else {
+        output[ key ] = value;
+      }
+    }
+
+    return { value: output };
   }
 
   // ---------------------------------------------------------------------------
@@ -318,7 +345,17 @@ export default class ObjectSchema
 
     const properties = this._schemaProperties;
 
-    const originalValue = obj[ key ];
+    let originalValue = obj[ key ];
+
+    if( (originalValue instanceof Object) &&
+        typeof originalValue.get === "function" )
+    {
+      //
+      // If the value is a `store` (or has a get method), use it to get the
+      // real value.
+      //
+      originalValue = originalValue.get();
+    }
 
     const property = properties[ key ];
 
