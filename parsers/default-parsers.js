@@ -3,9 +3,7 @@
 
 import { expectString,
          expectNotEmptyString,
-         expectPositiveNumber,
-         expectDefined,
-         expectObject } from "@hkd-base/helpers/expect.js";
+         expectPositiveNumber } from "@hkd-base/helpers/expect.js";
 
 import {
   TYPE_STRING,
@@ -14,9 +12,11 @@ import {
   TYPE_OBJECT,
   TYPE_ARRAY,
   TYPE_NAME,
+  TYPE_FANTASY_NAME,
   TYPE_EMAIL } from "@hkd-base/types/schema-types.js";
 
 import { RE_NAME,
+         RE_FANTASY_NAME,
          RE_EMAIL,
          RE_MULTIPLE_SPACES } from "@hkd-base/constants/regexp.js";
 
@@ -28,6 +28,20 @@ let registered = false;
 
 /* ------------------------------------------------------------------ Exports */
 
+/**
+ * Rules can be used in a schema
+ *
+ * e.g.
+ *
+ * let schema =
+ *  {
+ *    name:
+ *      { type: TYPE_STRING,
+ *        rules: [ { name: "trim" },
+ *                 { name: "min", limit: 2 } ]
+ *      }
+ *  }
+ */
 export const rulesByName =
   {
     /**
@@ -122,11 +136,14 @@ export const rulesByName =
  */
 export const parsers =
   {
-    [ TYPE_STRING ]: function( value, flags={}, rules=[] )
+    [ TYPE_STRING ]: function( value, { flags={}, rules=[] }={} )
       {
         //
         // TODO parse options (to check if options are valid)
         //
+
+        // console.log( "flags", flags );
+        // console.log( "rules", rules );
 
         if( undefined === value )
         {
@@ -139,6 +156,8 @@ export const parsers =
         if( typeof value !== "string" ) {
           return { error: new Error("Value should be a string") };
         }
+
+        let finalValue = value;
 
         for( const rule of rules )
         {
@@ -154,22 +173,23 @@ export const parsers =
             throw new Error(`Rule [${name}] does not exist`);
           }
 
-          const output = ruleFn( value, rule );
+          const output = ruleFn( finalValue, rule );
 
           if( output.error )
           {
             return output;
           }
-          else if( output.value ) {
-            value = output.value;
+          else if( output.finalValue )
+          {
+            finalValue = output.finalValue;
           }
 
         } // end for
 
-        return { value };
+        return { value, finalValue };
       },
 
-    [ TYPE_NAME ]: function( value, options )
+    [ TYPE_NAME ]: function( value /* , { flags={}, rules=[] }={} */ )
     {
       if( typeof value !== "string" ) {
         return { error: new Error("Value should be a string") };
@@ -191,7 +211,29 @@ export const parsers =
       return { value, finalValue };
     },
 
-    [ TYPE_EMAIL ]: function( value, options )
+    [ TYPE_FANTASY_NAME ]: function( value /* , { flags={}, rules=[] }={} */ )
+    {
+      if( typeof value !== "string" ) {
+        return { error: new Error("Value should be a string") };
+      }
+
+      const finalValue = value.trim(); // trim value before test
+
+      if( !RE_FANTASY_NAME.test( finalValue ) )
+      {
+        return { error: new Error("Value should be a valid 'fantasy name'") };
+      }
+
+      //
+      // @note trimEnd() not possible while typing e.g. fullname
+      //       because typing spaces between names is not possible
+      //
+      value = value.trimStart();
+
+      return { value, finalValue };
+    },
+
+    [ TYPE_EMAIL ]: function( value /* , { flags={}, rules=[] }={} */ )
     {
       // return { error: new Error("Test failure") };
 
@@ -209,7 +251,7 @@ export const parsers =
       return { value };
     },
 
-    [ TYPE_NUMBER ]: function( value, options )
+    [ TYPE_NUMBER ]: function( value /* , { flags={}, rules=[] }={} */ )
       {
         if( typeof value !== "number" ) {
           return { error: new Error("Value should be a number") };
@@ -218,7 +260,7 @@ export const parsers =
         return { value };
       },
 
-    [ TYPE_BOOLEAN ]: function( value, options )
+    [ TYPE_BOOLEAN ]: function( value /* , { flags={}, rules=[] }={} */ )
       {
         if( typeof value !== "boolean" ) {
           return { error: new Error("Value should be a boolean") };
@@ -227,7 +269,7 @@ export const parsers =
         return { value };
       },
 
-    [ TYPE_OBJECT ]: function( value, options )
+    [ TYPE_OBJECT ]: function( value /* , { flags={}, rules=[] }={} */ )
       {
         if( typeof value !== "object" || value === null ) {
           return { error: new Error("Value should be an object") };
@@ -236,7 +278,7 @@ export const parsers =
         return { value };
       },
 
-    [ TYPE_ARRAY ]: function( value, options )
+    [ TYPE_ARRAY ]: function( value /* , { flags={}, rules=[] }={} */ )
       {
         if( !Array.isArray(value) ) {
           return { error: new Error("Value should be an array") };
