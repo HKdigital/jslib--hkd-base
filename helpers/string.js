@@ -84,6 +84,26 @@ export function interpolate(
 // ---------------------------------------------------------------------- Method
 
 /**
+ * Remove strange characters from a string and replace whitespace by
+ * dashes.
+ *
+ * @returns {string} string that can be used as uri
+ */
+export function toUriName( str )
+{
+  expectString( str,
+    "Missing or invalid variable [str]" );
+
+  str = str.toLowerCase().replace(/[^a-z0-9]+/ig, "-");
+
+  // TODO: remove duplicate dashes
+
+  return str;
+}
+
+// ---------------------------------------------------------------------- Method
+
+/**
  * Make sure that the outputted path is an array path
  * - The input value may be a array path
  * - The input value may be a string path (no conversion needed)
