@@ -33,7 +33,7 @@ export function buildTreeFromBranches( branchGraphData, idKey="_id" )
 
   // -- Build graph
 
-  const nodesByFrom = { [rootId]: root };
+  const nodesByFromOrTo = { [rootId]: root };
 
   const allNodeIds = new Set();
 
@@ -43,10 +43,22 @@ export function buildTreeFromBranches( branchGraphData, idKey="_id" )
 
   for( const branch of branches )
   {
-    const { from, node } = branch;
+    const { from, to, node } = branch;
 
-    expectNotEmptyString( from,
-      "Invalid property [branch.from] in branchGraphData" );
+    if( from )
+    {
+      expectNotEmptyString( from,
+        "Invalid property [branch.from] in branchGraphData" );
+    }
+    else if( to )
+    {
+      expectNotEmptyString( to,
+        "Invalid property [branch.to] in branchGraphData" );
+    }
+    else {
+      throw new Error(
+        `Missing property [branch.from] or [branch.to] in branchGraphData`);
+    }
 
     expectObject( node,
       "Invalid property [branch.node] in branchGraphData" );
@@ -63,37 +75,55 @@ export function buildTreeFromBranches( branchGraphData, idKey="_id" )
 
   while( todo.length )
   {
-    let { from, node } = todo.shift();
+    let { from, to, node } = todo.shift();
 
-    if( !allNodeIds.has( from ) )
+    let fromOrTo;
+
+    if( from )
     {
-      throw new Error(`Invalid branch node [from=${from}] was not found`);
+      if( !allNodeIds.has( from ) )
+      {
+        throw new Error(`Invalid branch node [from=${from}] was not found`);
+      }
+
+      fromOrTo = from;
+    }
+    else {
+      if( !allNodeIds.has( to ) )
+      {
+        throw new Error(`Invalid branch node [to=${to}] was not found`);
+      }
+
+      fromOrTo = to;
     }
 
-    const fromNode = nodesByFrom[ from ];
+    const fromOrToNode = nodesByFromOrTo[ fromOrTo ];
 
-    if( !fromNode )
+    if( !fromOrToNode )
     {
-      // fromNode has not been set yet (but we know it exists) -> process later
-      todo.push( fromNode );
+      //
+      // fromOrToNode has not been set yet (but we know it exists)
+      // => process later
+      //
+      todo.push( fromOrToNode );
       continue;
     }
 
     const nodeId = node[ idKey ];
 
-    if( !nodesByFrom[ nodeId ] )
+    if( !nodesByFromOrTo[ nodeId ] )
     {
       //
       // Shallow clone node and store
       //
       node =
-        nodesByFrom[ nodeId ] = { ...node };
+        nodesByFromOrTo[ nodeId ] = { ...node };
     }
     else {
       //
-      // Use (shallow cloned) node from `nodesByFrom`
+      // Use (shallow cloned) node from `nodesByFromOrTo`
       //
-      node = nodesByFrom[ nodeId ];
+      node = nodesByFromOrTo[ nodeId ];
     }
 
     const x = nodeId.indexOf("/");
@@ -108,12 +138,12 @@ export function buildTreeFromBranches( branchGraphData, idKey="_id" )
       subGroupName = "_next";
     }
 
-    if( !fromNode[ subGroupName ] )
+    if( !fromOrToNode[ subGroupName ] )
     {
-      fromNode[ subGroupName ] = [ node ];
+      fromOrToNode[ subGroupName ] = [ node ];
     }
     else {
-      fromNode[ subGroupName ].push( node );
+      fromOrToNode[ subGroupName ].push( node );
     }
 
   } // end for
