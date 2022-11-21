@@ -21,6 +21,11 @@ export function buildTreeFromBranches( branchGraphData, idKey="_id" )
 
   let { root, branches } = branchGraphData;
 
+  if( !branches || !branches.length )
+  {
+    return root;
+  }
+
   const rootId = root[ idKey ];
 
   expectNotEmptyString( rootId,
