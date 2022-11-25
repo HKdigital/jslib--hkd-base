@@ -300,7 +300,7 @@ export async function jsonGet( { url, urlSearchParams, headers } )
     // console.log( response );
     throw new ResponseError(
       `Failed to JSON decode server response from [${decodeURI(url.href)}]`,
-      { casue: e } );
+      { cause: e } );
   }
 
   if( parsedResponse.error )

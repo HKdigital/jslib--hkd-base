@@ -146,6 +146,16 @@ export function rethrow( message, error )
  */
 export function catchUncaughtExceptions( exitProcess=true )
 {
+  //
+  // Prevent double registrations
+  //
+  if( catchUncaughtExceptions.enabled )
+  {
+    return;
+  }
+
+  catchUncaughtExceptions.enabled = true;
+
   // TODO: return unsubscribe function (removeEventListener)
   // TODO: prevent subscribing more than once
 
@@ -211,7 +221,9 @@ export function catchUncaughtExceptions( exitProcess=true )
           //   console.log( message, url, line );
           // }
 
-          //console.log( 123, errorEvent );
+          console.log("Jens was here");
+
+          // console.log( 123, errorEvent );
 
           systemLog.error( errorEvent.error );
 
@@ -227,17 +239,33 @@ export function catchUncaughtExceptions( exitProcess=true )
         {
 
           // FIXME: send to systemLog!!!
+          // systemLog.error( errorEvent.error );
 
           const { reason } = promiseRejectionEvent;
 
-          console.log( reason );
+          console.group();
 
-          // reason.message?
+          let current = reason;
 
-          if( reason.cause )
+          let maxDepth = 15;
+
+          while( current && maxDepth > 0 )
           {
-            console.log( reason.cause );
+            console.error( current );
+
+            if( current == current.cause )
+            {
+              break;
+            }
+
+            current = current.cause;
+
+            maxDepth = maxDepth - 1;
           }
+
+          console.groupEnd();
+
+          promiseRejectionEvent.preventDefault();
         } );
     }
 
