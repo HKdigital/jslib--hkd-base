@@ -21,6 +21,8 @@
 
 import { value$, default as ValueStore } from "./ValueStore.js";
 
+import { equals } from "@hkd-base/helpers/compare.js";
+
 /* ------------------------------------------------------------------- Export */
 
 /**
@@ -66,11 +68,17 @@ export default class DedupValueStore extends ValueStore
       throw new Error( "Missing parameter [value]" );
     }
 
-    if( this[ value$ ] === value )
+    // if( this[ value$ ] === value )
+    // {
+    //   //
+    //   // *** FIXME: make this also work for not primitive values using equals?
+    //   //
+    //   return;
+    // }
+
+    if( equals( this[ value$ ], value ) )
     {
-      //
-      // *** FIXME: make this also work for not primitive values using equals?
-      //
+      // Nothing to do
       return;
     }
 

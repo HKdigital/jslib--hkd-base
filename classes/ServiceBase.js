@@ -753,8 +753,6 @@ export default class ServiceBase extends LogBase
       // await handlers[ targetState ]( currentState, this[ targetState$ ]);
       try {
         await handlers[ targetState ]( this._setState.bind( this ) );
-
-
       }
       catch( e )
       {

@@ -65,8 +65,15 @@ export function buildTreeFromBranches( branchGraphData, idKey="_id" )
         `Missing property [branch.from] or [branch.to] in branchGraphData`);
     }
 
-    expectObject( node,
-      "Invalid property [branch.node] in branchGraphData" );
+    // expectObject( node,
+    //   "Invalid property [branch.node] in branchGraphData" );
+
+    if( !node )
+    {
+      // Ignore branch with missing node property
+      // (a link as found, but node is missing)
+      continue;
+    }
 
     const nodeId = node[ idKey ];
 

@@ -331,9 +331,17 @@ class InitService extends Base
 
       const serviceName = registration.serviceName;
 
-      const service = this.service( serviceName );
+      try {
+        const service = this.service( serviceName );
 
-      await service.setTargetState( RUNNING );
+        await service.setTargetState( RUNNING );
+      }
+      catch( e )
+      {
+        throw new Error(
+          `InitService: failed to start service [${serviceName}]`,
+          { cause: e } );
+      }
 
     } // end for
 
