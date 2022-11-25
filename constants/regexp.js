@@ -58,7 +58,8 @@ export const RE_NAME =
   new RegExp( "^[" + C.REP_LETTER_LC + "\\s-]{2,}$", "i" );
 
 export const RE_FANTASY_NAME =
-  new RegExp("^[" + C.REP_LETTER_NUMBER_LC + "\\s-_&|,./\\\\]{2,}$", "i" );
+  new RegExp("^[" + C.REP_LETTER_NUMBER_LC +
+             "\\x20!@#\\$%\\^&\\*\\(\\)-_+=\\|:;'\"`~<,>.?/\\\\]{2,}$", "i" );
 
 export const RE_ADDRESS =
   new RegExp( "^[" + C.REP_LETTER_NUMBER_LC + ".,°\\s-]{2,}$", "i" );
