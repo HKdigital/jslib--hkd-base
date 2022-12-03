@@ -118,10 +118,7 @@ function expectResponseOk( response, url )
 {
   expectObject( response, "Missing or invalid parameter [response]" );
 
-  if( !(url instanceof URL) )
-  {
-    throw new Error( "Missing or invalid parameter [url]" );
-  }
+  url = toURL( url );
 
   switch( response.status )
   {
@@ -208,12 +205,7 @@ export async function waitForAndCheckResponse( responsePromise, url )
       "Missing or invalid parameter [responsePromise]");
   }
 
-  if( !(url instanceof URL) )
-  {
-    throw new TypeOrValueError(
-      "Missing or invalid parameter [url]");
-  }
-
+  url = toURL( url );
 
   let response;
 
