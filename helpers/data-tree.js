@@ -21,6 +21,18 @@ export function buildTreeFromBranches( branchGraphData, idKey="_id" )
 
   let { root, branches } = branchGraphData;
 
+  if( !root )
+  {
+    if( branches && branches.length )
+    {
+      throw new Error(
+        `Invalid tree data. Missing property [root], ` +
+        `but property [branches] is not empty`);
+    }
+
+    return null;
+  }
+
   if( !branches || !branches.length )
   {
     return root;
