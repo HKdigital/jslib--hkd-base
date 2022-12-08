@@ -47,7 +47,9 @@ export { PATH_SEPARATOR };
 // ---------------------------------------------------------------------- Method
 
 /**
- * Returns true if the object has no (iterable) key value pairs
+ * Returns true
+ * - if the object has no (iterable) key value pairs
+ * - if the object is an empty array
  *
  * @param {object} obj
  *
@@ -64,6 +66,11 @@ export function isEmpty( obj )
   }
 
   expectObject( obj, "Invalid parameter [obj]" );
+
+  if( /*obj instanceof Array && */ 0 === obj.length )
+  {
+    return true;
+  }
 
   for( const key in obj )
   {
