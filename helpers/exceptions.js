@@ -16,9 +16,17 @@
 import { isObject } from "@hkd-base/helpers/is.js";
 import { systemLog } from "@hkd-base/helpers/log.js";
 
+import { onLoad } from "@hkd-fe/helpers/browser-events.js";
+
 /* ---------------------------------------------------------------- Internals */
 
 const EXIT_CODE_FATAL = 1;
+
+let bootReady = false;
+
+onLoad( () => {
+  bootReady = true;
+} );
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -216,18 +224,27 @@ export function catchUncaughtExceptions( exitProcess=true )
     {
       window.addEventListener("error", ( errorEvent ) =>
         {
-          // function windowError(message, url, line)
-          // {
-          //   console.log( message, url, line );
-          // }
+          try {
+            // console.log( {bootReady} );
+            //
+            // Prevent:
+            // Uncaught ReferenceError: Cannot access 'Base'
+            // before initialization in InitService
+            //
+            if( bootReady )
+            {
+              systemLog.error( errorEvent.error );
+            }
+            else {
+              console.log('Uncaught exception:', errorEvent );
+            }
+          }
+          catch( e )
+          {
+            console.log('Failed to log uncaught exception:', e, errorEvent );
+          }
 
-          console.log("Jens was here");
-
-          // console.log( 123, errorEvent );
-
-          systemLog.error( errorEvent.error );
-
-          // console.log('Uncaught exception:', errorEvent );
+          // console.error( "Uncaught exception", errorEvent.error );
 
           errorEvent.stopPropagation();
 

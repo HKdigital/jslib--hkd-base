@@ -42,7 +42,7 @@ import LogBase from "@hkd-base/classes/LogBase.js";
 
 // import { SystemLogger } from "@platform/system.js";
 
-import InitService from "@hkd-base/services/InitService.js";
+// import InitService from "@hkd-base/services/InitService.js";
 
 import Offs from "@hkd-base/classes/Offs.js";
 
@@ -66,6 +66,21 @@ const transitionHandlers$ = Symbol("transitionHandlers");
 
 const configureFn$ = Symbol("configureFn");
 const configured$ = Symbol("configured");
+
+let InitService;
+
+/* ------------------------------------------------------------------ Exports */
+
+/**
+ * Let InitService set itself as internal variable to prevent circular
+ * dependencies
+ *
+ * @param {object} service
+ */
+export function setInitService( service )
+{
+  InitService = service;
+}
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -336,7 +351,7 @@ export default class ServiceBase extends LogBase
       //
       // Use InitService to get the Service by name
       //
-      dependency = InitService.service( dependency );
+      dependency = this.getServiceByName( { name: dependency } );
     }
     else {
       expectObject( dependency, "Missing or invalid parameter [dependency]" );
@@ -410,6 +425,26 @@ export default class ServiceBase extends LogBase
           }
         },
         true /* true -> run upon registration */ );
+  }
+
+  // -------------------------------------------------------------------- Method
+
+  /**
+   * Use InitService to get a dependency by name
+   *
+   * @param {string} _.name
+   *   Name of the service as used in InitService.register()
+   */
+  getServiceByName( { name } )
+  {
+    expectNotEmptyString( name, "Missing or invalid parameter [name]" );
+
+    if( !InitService )
+    {
+      throw new Error("Missing [InitService] (use [setInitService] first)");
+    }
+
+    return InitService.service( name );
   }
 
   // -------------------------------------------------------------------- Method
