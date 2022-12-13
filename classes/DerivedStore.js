@@ -15,9 +15,9 @@
  *
  *   const derivedStore = new DerivedStore(
  *     store1, store2,
- *     function derive( store1, store2 )
+ *     function derive( storesMap )
  *     {
- *       return store1.get() + store2.get();
+ *       return storesMap.get(0).get() + storesMap.get(1).get();
  *     } );
  *
  *   const value = derivedStore.get(); // 3
