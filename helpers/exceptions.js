@@ -16,17 +16,26 @@
 import { isObject } from "@hkd-base/helpers/is.js";
 import { systemLog } from "@hkd-base/helpers/log.js";
 
-import { onLoad } from "@hkd-fe/helpers/browser-events.js";
+// import { onLoad } from "@hkd-fe/helpers/browser-events.js";
 
 /* ---------------------------------------------------------------- Internals */
 
 const EXIT_CODE_FATAL = 1;
 
-let bootReady = false;
+// let bootReady = false;
 
-onLoad( () => {
-  bootReady = true;
-} );
+// if( typeof window !== "undefined" )
+// {
+//   // eslint-disable-next-line no-undef
+//   window.addEventListener('DOMContentLoaded', () =>
+//     {
+//       bootReady = true;
+//     } );
+// }
+// else {
+//   // eslint-disable-next-line no-undef
+//   onBootstrapReady( () => { bootReady = true; } );
+// }
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -231,13 +240,13 @@ export function catchUncaughtExceptions( exitProcess=true )
             // Uncaught ReferenceError: Cannot access 'Base'
             // before initialization in InitService
             //
-            if( bootReady )
-            {
-              systemLog.error( errorEvent.error );
-            }
-            else {
-              console.log('Uncaught exception:', errorEvent );
-            }
+            // if( bootReady )
+            // {
+            systemLog.error( errorEvent.error );
+            // }
+            // else {
+            //   console.log('Uncaught exception:', errorEvent );
+            // }
           }
           catch( e )
           {
