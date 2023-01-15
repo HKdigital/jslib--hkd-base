@@ -13,11 +13,13 @@ import {
   TYPE_ARRAY,
   TYPE_NAME,
   TYPE_FANTASY_NAME,
-  TYPE_EMAIL } from "@hkd-base/types/schema-types.js";
+  TYPE_EMAIL,
+  TYPE_PHONE } from "@hkd-base/types/schema-types.js";
 
 import { RE_NAME,
          RE_FANTASY_NAME,
          RE_EMAIL,
+         RE_PHONE,
          RE_MULTIPLE_SPACES } from "@hkd-base/constants/regexp.js";
 
 import { registerParsers } from "@hkd-base/helpers/parse.js";
@@ -246,6 +248,24 @@ export const parsers =
       if( !RE_EMAIL.test( value ) )
       {
         return { error: new Error("Value should be a valid e-mail address") };
+      }
+
+      return { value };
+    },
+
+    [ TYPE_PHONE ]: function( value /* , { flags={}, rules=[] }={} */ )
+    {
+      // return { error: new Error("Test failure") };
+
+      if( typeof value !== "string" ) {
+        return { error: new Error("Value should be a string") };
+      }
+
+      // value = value.trim().toLowerCase();
+
+      if( !RE_PHONE.test( value ) )
+      {
+        return { error: new Error("Value should be a valid phone number") };
       }
 
       return { value };
