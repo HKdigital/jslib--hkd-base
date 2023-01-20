@@ -253,11 +253,16 @@ export const parsers =
       return { value };
     },
 
-    [ TYPE_PHONE ]: function( value /* , { flags={}, rules=[] }={} */ )
+    [ TYPE_PHONE ]: function( value, { flags={} /*, rules=[]*/ }={} )
     {
-      // return { error: new Error("Test failure") };
+      if( !value && flags.presence === "optional" )
+      {
+        // Phone number is optional
+        return { value: null };
+      }
 
-      if( typeof value !== "string" ) {
+      if( typeof value !== "string" )
+      {
         return { error: new Error("Value should be a string") };
       }
 

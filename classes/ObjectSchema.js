@@ -185,9 +185,11 @@ export default class ObjectSchema
             value,
             finalValue } = this.validateProperty( obj, key );
 
+      let property = properties[ key ];
+
       if( error )
       {
-        const type = properties[ key ].type;
+        const type = property.type;
 
         expectError( error,
           `Parser [${type}] did not return a valid error property` );
