@@ -44,7 +44,7 @@ export const RE_EMAIL =
 export const RE_PHONE =
   /(^\+[0-9]{2}|^\+[0-9]{2}\(0\)|^\(\+[0-9]{2}\)\(0\)|^00[0-9]{2}|^0)([0-9]{9}$|[0-9\-\s]{10}$)/;
 
-export const RE_POSTAL_CODE_DUTCH =
+export const RE_POSTCODE_DUTCH =
    /^[1-9]{1}[0-9]{3} ?[A-Za-z]{2}$/;
 
 export const RE_PLACE_DUTCH =

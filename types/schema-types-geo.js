@@ -1,4 +1,3 @@
 
-// export const TYPE_POSTAL_CODE_DUTCH;
-
-export const TYPE_POSTAL_CODE_OR_PLACE_DUTCH = "pc-place-dutch";
+export const TYPE_POSTCODE_DUTCH = "postcode-dutch";
+export const TYPE_POSTCODE_OR_PLACE_DUTCH = "postcode-or-place-dutch";
