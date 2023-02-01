@@ -68,16 +68,9 @@ export default class DedupValueStore extends ValueStore
       throw new Error( "Missing parameter [value]" );
     }
 
-    // if( this[ value$ ] === value )
-    // {
-    //   //
-    //   // *** FIXME: make this also work for not primitive values using equals?
-    //   //
-    //   return;
-    // }
-
     if( equals( this[ value$ ], value ) )
     {
+      // console.log("value equals: ignore", this[ value$ ], value);
       // Nothing to do
       return;
     }
