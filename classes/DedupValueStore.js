@@ -20,8 +20,10 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { value$, default as ValueStore } from "./ValueStore.js";
+import { defer } from "@hkd-base/helpers/process.js";
 
 import { equals } from "@hkd-base/helpers/compare.js";
+
 
 /* ------------------------------------------------------------------- Export */
 
@@ -59,7 +61,7 @@ export default class DedupValueStore extends ValueStore
    *
    * @param {mixed} [value] - Value to store
    */
-  set( value )
+  set( value, deferCallSubscribers=false )
   {
     // expectDefined( value, "Missing parameter [value]" );
 
@@ -77,7 +79,13 @@ export default class DedupValueStore extends ValueStore
 
     this[ value$ ] = value;
 
-    this._callSubscribers();
+    if( !deferCallSubscribers )
+    {
+      this._callSubscribers();
+    }
+    else {
+      defer( () => { this._callSubscribers(); } );
+    }
   }
 
 } // end class
