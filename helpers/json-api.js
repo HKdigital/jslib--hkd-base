@@ -164,6 +164,27 @@ export async function jsonApiPost(
  *   Config parameters or label of the global config entry that contains
  *   the remote API configuration.
  *
+ * --
+ *
+ * @throws {ResponseError}
+ *
+ *   A ResponseError will be thrown if:
+ *     - A network error occurs
+ *     - When the response status is 403, 404 or 500 or not `response.ok`
+ *     - The "JSON" response could not be decoded
+ *     - The response contains a not-empty error property
+ *     - Something else went wrong
+ *
+ * @throws {TypeError}
+ *
+ *   --> TODO check if this is not caught and converted into a ResponseError <--
+ *
+ *   A TypeError will be throw if the internal call to `fetch` fails due to:
+ *     - A network error
+ *     - Misconfigured CORS on the server side
+ *
+ * --
+ *
  * @returns {mixed} response data: parsed JSON response from backend server
  */
 export async function jsonApiRequest(
@@ -231,6 +252,7 @@ export async function jsonApiRequest(
   const responsePromise =
     httpRequest( { method, url, body, urlSearchParams, headers } );
 
+  /**/
   const response = await waitForAndCheckResponse( responsePromise, url );
 
   let parsedResponse;
