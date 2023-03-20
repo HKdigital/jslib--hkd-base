@@ -113,13 +113,18 @@ export function objectSize( obj )
  *
  * @param {object} obj
  *
+ * @param {string[]} [onlyKeys]
+ *   If specified, only the selected keys will be exported
+ *
  * @returns {object} new object without the null properties
  */
-export function exportNotNull( obj )
+export function exportNotNull( obj, onlyKeys )
 {
   expectObject( obj, "Invalid parameter [obj]" );
 
   const newObj = {};
+
+  const onlyKeysSet = onlyKeys ? new Set( onlyKeys ) : null;
 
   for( const key in obj )
   {
@@ -127,6 +132,11 @@ export function exportNotNull( obj )
 
     if( value !== null && value !== undefined )
     {
+      if( !onlyKeysSet || !onlyKeysSet.has(key) )
+      {
+        continue;
+      }
+
       newObj[ key ] = value;
     }
   } // end for
@@ -146,10 +156,11 @@ export function exportNotNull( obj )
  *
  * @param {object} obj
  * @param {string[]} keys
+ * @param {boolean} [removeNullAndUndefined=true]
  *
  * @returns {object} object that only contains the specified keys
  */
-export function keep( obj, keys )
+export function keep( obj, keys, removeNullAndUndefined=true )
 {
   expectObject( obj, "Invalid parameter [obj]" );
   expectArray( obj, "Invalid parameter [properties]" );
@@ -161,8 +172,20 @@ export function keep( obj, keys )
     if( !keep.has( key ) )
     {
       delete obj[ key ];
+      continue;
     }
-  }
+
+    const value = obj[ key ];
+
+    if( removeNullAndUndefined )
+    {
+      if( value === null || value === undefined )
+      {
+        delete obj[ key ];
+      }
+    }
+
+  } // end for
 
   return obj;
 }
