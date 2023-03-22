@@ -176,12 +176,12 @@ export default class MemoryCache
    *   Value to return if no value was stored for the specified key.
    *
    * @param {object} [options]
-   * @param {boolean} [options.updateTTL=true]
+   * @param {boolean} [options.updateTTL=false]
    *
    * @returns {mixed|null}
    *  the value that was stored for the specified key or the default value
    */
-  get( key, defaultValue, { updateTTL=true }={} )
+  get( key, defaultValue, { updateTTL=false }={} )
   {
     expectDefined( key, "Missing or invalid parameter [key]");
 
@@ -210,12 +210,12 @@ export default class MemoryCache
    * @param {string} key - Key that specifies the node to retrieve
    *
    * @param {object} [options]
-   * @param {boolean} [options.updateTTL=true]
+   * @param {boolean} [options.updateTTL=false]
    *
    * @returns {mixed|null}
    *  the value that was stored for the specified key or the default value
    */
-  getNode( key, { updateTTL=true }={} )
+  getNode( key, { updateTTL=false }={} )
   {
     expectDefined( key, "Missing or invalid parameter [key]");
 

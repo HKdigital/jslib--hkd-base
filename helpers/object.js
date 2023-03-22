@@ -132,7 +132,7 @@ export function exportNotNull( obj, onlyKeys )
 
     if( value !== null && value !== undefined )
     {
-      if( !onlyKeysSet || !onlyKeysSet.has(key) )
+      if( onlyKeysSet && !onlyKeysSet.has(key) )
       {
         continue;
       }
