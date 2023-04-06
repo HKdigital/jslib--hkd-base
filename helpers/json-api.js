@@ -56,6 +56,25 @@ export function buildApiUrl( uri, config )
   expectString( apiPrefix,
     `Invalid parameter [config.apiPrefix]` );
 
+  // console.log( { apiPrefix, uri, origin } );
+
+  if( origin )
+  {
+    const x = origin.indexOf("://");
+
+    if( x !== -1 )
+    {
+      const y = origin.indexOf( "/", x + 3 );
+
+      if( y !== -1 && origin.length !== y + 1 )
+      {
+        throw new Error(
+          `Invalid parameter [config.origin=${origin}] ` +
+          `(should not contain a path)` );
+      }
+    }
+  }
+
   return new URL( apiPrefix + uri, origin );
 }
 
