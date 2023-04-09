@@ -3,7 +3,9 @@
 
 import { expectString,
          expectNotEmptyString,
-         expectPositiveNumber } from "@hkd-base/helpers/expect.js";
+         expectNumber,
+         expectPositiveNumber,
+         expectObject } from "@hkd-base/helpers/expect.js";
 
 import {
   TYPE_STRING,
@@ -40,7 +42,7 @@ let registered = false;
  *    name:
  *      { type: TYPE_STRING,
  *        rules: [ { name: "trim" },
- *                 { name: "min", limit: 2 } ]
+ *                 { name: "length", min: 2 } ]
  *      }
  *  }
  */
@@ -105,31 +107,175 @@ export const rulesByName =
       },
 
     /**
-     * Check for minimum string length
+     * Check for minimum or maximum string or array length
      *
-     * @param {string} value
-     * @param {number} options.limit - minimum string length
+     * @param {string|array} value
+     * @param {number} [options.min] - minimum string length
+     * @param {number} [options.max] - maximum string length
      *
      * @returns {object} { value [,error] }
      */
-    min: ( value, { limit=0 }={} ) =>
+    length: ( value, { min, max }={} ) =>
       {
-        expectString( value, "Missing or invalid parameter [value]" );
-
-        expectPositiveNumber( limit,
-          "Missing or invalid parameter [limit]" );
-
-        if( value.length < limit )
+        if( value === undefined || value.length === undefined )
         {
-          return {
-            error: new Error(
-              `Length should be equal or larger than [${limit}]`)
-          };
+          throw new Error("Missing or invalid parameter [value]");
+        }
+
+        if( min !== undefined )
+        {
+          expectPositiveNumber( min,
+            "Missing or invalid parameter [min]" );
+
+          if( value.length < min )
+          {
+            return {
+              error: new Error(
+                `Length should be equal or larger than [${min}]`)
+            };
+          }
+        }
+
+        if( max !== undefined )
+        {
+          expectPositiveNumber( max,
+            "Missing or invalid parameter [max]" );
+
+          if( value.length > max )
+          {
+            return {
+              error: new Error(
+                `Length should be smaller or equal to [${max}]`)
+            };
+          }
         }
 
         return { value };
+      },
+
+    /**
+     * Check if the number is within the specified range
+     *
+     * @param {number} value
+     * @param {number} [options.min] - minimum string length
+     * @param {number} [options.max] - maximum string length
+     *
+     * @returns {object} { value [,error] }
+     */
+    range: ( value, { min, max }={} ) =>
+      {
+        expectNumber( value,
+          "Missing or invalid parameter [value]" );
+
+        // console.log("check range", { value, min, max } );
+
+        if( min !== undefined )
+        {
+          expectPositiveNumber( min,
+            "Missing or invalid parameter [min]" );
+
+          if( value < min )
+          {
+            return {
+              error: new Error(
+                `Value should be equal or larger than [${min}]`)
+            };
+          }
+        }
+
+        if( max !== undefined )
+        {
+          expectPositiveNumber( max,
+            "Missing or invalid parameter [max]" );
+
+          if( value > max )
+          {
+            return {
+              error: new Error(
+                `Value should be smaller or equal to [${max}]`)
+            };
+          }
+        }
+
+        return { value };
+      },
+
+    /**
+     * Check if the object has keys
+     *
+     * @param {number} value
+     * @param {number} [options.truthy]
+     *   If true, the property value should be truthy
+     *
+     * @returns {object} { value [,error] }
+     */
+    hasKeys: ( value, { truthy=false } ) =>
+    {
+      expectObject( value,
+        "Missing or invalid parameter [value]" );
+
+      for( const key in value )
+      {
+        if( !truthy || value[ key ] )
+        {
+          //
+          // Truthy not required or truthy
+          //
+          return { value };
+        }
       }
+
+      // No keys found
+
+      return {
+        error: new Error( `Value (object) should have at least one key`)
+      };
+    }
+
   };
+
+// ---------------------------------------------------------------------------
+
+/**
+ * Apply rules to a value and return a finalValue
+ *
+ * @param {*} _.value
+ * @param {} _.rules
+ *
+ * @returns {object} { value, finalValue [, error] }
+ */
+export function applyRules( { value, rules } )
+{
+  let finalValue = value;
+
+  for( const rule of rules )
+  {
+    const name = rule.name;
+
+    expectNotEmptyString( name,
+      "Invalid rule, invalid property [name]" );
+
+    const ruleFn = rulesByName[ name ];
+
+    if( !ruleFn )
+    {
+      throw new Error(`Rule [${name}] does not exist`);
+    }
+
+    const output = ruleFn( finalValue, rule );
+
+    if( output.error )
+    {
+      return output;
+    }
+    else if( output.finalValue )
+    {
+      finalValue = output.finalValue;
+    }
+  }
+
+  return { value, finalValue };
+}
 
 // ---------------------------------------------------------------------------
 
@@ -155,45 +301,18 @@ export const parsers =
           }
         }
 
-        if( typeof value !== "string" ) {
+        if( typeof value !== "string" )
+        {
           return { error: new Error("Value should be a string") };
         }
 
-        let finalValue = value;
-
-        for( const rule of rules )
-        {
-          const name = rule.name;
-
-          expectNotEmptyString( name,
-            "Invalid rule, invalid property [name]" );
-
-          const ruleFn = rulesByName[ name ];
-
-          if( !ruleFn )
-          {
-            throw new Error(`Rule [${name}] does not exist`);
-          }
-
-          const output = ruleFn( finalValue, rule );
-
-          if( output.error )
-          {
-            return output;
-          }
-          else if( output.finalValue )
-          {
-            finalValue = output.finalValue;
-          }
-
-        } // end for
-
-        return { value, finalValue };
+        return applyRules( { value, rules } );
       },
 
     [ TYPE_NAME ]: function( value /* , { flags={}, rules=[] }={} */ )
     {
-      if( typeof value !== "string" ) {
+      if( typeof value !== "string" )
+      {
         return { error: new Error("Value should be a string") };
       }
 
@@ -215,7 +334,8 @@ export const parsers =
 
     [ TYPE_FANTASY_NAME ]: function( value /* , { flags={}, rules=[] }={} */ )
     {
-      if( typeof value !== "string" ) {
+      if( typeof value !== "string" )
+      {
         return { error: new Error("Value should be a string") };
       }
 
@@ -239,7 +359,8 @@ export const parsers =
     {
       // return { error: new Error("Test failure") };
 
-      if( typeof value !== "string" ) {
+      if( typeof value !== "string" )
+      {
         return { error: new Error("Value should be a string") };
       }
 
@@ -276,13 +397,21 @@ export const parsers =
       return { value };
     },
 
-    [ TYPE_NUMBER ]: function( value /* , { flags={}, rules=[] }={} */ )
+    [ TYPE_NUMBER ]: function( value, { flags={}, rules=[] }={} )
       {
+        if( undefined === value )
+        {
+          if( "default" in flags )
+          {
+            return flags.default;
+          }
+        }
+
         if( typeof value !== "number" ) {
           return { error: new Error("Value should be a number") };
         }
 
-        return { value };
+        return applyRules( { value, rules } );
       },
 
     [ TYPE_BOOLEAN ]: function( value /* , { flags={}, rules=[] }={} */ )
@@ -294,13 +423,14 @@ export const parsers =
         return { value };
       },
 
-    [ TYPE_OBJECT ]: function( value /* , { flags={}, rules=[] }={} */ )
+    [ TYPE_OBJECT ]: function( value, { flags={}, rules=[] }={} )
       {
-        if( typeof value !== "object" || value === null ) {
+        if( typeof value !== "object" || value === null )
+        {
           return { error: new Error("Value should be an object") };
         }
 
-        return { value };
+        return applyRules( { value, rules } );
       },
 
     [ TYPE_ARRAY ]: function( value /* , { flags={}, rules=[] }={} */ )
