@@ -521,11 +521,12 @@ export function objectGet( obj, path, defaultValue )
  */
 export function objectGetWithThrow( obj, path, parseFn )
 {
-  const value = objectGet( obj, path );
+  let value = objectGet( obj, path );
 
   if( parseFn )
   {
-    const { value, error } = parseFn( value );
+    const { value: parsedValue,
+            error } = parseFn( value );
 
     if( error )
     {
@@ -533,6 +534,8 @@ export function objectGetWithThrow( obj, path, parseFn )
         `Invalid value found at path [${toStringPath( path )}]`,
         { cause: error } );
     }
+
+    value = parsedValue;
   }
 
   if( value === undefined )
@@ -540,6 +543,8 @@ export function objectGetWithThrow( obj, path, parseFn )
     throw new Error(
       `No value found at path [${toStringPath( path )}]` );
   }
+
+  return value;
 }
 
 // ---------------------------------------------------------------------- Method
