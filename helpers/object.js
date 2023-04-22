@@ -12,6 +12,8 @@ import { equals } from "./compare.js";
 
 import { toArrayPath } from "./array.js";
 
+import { toStringPath } from "./string.js";
+
 import { isIterable } from "./is.js";
 
 import { iterateObjectPaths,
@@ -459,7 +461,7 @@ export function deletePath( obj, path )
 
 /**
  * Get a value from an object using a path
- * - Returns a default
+ * - Returns a default value if not found, with is [undefined] by default
  *
  * @param {object} obj - Object to get the value from
  * @param {string|Array} path - Dot separated string path or array path
@@ -467,7 +469,7 @@ export function deletePath( obj, path )
  * @param {mixed} [defaultValue=undefined]
  *   Value to return if the value does not exist
  *
- * @return {mixed} value found at path, defaultValue or undefined
+ * @return {*} value found at path, defaultValue or undefined
  */
 export function objectGet( obj, path, defaultValue )
 {
@@ -498,6 +500,46 @@ export function objectGet( obj, path, defaultValue )
   }
 
   return value;
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Get a value from an object using a path
+ * - Throws an exception if the path does not exist or the value is undefined
+ *
+ * @param {object} obj - Object to get the value from
+ * @param {string|Array} path - Dot separated string path or array path
+ *
+ * @param {function} [parseFn]
+ *   Optional parser function that checks and converts the value
+ *
+ * @throws No value found at path
+ * @throws Invalid value
+ *
+ * @return {*} value found at path
+ */
+export function objectGetWithThrow( obj, path, parseFn )
+{
+  const value = objectGet( obj, path );
+
+  if( parseFn )
+  {
+    const { value, error } = parseFn( value );
+
+    if( error )
+    {
+      throw new Error(
+        `Invalid value found at path [${toStringPath( path )}]`,
+        { cause: error } );
+    }
+  }
+
+  if( value === undefined )
+  {
+    throw new Error(
+      `No value found at path [${toStringPath( path )}]` );
+  }
 }
 
 // ---------------------------------------------------------------------- Method
