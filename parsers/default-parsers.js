@@ -204,22 +204,24 @@ export const rulesByName =
      * Check if the object has keys
      *
      * @param {number} value
-     * @param {number} [options.truthy]
-     *   If true, the property value should be truthy
+     * @param {number} [options.truthyValues]
+     *   If true, all property values must be truthy
+     *   - If set to true, the value may not be false, null, 0 or an empty
+     *     string
      *
      * @returns {object} { value [,error] }
      */
-    hasKeys: ( value, { truthy=false } ) =>
+    hasKeys: ( value, { truthyValues=false } ) =>
     {
       expectObject( value,
         "Missing or invalid parameter [value]" );
 
       for( const key in value )
       {
-        if( !truthy || value[ key ] )
+        if( !truthyValues || value[ key ] )
         {
           //
-          // Truthy not required or truthy
+          // truthyValues not set or value is truthy
           //
           return { value };
         }
