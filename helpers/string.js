@@ -2,9 +2,12 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectString,
-         expectObject } from "@hkd-base/helpers/expect.js";
+         expectObject }
+  from "@hkd-base/helpers/expect.js";
 
-import { objectGet } from "@hkd-base/helpers/object.js";
+import { objectGet,
+         PATH_SEPARATOR }
+  from "./object.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -99,6 +102,39 @@ export function toUriName( str )
   // TODO: remove duplicate dashes
 
   return str;
+}
+
+// ---------------------------------------------------------------------- Method
+
+/**
+ * Convert a path string to an array path
+ * - The path string will be spit at the `pathSeparator` token
+ * - If the supplied path is already an array, the original array will
+ *   be returned
+ *
+ * @param {string|string[]} path
+ *   String or array path (e.g. "some.path.to")
+ *
+ * @param {string} [pathSeparator=PATH_SEPARATOR]
+ *   A custom path separator to use instead of the default "."
+ *
+ * @returns {string[]} array path (e.g. ["some", "path", "to"])
+ */
+export function toStringPath( path, pathSeparator=PATH_SEPARATOR )
+{
+  if( Array.isArray( path ) )
+  {
+    return path.join( pathSeparator );
+  }
+  else if( typeof path === "string" )
+  {
+    // path is already a string
+    return path;
+  }
+  else {
+    throw new Error(
+      "Missing or invalid parameter [path] (expected string or array)");
+  }
 }
 
 // ---------------------------------------------------------------------- Method

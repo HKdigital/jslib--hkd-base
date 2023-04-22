@@ -1,7 +1,8 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectDefined,
+import { expectNotEmptyString,
+         expectDefined,
          expectObject } from "@hkd-base/helpers/expect.js";
 
 import { tryRegisterDefaultParsers }
@@ -44,6 +45,55 @@ export { registerParsers };
 // -----------------------------------------------------------------------------
 
 /**
+ * Get a parser function
+ * - The parser can be preconfigured with flags and rules
+ *
+ * @param {string} type - Parser type e.g. TYPE_STRING
+ * @param {string} [_.flags]
+ * @param {string} [_.rules]
+ *
+ * @returns {function} parser function
+ */
+export function getParser( type, { flags, rules }={} )
+{
+  expectNotEmptyString( type,
+    "Missing or invalid parameter [type]" );
+
+  const parser = registeredParsers[ type ];
+
+  if( !parser )
+  {
+    throw new Error(`No parser found for [type=${type}]`);
+  }
+
+  if( flags || (rules && rules.length) )
+  {
+    const options = {};
+
+    if( flags )
+    {
+      options.flags = flags;
+    }
+
+    if( rules )
+    {
+      options.rules = rules;
+    }
+
+    // Return parser with predefined flags and/or rules
+
+    return ( value ) => {
+      return parser( value, options );
+    };
+  }
+  else {
+    return parser;
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+/**
  * Parse a value using a schema
  *
  * A schema should have a `validate` method that returns an
@@ -76,7 +126,7 @@ export { registerParsers };
  *
  * @param {*} value
  *
- * @returns {*} parsed value
+ * @returns {object} { value [, error] }
  */
 export function parse( schema, value )
 {
