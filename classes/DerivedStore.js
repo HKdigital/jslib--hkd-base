@@ -116,6 +116,21 @@ export default class DerivedStore
       throw new Error("Invalid parameter [stores] (expected Map or Array)");
     }
 
+    // -- Ensure `storesMap` only contains store instances
+
+    for( const [ label, store ] of this[ stores$ ].entries() )
+    {
+      if( !(store instanceof Object) ||
+          typeof store.subscribe !== "function" )
+      {
+        throw new Error(
+          `Invalid parameter [stores]. ` +
+          `Store[${label}] has no method subscribe` );
+      }
+    }
+
+    // -- Add handy function to `storesMap`
+
     /**
      * Get value from the specified store
      *
