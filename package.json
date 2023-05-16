@@ -12,6 +12,6 @@
     "test": "NODE_OPTIONS=\"--experimental-vm-modules --no-warnings\" jest --config ./config/jest.config.js --watch"
   },
   "devDependencies": {
-    "jest": "^27.5.1"
+    "jest": "^29.5.0"
   }
 }

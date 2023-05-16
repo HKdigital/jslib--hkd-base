@@ -17,6 +17,7 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectFunction } from "../helpers/expect.js";
+import { defer } from "@hkd-base/helpers/process.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -233,7 +234,7 @@ export default class ValueStore
    *
    * @returns {mixed} the value that was set
    */
-  set( value )
+  set( value, deferCallSubscribers=false )
   {
     // expectDefined( value, "Missing parameter [value]" );
 
@@ -260,7 +261,13 @@ export default class ValueStore
     //   this[ nextPromise$ ].resolve( value );
     // }
 
-    this._callSubscribers();
+    if( !deferCallSubscribers )
+    {
+      this._callSubscribers();
+    }
+    else {
+      defer( () => { this._callSubscribers(); } );
+    }
 
     return value;
   }

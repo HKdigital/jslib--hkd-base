@@ -64,7 +64,7 @@ export default class MemoryCache
 
   /**
    * Enable automatic cleanup of expired items
-   * - If not enabled, items that are no longer requested will remain in cache
+   * - If NOT enabled, items that are no longer requested will remain in cache
    *
    * @returns {function} cancelAutomaticCleanup
    */
@@ -77,13 +77,13 @@ export default class MemoryCache
 
     // == Enable cleanup loop
 
-    if( !this._cleanupLoopBound )
+    if( !this._runCleanupLoopBound )
     {
-      this._cleanupLoopBound = this._runCleanupAndLoop.bind( this );
+      this._runCleanupLoopBound = this._runCleanupAndLoop.bind( this );
     }
 
     this.cleanupTimer =
-      setTimeout( this._cleanupLoopBound, CLEANUP_INTERVAL_MS );
+      setTimeout( this._runCleanupLoopBound, CLEANUP_INTERVAL_MS );
 
     // == Return cancelAutomaticCleanup function
 
@@ -96,7 +96,7 @@ export default class MemoryCache
     };
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Store item in cache
@@ -176,12 +176,12 @@ export default class MemoryCache
    *   Value to return if no value was stored for the specified key.
    *
    * @param {object} [options]
-   * @param {boolean} [options.updateTTL=true]
+   * @param {boolean} [options.updateTTL=false]
    *
    * @returns {mixed|null}
    *  the value that was stored for the specified key or the default value
    */
-  get( key, defaultValue, { updateTTL=true }={} )
+  get( key, defaultValue, { updateTTL=false }={} )
   {
     expectDefined( key, "Missing or invalid parameter [key]");
 
@@ -210,12 +210,12 @@ export default class MemoryCache
    * @param {string} key - Key that specifies the node to retrieve
    *
    * @param {object} [options]
-   * @param {boolean} [options.updateTTL=true]
+   * @param {boolean} [options.updateTTL=false]
    *
    * @returns {mixed|null}
    *  the value that was stored for the specified key or the default value
    */
-  getNode( key, { updateTTL=true }={} )
+  getNode( key, { updateTTL=false }={} )
   {
     expectDefined( key, "Missing or invalid parameter [key]");
 
@@ -253,7 +253,7 @@ export default class MemoryCache
     return node;
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Check if an item exists in the cache (and has not been expired)
@@ -295,7 +295,7 @@ export default class MemoryCache
     return true;
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Remove an item from the cache
@@ -318,6 +318,29 @@ export default class MemoryCache
     }
   }
 
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Runs a cleanup to remove expired items and counts the number of remaining
+   * cached items
+   */
+  cleanupAndCount()
+  {
+    this._runCleanup();
+
+    return this.storage.size;
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Remove all items from cache
+   */
+  clear()
+  {
+    this.storage = new Map();
+  }
+
   /* ------------------------------------------------------- Internal Methods */
 
   /**
@@ -325,6 +348,19 @@ export default class MemoryCache
    * - Removes all expired items from the cache
    */
   _runCleanupAndLoop()
+  {
+    this._runCleanup();
+
+    this.cleanupTimer = setTimeout( this._cleanupBound, CLEANUP_INTERVAL_MS );
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Clean up all expired items
+   * - Removes all expired items from the cache
+   */
+  _runCleanup()
   {
     const storage = this.storage;
 
@@ -340,10 +376,6 @@ export default class MemoryCache
         this.remove( key );
       }
     } // end for
-
-    //
-
-    this.cleanupTimer = setTimeout( this._cleanupBound, CLEANUP_INTERVAL_MS );
   }
 
-}
+} // end class

@@ -1,115 +1,97 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectString,
-         expectNotEmptyString,
-         expectPositiveNumber,
+import { expectNotEmptyString,
          expectDefined,
          expectObject } from "@hkd-base/helpers/expect.js";
 
-import {
-  TYPE_STRING,
-  TYPE_NUMBER,
-  TYPE_BOOLEAN,
-  TYPE_OBJECT,
-  TYPE_ARRAY,
-  TYPE_NAME,
-  TYPE_EMAIL } from "@hkd-base/types/schema-types.js";
-
-import { RE_NAME,
-         RE_EMAIL,
-         RE_MULTIPLE_SPACES } from "@hkd-base/constants/regexp.js";
+import { tryRegisterDefaultParsers }
+  from "@hkd-base/parsers/default-parsers.js";
 
 /* ---------------------------------------------------------------- Internals */
 
-const rulesByName =
+const registeredParsers = {};
+
+/**
+ * Register parsers
+ *
+ * @param {object} _.parsers
+ * @param {object} _.overwrite
+ */
+function registerParsers( { parsers, overwrite=false } )
+{
+  expectObject( parsers, "Missing or invalid parameter [parsers]" );
+
+  for( const label in parsers )
   {
-    /**
-     * Remove leading and trailing whitespace from a string
-     *
-     * @param {string} value
-     *
-     * @returns {object} { value }
-     */
-    trim: ( value ) =>
-      {
-        expectString( value, "Missing or invalid parameter [value]" );
+    registeredParsers[ label ] = parsers[ label ];
+  }
+}
 
-        return { value: value.trim() };
-      },
-
-    /**
-     * Convert string to lowercase
-     *
-     * @param {string} value
-     *
-     * @returns {object} { value }
-     */
-    lowercase: ( value ) =>
-      {
-        expectString( value, "Missing or invalid parameter [value]" );
-
-        return { value: value.toLowerCase() };
-      },
-
-    /**
-     * Convert string to uppercase
-     *
-     * @param {string} value
-     *
-     * @returns {object} { value }
-     */
-    uppercase: ( value ) =>
-      {
-        expectString( value, "Missing or invalid parameter [value]" );
-
-        return { value: value.toUpperCase() };
-      },
-
-    /**
-     * Replace duplicate white space by single space
-     *
-     * @param {string} value
-     *
-     * @returns {object} { value }
-     */
-    singleSpaces: ( value ) =>
-      {
-        expectString( value, "Missing or invalid parameter [value]" );
-
-        value.replace( RE_MULTIPLE_SPACES, ' ' );
-
-        return { value };
-      },
-
-    /**
-     * Check for minimum string length
-     *
-     * @param {string} value
-     * @param {number} options.limit - minimum string length
-     *
-     * @returns {object} { value [,error] }
-     */
-    min: ( value, { limit=0 }={} ) =>
-      {
-        expectString( value, "Missing or invalid parameter [value]" );
-
-        expectPositiveNumber( limit,
-          "Missing or invalid parameter [limit]" );
-
-        if( value.length < limit )
-        {
-          return {
-            error: new Error(
-              `Length should be equal or larger than [${limit}]`)
-          };
-        }
-
-        return { value };
-      }
-  };
+tryRegisterDefaultParsers();
 
 /* ------------------------------------------------------------------ Exports */
+
+export { registeredParsers };
+
+/**
+ * Register parsers
+ *
+ * @param {object} _.parsers
+ * @param {object} _.overwrite
+ */
+export { registerParsers };
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Get a parser function
+ * - The parser can be preconfigured with flags and rules
+ *
+ * @param {string} type - Parser type e.g. TYPE_STRING
+ * @param {string} [_.flags]
+ * @param {string} [_.rules]
+ *
+ * @returns {function} parser function
+ */
+export function getParser( type, { flags, rules }={} )
+{
+  expectNotEmptyString( type,
+    "Missing or invalid parameter [type]" );
+
+  const parser = registeredParsers[ type ];
+
+  if( !parser )
+  {
+    throw new Error(`No parser found for [type=${type}]`);
+  }
+
+  if( flags || (rules && rules.length) )
+  {
+    const options = {};
+
+    if( flags )
+    {
+      options.flags = flags;
+    }
+
+    if( rules )
+    {
+      options.rules = rules;
+    }
+
+    // Return parser with predefined flags and/or rules
+
+    return ( value ) => {
+      return parser( value, options );
+    };
+  }
+  else {
+    return parser;
+  }
+}
+
+// -----------------------------------------------------------------------------
 
 /**
  * Parse a value using a schema
@@ -144,7 +126,7 @@ const rulesByName =
  *
  * @param {*} value
  *
- * @returns {*} parsed value
+ * @returns {object} { value [, error] }
  */
 export function parse( schema, value )
 {
@@ -161,136 +143,3 @@ export function parse( schema, value )
 
   return parsedValue;
 }
-
-// -----------------------------------------------------------------------------
-
-/**
- * Object that contains parser functions
- */
-export const parsers =
-{
-  [ TYPE_STRING ]: function( value, flags={}, rules=[] )
-    {
-      //
-      // TODO parse options (to check if options are valid)
-      //
-
-      if( undefined === value )
-      {
-        if( "default" in flags )
-        {
-          return flags.default;
-        }
-      }
-
-      if( typeof value !== "string" ) {
-        return { error: new Error("Value should be a string") };
-      }
-
-      for( const rule of rules )
-      {
-        const name = rule.name;
-
-        expectNotEmptyString( name,
-          "Invalid rule, invalid property [name]" );
-
-        const ruleFn = rulesByName[ name ];
-
-        if( !ruleFn )
-        {
-          throw new Error(`Rule [${name}] does not exist`);
-        }
-
-        const output = ruleFn( value, rule );
-
-        if( output.error )
-        {
-          return output;
-        }
-        else if( output.value ) {
-          value = output.value;
-        }
-
-      } // end for
-
-      return { value };
-    },
-
-  [ TYPE_NAME ]: function( value, options )
-  {
-    if( typeof value !== "string" ) {
-      return { error: new Error("Value should be a string") };
-    }
-
-    const finalValue = value.trim(); // trim value before test
-
-    if( !RE_NAME.test( finalValue ) )
-    {
-      return { error: new Error("Value should be a valid 'name'") };
-    }
-
-    //
-    // @note trimEnd() not possible while typing e.g. fullname
-    //       because typing spaces between names is not possible
-    //
-    value = value.trimStart();
-
-    return { value, finalValue };
-  },
-
-  [ TYPE_EMAIL ]: function( value, options )
-  {
-    // return { error: new Error("Test failure") };
-
-    if( typeof value !== "string" ) {
-      return { error: new Error("Value should be a string") };
-    }
-
-    value = value.trim().toLowerCase();
-
-    if( !RE_EMAIL.test( value ) )
-    {
-      return { error: new Error("Value should be a valid e-mail address") };
-    }
-
-    return { value };
-  },
-
-  [ TYPE_NUMBER ]: function( value, options )
-    {
-      if( typeof value !== "number" ) {
-        return { error: new Error("Value should be a number") };
-      }
-
-      return { value };
-    },
-
-  [ TYPE_BOOLEAN ]: function( value, options )
-    {
-      if( typeof value !== "boolean" ) {
-        return { error: new Error("Value should be a boolean") };
-      }
-
-      return { value };
-    },
-
-  [ TYPE_OBJECT ]: function( value, options )
-    {
-      if( typeof value !== "object" || value === null ) {
-        return { error: new Error("Value should be an object") };
-      }
-
-      return { value };
-    },
-
-  [ TYPE_ARRAY ]: function( value, options )
-    {
-      if( !Array.isArray(value) ) {
-        return { error: new Error("Value should be an array") };
-      }
-
-      return { value };
-    },
-
-  // ...
-};

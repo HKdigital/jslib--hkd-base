@@ -368,3 +368,22 @@ export function getDayName( dateOrTimestamp )
   return DAY_NAME_LABELS_EN[ toDate( dateOrTimestamp ).getDay() ];
 }
 
+// -----------------------------------------------------------------------------
+
+/**
+ * Return the timestamp of the start of the day
+ * - Midnight + 1 millisecond
+ *
+ * @returns {number} timestamp of start of the day
+ */
+export function getTimeAtStartOfDay()
+{
+  const d = new Date();
+  d.setHours(0);
+  d.setMinutes(0);
+  d.setSeconds(0);
+  d.setMilliseconds(1);
+
+  return d.getTime();
+}
+

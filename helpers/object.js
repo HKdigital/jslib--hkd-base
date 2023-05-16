@@ -12,6 +12,8 @@ import { equals } from "./compare.js";
 
 import { toArrayPath } from "./array.js";
 
+import { toStringPath } from "./string.js";
+
 import { isIterable } from "./is.js";
 
 import { iterateObjectPaths,
@@ -47,7 +49,9 @@ export { PATH_SEPARATOR };
 // ---------------------------------------------------------------------- Method
 
 /**
- * Returns true if the object has no (iterable) key value pairs
+ * Returns true
+ * - if the object has no (iterable) key value pairs
+ * - if the object is an empty array
  *
  * @param {object} obj
  *
@@ -64,6 +68,11 @@ export function isEmpty( obj )
   }
 
   expectObject( obj, "Invalid parameter [obj]" );
+
+  if( /*obj instanceof Array && */ 0 === obj.length )
+  {
+    return true;
+  }
 
   for( const key in obj )
   {
@@ -106,13 +115,18 @@ export function objectSize( obj )
  *
  * @param {object} obj
  *
+ * @param {string[]} [onlyKeys]
+ *   If specified, only the selected keys will be exported
+ *
  * @returns {object} new object without the null properties
  */
-export function exportNotNull( obj )
+export function exportNotNull( obj, onlyKeys )
 {
   expectObject( obj, "Invalid parameter [obj]" );
 
   const newObj = {};
+
+  const onlyKeysSet = onlyKeys ? new Set( onlyKeys ) : null;
 
   for( const key in obj )
   {
@@ -120,6 +134,11 @@ export function exportNotNull( obj )
 
     if( value !== null && value !== undefined )
     {
+      if( onlyKeysSet && !onlyKeysSet.has(key) )
+      {
+        continue;
+      }
+
       newObj[ key ] = value;
     }
   } // end for
@@ -139,10 +158,11 @@ export function exportNotNull( obj )
  *
  * @param {object} obj
  * @param {string[]} keys
+ * @param {boolean} [removeNullAndUndefined=true]
  *
  * @returns {object} object that only contains the specified keys
  */
-export function keep( obj, keys )
+export function keep( obj, keys, removeNullAndUndefined=true )
 {
   expectObject( obj, "Invalid parameter [obj]" );
   expectArray( obj, "Invalid parameter [properties]" );
@@ -154,8 +174,20 @@ export function keep( obj, keys )
     if( !keep.has( key ) )
     {
       delete obj[ key ];
+      continue;
     }
-  }
+
+    const value = obj[ key ];
+
+    if( removeNullAndUndefined )
+    {
+      if( value === null || value === undefined )
+      {
+        delete obj[ key ];
+      }
+    }
+
+  } // end for
 
   return obj;
 }
@@ -429,7 +461,7 @@ export function deletePath( obj, path )
 
 /**
  * Get a value from an object using a path
- * - Returns a default
+ * - Returns a default value if not found, with is [undefined] by default
  *
  * @param {object} obj - Object to get the value from
  * @param {string|Array} path - Dot separated string path or array path
@@ -437,7 +469,7 @@ export function deletePath( obj, path )
  * @param {mixed} [defaultValue=undefined]
  *   Value to return if the value does not exist
  *
- * @return {mixed} value found at path, defaultValue or undefined
+ * @return {*} value found at path, defaultValue or undefined
  */
 export function objectGet( obj, path, defaultValue )
 {
@@ -465,6 +497,51 @@ export function objectGet( obj, path, defaultValue )
   if( value === undefined )
   {
     return defaultValue;  // @note may be undefined
+  }
+
+  return value;
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Get a value from an object using a path
+ * - Throws an exception if the path does not exist or the value is undefined
+ *
+ * @param {object} obj - Object to get the value from
+ * @param {string|Array} path - Dot separated string path or array path
+ *
+ * @param {function} [parseFn]
+ *   Optional parser function that checks and converts the value
+ *
+ * @throws No value found at path
+ * @throws Invalid value
+ *
+ * @return {*} value found at path
+ */
+export function objectGetWithThrow( obj, path, parseFn )
+{
+  let value = objectGet( obj, path );
+
+  if( parseFn )
+  {
+    const { value: parsedValue,
+            error } = parseFn( value );
+
+    if( error )
+    {
+      throw new Error(
+        `Invalid value found at path [${toStringPath( path )}]`,
+        { cause: error } );
+    }
+
+    value = parsedValue;
+  }
+
+  if( value === undefined )
+  {
+    throw new Error(
+      `No value found at path [${toStringPath( path )}]` );
   }
 
   return value;

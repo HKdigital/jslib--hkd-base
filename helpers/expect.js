@@ -47,6 +47,14 @@ export function type( value )
       {
         return "Promise";
       }
+      else if( value instanceof Map )
+      {
+        return "Map";
+      }
+      else if( value instanceof Set )
+      {
+        return "Set";
+      }
       // else if( typeof value.next === "function" )
       // {
       //   return "Iterator";
@@ -669,6 +677,22 @@ export function expectPromise( value, errorText )
   if( !(value instanceof Promise) )
   {
     expected( errorText, "expected Promise", value );
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Expect a value to be a Map
+ *
+ * @param {mixed} value - Value to check
+ * @param {string} errorText - Text of the error to throw
+ */
+export function expectMap( value, errorText )
+{
+  if( !(value instanceof Map) )
+  {
+    expected( errorText, "expected Map", value );
   }
 }
 

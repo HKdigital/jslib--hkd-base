@@ -20,6 +20,10 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { value$, default as ValueStore } from "./ValueStore.js";
+import { defer } from "@hkd-base/helpers/process.js";
+
+import { equals } from "@hkd-base/helpers/compare.js";
+
 
 /* ------------------------------------------------------------------- Export */
 
@@ -57,7 +61,7 @@ export default class DedupValueStore extends ValueStore
    *
    * @param {mixed} [value] - Value to store
    */
-  set( value )
+  set( value, deferCallSubscribers=false )
   {
     // expectDefined( value, "Missing parameter [value]" );
 
@@ -66,17 +70,22 @@ export default class DedupValueStore extends ValueStore
       throw new Error( "Missing parameter [value]" );
     }
 
-    if( this[ value$ ] === value )
+    if( equals( this[ value$ ], value ) )
     {
-      //
-      // *** FIXME: make this also work for not primitive values using equals?
-      //
+      // console.log("value equals: ignore", this[ value$ ], value);
+      // Nothing to do
       return;
     }
 
     this[ value$ ] = value;
 
-    this._callSubscribers();
+    if( !deferCallSubscribers )
+    {
+      this._callSubscribers();
+    }
+    else {
+      defer( () => { this._callSubscribers(); } );
+    }
   }
 
 } // end class

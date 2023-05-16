@@ -77,7 +77,7 @@ export default class Config extends LogBase
     expectObjectPath( objectPath,
       "Missing or invalid parameter [objectPath]" );
 
-    expectDefined( newValue, "Missing or invalid parameter [new`Value]" );
+    expectDefined( newValue, "Missing or invalid parameter [newValue]" );
 
     objectPath = toArrayPath( objectPath );
 

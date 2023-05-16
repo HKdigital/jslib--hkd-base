@@ -432,3 +432,32 @@ export function findAll( arr, selector )
 
   return selectorObj.findAll( arr );
 }
+
+// ---------------------------------------------------------------------- Method
+
+/**
+ * Convert array to an object using a list of keys for each index
+ *
+ * @param {array} arr
+ * @param {string[]} keys
+ *
+ * @returns {object}
+ */
+export function arrayToObject( arr, keys )
+{
+  expectArray( arr, "Invalid or missing parameter [arr]" );
+  expectArray( keys, "Invalid or missing parameter [keys]" );
+
+  const obj = {};
+
+  const n = Math.min( arr.length, keys.length );
+
+  for( let j = 0; j < n; j = j + 1 )
+  {
+    obj[ keys[j] ] = arr[j];
+  }
+
+  return obj;
+}
+
+

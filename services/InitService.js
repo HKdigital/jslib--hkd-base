@@ -36,8 +36,9 @@ import {
   STOPPING,
   UNAVAILABLE,
   ERROR,
-  /*displayState,*/
-  Base } from "../helpers/services.js";
+  /*displayState,*/ } from "../helpers/services.js";
+
+import ServiceBase, { setInitService } from "../classes/ServiceBase.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -50,7 +51,7 @@ const serviceStateUnsubscribers$ = Symbol("serviceStateUnsubscribers");
 
 /* ------------------------------------------------------------ Service class */
 
-class InitService extends Base
+class InitService extends ServiceBase
 {
   constructor()
   {
@@ -191,7 +192,7 @@ class InitService extends Base
    */
   async boot()
   {
-    this.log.info("InitService: boot");
+    // this.log.info("InitService: boot");
 
     if( !this.isConfigured() )
     {
@@ -331,9 +332,17 @@ class InitService extends Base
 
       const serviceName = registration.serviceName;
 
-      const service = this.service( serviceName );
+      try {
+        const service = this.service( serviceName );
 
-      await service.setTargetState( RUNNING );
+        await service.setTargetState( RUNNING );
+      }
+      catch( e )
+      {
+        throw new Error(
+          `InitService: failed to start service [${serviceName}]`,
+          { cause: e } );
+      }
 
     } // end for
 
@@ -393,4 +402,8 @@ class InitService extends Base
 
 /* ------------------------------------------------------------------ Exports */
 
-export default new InitService();
+const service = new InitService();
+
+setInitService( service );
+
+export default service;

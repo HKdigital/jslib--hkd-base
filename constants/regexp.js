@@ -44,14 +44,22 @@ export const RE_EMAIL =
 export const RE_PHONE =
   /(^\+[0-9]{2}|^\+[0-9]{2}\(0\)|^\(\+[0-9]{2}\)\(0\)|^00[0-9]{2}|^0)([0-9]{9}$|[0-9\-\s]{10}$)/;
 
-export const RE_POSTAL_CODE_DUTCH =
+export const RE_POSTCODE_DUTCH =
    /^[1-9]{1}[0-9]{3} ?[A-Za-z]{2}$/;
+
+export const RE_PLACE_DUTCH =
+   new RegExp( "^['`]{0,1}" +
+               "[" + C.REP_LETTER_LC + "]{0,}" +
+               "[-\\s]{0,1}" +
+               "[" + C.REP_LETTER_LC + "]{2,}$",
+               "i" );
 
 export const RE_NAME =
   new RegExp( "^[" + C.REP_LETTER_LC + "\\s-]{2,}$", "i" );
 
 export const RE_FANTASY_NAME =
-  new RegExp("^[" + C.REP_LETTER_NUMBER_LC + "\\s-_&|,./\\\\]{2,}$", "i" );
+  new RegExp("^[" + C.REP_LETTER_NUMBER_LC +
+             "\\x20!@#\\$%\\^&\\*\\(\\)-_+=\\|:;'\"`~<,>.?/\\\\]{2,}$", "i" );
 
 export const RE_ADDRESS =
   new RegExp( "^[" + C.REP_LETTER_NUMBER_LC + ".,°\\s-]{2,}$", "i" );

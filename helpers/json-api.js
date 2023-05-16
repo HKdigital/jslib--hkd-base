@@ -56,6 +56,25 @@ export function buildApiUrl( uri, config )
   expectString( apiPrefix,
     `Invalid parameter [config.apiPrefix]` );
 
+  // console.log( { apiPrefix, uri, origin } );
+
+  if( origin )
+  {
+    const x = origin.indexOf("://");
+
+    if( x !== -1 )
+    {
+      const y = origin.indexOf( "/", x + 3 );
+
+      if( y !== -1 && origin.length !== y + 1 )
+      {
+        throw new Error(
+          `Invalid parameter [config.origin=${origin}] ` +
+          `(should not contain a path)` );
+      }
+    }
+  }
+
   return new URL( apiPrefix + uri, origin );
 }
 
@@ -164,6 +183,27 @@ export async function jsonApiPost(
  *   Config parameters or label of the global config entry that contains
  *   the remote API configuration.
  *
+ * --
+ *
+ * @throws {ResponseError}
+ *
+ *   A ResponseError will be thrown if:
+ *     - A network error occurs
+ *     - When the response status is 403, 404 or 500 or not `response.ok`
+ *     - The "JSON" response could not be decoded
+ *     - The response contains a not-empty error property
+ *     - Something else went wrong
+ *
+ * @throws {TypeError}
+ *
+ *   --> TODO check if this is not caught and converted into a ResponseError <--
+ *
+ *   A TypeError will be throw if the internal call to `fetch` fails due to:
+ *     - A network error
+ *     - Misconfigured CORS on the server side
+ *
+ * --
+ *
  * @returns {mixed} response data: parsed JSON response from backend server
  */
 export async function jsonApiRequest(
@@ -231,6 +271,7 @@ export async function jsonApiRequest(
   const responsePromise =
     httpRequest( { method, url, body, urlSearchParams, headers } );
 
+  /**/
   const response = await waitForAndCheckResponse( responsePromise, url );
 
   let parsedResponse;

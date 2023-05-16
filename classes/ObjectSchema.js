@@ -6,7 +6,7 @@ import { expectBoolean,
          expectFunction,
          expectError } from "@hkd-base/helpers/expect.js";
 
-import { parsers } from "@hkd-base/helpers/parse.js";
+import { registeredParsers } from "@hkd-base/helpers/parse.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -62,7 +62,7 @@ export default class ObjectSchema
       expectObject( property,
         `Invalid parameter [properties]. Property [${key}] is not an object`);
 
-      const parser = parsers[ property.type ];
+      const parser = registeredParsers[ property.type ];
 
       if( !parser )
       {
@@ -185,9 +185,11 @@ export default class ObjectSchema
             value,
             finalValue } = this.validateProperty( obj, key );
 
+      let property = properties[ key ];
+
       if( error )
       {
-        const type = properties[ key ].type;
+        const type = property.type;
 
         expectError( error,
           `Parser [${type}] did not return a valid error property` );
@@ -251,7 +253,16 @@ export default class ObjectSchema
         value = finalValue;
       }
 
-      obj[ key ] = value;
+      const existingValue = obj[ key ];
+
+      if( existingValue instanceof Object &&
+          typeof existingValue.get === "function" )
+      {
+        obj[ key ].set( value );
+      }
+      else {
+        obj[ key ] = value;
+      }
 
       // -- Keep track of `missing required properties`
 
@@ -299,7 +310,25 @@ export default class ObjectSchema
 
     // -- Parsing was ok: return parsed object
 
-    return { value: obj  };
+    // Convert stores to values in returned output
+
+    const output = {};
+
+    for( const key in obj )
+    {
+      const value = obj[ key ];
+
+      if( value instanceof Object &&
+          typeof value.get === "function" )
+      {
+        output[ key ] = value.get();
+      }
+      else {
+        output[ key ] = value;
+      }
+    }
+
+    return { value: output };
   }
 
   // ---------------------------------------------------------------------------
@@ -318,7 +347,17 @@ export default class ObjectSchema
 
     const properties = this._schemaProperties;
 
-    const originalValue = obj[ key ];
+    let originalValue = obj[ key ];
+
+    if( (originalValue instanceof Object) &&
+        typeof originalValue.get === "function" )
+    {
+      //
+      // If the value is a `store` (or has a get method), use it to get the
+      // real value.
+      //
+      originalValue = originalValue.get();
+    }
 
     const property = properties[ key ];
 
@@ -338,7 +377,7 @@ export default class ObjectSchema
 
     const type = property.type;
 
-    const parser = parsers[ type ];
+    const parser = registeredParsers[ type ];
 
     const parseOptions = property; // parseOptions === property
 
