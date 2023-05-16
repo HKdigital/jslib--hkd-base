@@ -2,9 +2,9 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectString,
-         expectObject } from "@hkd-base/helpers/expect.js";
+         expectObject } from "./expect.js";
 
-import { objectGet } from "@hkd-base/helpers/object.js";
+import { objectGet } from "./object.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -37,12 +37,14 @@ export function capitalizeFirstLetter( str )
 /**
  * Interpolate: substitute variables in a string
  *
- * - Uses es6 template style expression substitution:
- *   Variables and expressions are surrounded by ${...}
+ * - Uses mustache template style expression substitution:
+ *   Variables and expressions are surrounded by {{...}}
+ *
+ *  TODO: full mustache support, see https://github.com/janl/mustache.js
  *
  * --
  *
- * @eg const template = `Hello ${name}`;
+ * @eg const template = `Hello {{name}}`;
  *
  * --
  *
