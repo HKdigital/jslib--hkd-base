@@ -15,7 +15,7 @@ import { objectGet,
 export const RE_JS_EXPRESSION = /\$\{([^${}]*)\}/g;
 export const RE_MUSTACHE = /\{\{([^{}]*)\}\}/g;
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Captizalize the first letter of a string
@@ -34,7 +34,7 @@ export function capitalizeFirstLetter( str )
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Interpolate: substitute variables in a string
@@ -85,7 +85,7 @@ export function interpolate(
     } );
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Remove strange characters from a string and replace whitespace by
@@ -105,7 +105,7 @@ export function toUriName( str )
   return str;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Convert a path string to an array path
@@ -138,7 +138,21 @@ export function toStringPath( path, pathSeparator=PATH_SEPARATOR )
   }
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
+
+/**
+ * Prefix a numeric string with 0's
+ *
+ * @param {string|number} input
+ *
+ * @returns {string}
+ */
+export function padDigits( input, targetLength=2, padString="0" )
+{
+  return ("" + input).padStart( targetLength, padString);
+}
+
+// -----------------------------------------------------------------------------
 
 /**
  * Make sure that the outputted path is an array path
