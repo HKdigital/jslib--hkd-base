@@ -1,82 +1,40 @@
 /* ------------------------------------------------------------------ Imports */
 
-import { expectString,
-         expectNotEmptyString,
-         expectObject } from "@hkd-base/helpers/expect.js";
+import { expectNotEmptyString }
+  from "@hkd-base/helpers/expect.js";
 
 import { ResponseError,
-         TokenExpiredError } from "@hkd-base/types/error-types.js";
+         TokenExpiredError }
+  from "@hkd-base/types/error-types.js";
 
-import { isObject } from "@hkd-base/helpers/is.js";
+import { isObject }
+  from "@hkd-base/helpers/is.js";
 
-import { getGlobalConfig } from "@hkd-base/helpers/global-config.js";
+import { buildApiUrl,
+         httpApiRequest }
+  from "@hkd-base/helpers/http-api.js";
+
+import { getGlobalConfig }
+  from "@hkd-base/helpers/global-config.js";
 
 import { waitForAndCheckResponse,
          httpRequest,
          METHOD_GET,
-         METHOD_POST } from "@hkd-base/helpers/http.js";
+         METHOD_POST }
+  from "@hkd-base/helpers/http.js";
 
-import { decodePayload } from "@hkd-base/helpers/jwt-info.js";
+import { decodePayload }
+  from "@hkd-base/helpers/jwt-info.js";
 
 /* ---------------------------------------------------------------- Internals */
 
 /* ------------------------------------------------------------------ Exports */
 
-export const KEY_DEFAULT_JSON_API = "default-api";
+export const KEY_DEFAULT_JSON_API = "default-json-api";
 
 // export const KEY_AUTH_JSON_API = "auth-api";
 
 // export const KEY_LIVE_JSON_API = "live-api";
-
-// -----------------------------------------------------------------------------
-
-/**
- * Build an URL object by using `origin` and `apiPrefix` from the specified
- * config and a custom `uri`.
- *
- * @param {string} uri - Custom uri part to append
- *
- * @param {object} config - API Config { origin: <string>, apiPrefix: <string> }
- *
- * @returns {object} URI object
- */
-export function buildApiUrl( uri, config )
-{
-  expectNotEmptyString( uri,
-    "Missing or invalid parameter [uri]");
-
-  expectObject( config,
-    "Missing or invalid parameter [config]");
-
-  const { origin, apiPrefix="" } = config;
-
-  expectNotEmptyString( origin,
-    `Missing or invalid parameter [config.origin]` );
-
-  expectString( apiPrefix,
-    `Invalid parameter [config.apiPrefix]` );
-
-  // console.log( { apiPrefix, uri, origin } );
-
-  if( origin )
-  {
-    const x = origin.indexOf("://");
-
-    if( x !== -1 )
-    {
-      const y = origin.indexOf( "/", x + 3 );
-
-      if( y !== -1 && origin.length !== y + 1 )
-      {
-        throw new Error(
-          `Invalid parameter [config.origin=${origin}] ` +
-          `(should not contain a path)` );
-      }
-    }
-  }
-
-  return new URL( apiPrefix + uri, origin );
-}
 
 // -----------------------------------------------------------------------------
 
@@ -215,81 +173,16 @@ export async function jsonApiRequest(
     config=KEY_DEFAULT_JSON_API
   } )
 {
-  expectNotEmptyString( uri, "Missing or invalid parameter [uri]" );
-
-  if( !isObject( config ) )
-  {
-    expectNotEmptyString( config, "Invalid parameter [config]" );
-
-    config = getGlobalConfig( config );
-  }
-
-  const { origin,
-          apiPrefix,
-          token,
-          /*includeSessionId=false*/ } = config;
-
-  const url = buildApiUrl( uri, { origin, apiPrefix } );
-
-  const headers =
-    {
-      /* Added `accept "text/html"` to prevent 406 Not Acceptable issues */
-      "accept": "text/html,application/json",
-      "content-type": "application/json"
-    };
-
-  if( token )
-  {
-    //
-    // A JSON Web Token should be used for authentication
-    //
-
-    //
-    // Check if token has not expired before doing a request
-    //
-    const decodedToken = decodePayload(token);
-
-    if( "exp" in decodedToken )
-    {
-      const expiredMs = Date.now() - decodedToken.exp * 1000;
-
-      if( expiredMs > 0 )
+  const parsedResponse =
+    await httpApiRequest(
       {
-        throw new TokenExpiredError(
-          `Token has expired (${Math.round(expiredMs/1000)} seconds ago)`);
-      }
-    }
-
-    //
-    // Add token as HTTP header
-    //
-    headers["authorization"] = `Bearer ${token}`;
-  }
-
-  // console.log( "json-api", { method, url, body, urlSearchParams, headers } );
-
-  const responsePromise =
-    httpRequest( { method, url, body, urlSearchParams, headers } );
-
-  /**/
-  const response = await waitForAndCheckResponse( responsePromise, url );
-
-  let parsedResponse;
-
-  try {
-    //
-    // @note when security on the client side fails, an `opaque` response
-    //       is returned by the browser (empty body) -> parsing fails
-    //       (use CORS to fix this)
-    //
-    parsedResponse = await response.json();
-  }
-  catch( e )
-  {
-    // console.log( response );
-    throw new ResponseError(
-      `Failed to JSON decode server response from [${decodeURI(url.href)}]`);
-  }
+        uri,
+        method,
+        urlSearchParams,
+        body,
+        // headers,
+        config
+      } );
 
   if( parsedResponse.error )
   {
