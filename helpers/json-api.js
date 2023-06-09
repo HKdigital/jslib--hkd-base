@@ -22,11 +22,11 @@ import { decodePayload } from "@hkd-base/helpers/jwt-info.js";
 
 /* ------------------------------------------------------------------ Exports */
 
-export const CONFIG_LABEL_DEFAULT_JSON_API = "default-api";
+export const KEY_DEFAULT_JSON_API = "default-api";
 
-// export const CONFIG_LABEL_AUTH_JSON_API = "auth-api";
+// export const KEY_AUTH_JSON_API = "auth-api";
 
-// export const CONFIG_LABEL_LIVE_JSON_API = "live-api";
+// export const KEY_LIVE_JSON_API = "live-api";
 
 // -----------------------------------------------------------------------------
 
@@ -98,7 +98,7 @@ export function buildApiUrl( uri, config )
  * @param {object} [urlSearchParams]
  *   Parameters that should be added to the request url
  *
- * @param {object|string} [config=CONFIG_LABEL_DEFAULT_JSON_API]
+ * @param {object|string} [config=KEY_DEFAULT_JSON_API]
  *   Config parameters or label of the global config entry that contains
  *   the remote API configuration.
  *
@@ -108,7 +108,7 @@ export async function jsonApiGet(
   {
     uri,
     urlSearchParams,
-    config=CONFIG_LABEL_DEFAULT_JSON_API
+    config=KEY_DEFAULT_JSON_API
   } )
 {
   return jsonApiRequest(
@@ -140,7 +140,7 @@ export async function jsonApiGet(
  * @param {*} body
  *   Data that will be converted to a JSON encoded and send to the server
  *
- * @param {object|string} [config=CONFIG_LABEL_DEFAULT_JSON_API]
+ * @param {object|string} [config=KEY_DEFAULT_JSON_API]
  *   Config parameters or label of the global config entry that contains
  *   the remote API configuration.
  *
@@ -150,7 +150,7 @@ export async function jsonApiPost(
   {
     uri,
     body=null,
-    config=CONFIG_LABEL_DEFAULT_JSON_API
+    config=KEY_DEFAULT_JSON_API
   } )
 {
   return jsonApiRequest(
@@ -179,7 +179,7 @@ export async function jsonApiPost(
  *
  * @param {string} uri - uri of the API method
  *
- * @param {object|string} [config=CONFIG_LABEL_DEFAULT_JSON_API]
+ * @param {object|string} [config=KEY_DEFAULT_JSON_API]
  *   Config parameters or label of the global config entry that contains
  *   the remote API configuration.
  *
@@ -212,7 +212,7 @@ export async function jsonApiRequest(
     method,
     urlSearchParams,
     body,
-    config=CONFIG_LABEL_DEFAULT_JSON_API
+    config=KEY_DEFAULT_JSON_API
   } )
 {
   expectNotEmptyString( uri, "Missing or invalid parameter [uri]" );
