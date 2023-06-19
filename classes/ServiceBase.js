@@ -190,10 +190,14 @@ export default class ServiceBase extends LogBase
    * - By default the service class name is returned
    * - A custom service name can be set in the property
    *   `this._customServiceName`
+   *
+   * @param {boolean} [includeOriginalServiceName=true]
+   *   If a custom service name has been set, also include the original
+   *   service name.
    */
-  serviceName()
+  serviceName( includeOriginalServiceName=true )
   {
-    if( this[ customServiceName$ ] )
+    if( this[ customServiceName$ ] && includeOriginalServiceName )
     {
       return `${this[ customServiceName$ ]}<${this.constructor.name}>`;
     }

@@ -4,9 +4,11 @@
 import { expectBoolean,
          expectObject,
          expectFunction,
-         expectError } from "@hkd-base/helpers/expect.js";
+         expectError }
+  from "@hkd-base/helpers/expect.js";
 
-import { registeredParsers } from "@hkd-base/helpers/parse.js";
+import { registeredParsers }
+  from "@hkd-base/helpers/parse.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -37,6 +39,8 @@ export default class ObjectSchema
    *   Object that contains key => ObjectSchema~Property entries
    *
    * @param {object} options
+   * @param {boolean} [options.allowUnknown=false]
+   * @param {boolean} [options.stripUnknown=false]
    *
    * --
    *
@@ -337,7 +341,7 @@ export default class ObjectSchema
    * Validate a single object property
    *
    * @param {object} obj
-   * @param {string} key - Name of hte property to validate
+   * @param {string} key - Key of the property to validate
    *
    * @returns {object} { value: <*> [, error: <Error>] [, finalValue: <*>] }
    */

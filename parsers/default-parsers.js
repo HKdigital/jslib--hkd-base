@@ -5,7 +5,8 @@ import { expectString,
          expectNotEmptyString,
          expectNumber,
          expectPositiveNumber,
-         expectObject } from "@hkd-base/helpers/expect.js";
+         expectObject }
+  from "@hkd-base/helpers/expect.js";
 
 import {
   TYPE_STRING,
@@ -16,15 +17,25 @@ import {
   TYPE_NAME,
   TYPE_FANTASY_NAME,
   TYPE_EMAIL,
-  TYPE_PHONE } from "@hkd-base/types/schema-types.js";
+  TYPE_PHONE }
+  from "@hkd-base/types/schema-types.js";
+
+import {
+  TYPE_COLLECTION_NAME,
+  TYPE_LABEL }
+  from "@hkd-base/types/schema-types-data.js";
 
 import { RE_NAME,
          RE_FANTASY_NAME,
          RE_EMAIL,
          RE_PHONE,
-         RE_MULTIPLE_SPACES } from "@hkd-base/constants/regexp.js";
+         RE_MULTIPLE_SPACES,
+         RE_LABEL,
+         RE_COLLECTION_NAME }
+  from "@hkd-base/constants/regexp.js";
 
-import { registerParsers } from "@hkd-base/helpers/parse.js";
+import { registerParsers }
+  from "@hkd-base/helpers/parse.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -310,6 +321,52 @@ export const parsers =
 
         return applyRules( { value, rules } );
       },
+
+    [ TYPE_COLLECTION_NAME ]: function( value /* , { flags={}, rules=[] }={} */ )
+    {
+      if( typeof value !== "string" )
+      {
+        return { error: new Error("Value should be a string") };
+      }
+
+      const finalValue = value.trim(); // trim value before test
+
+      if( !RE_COLLECTION_NAME.test( finalValue ) )
+      {
+        return { error: new Error("Value should be a valid 'collection name'") };
+      }
+
+      //
+      // @note trimEnd() not possible while typing e.g. fullname
+      //       because typing spaces between names is not possible
+      //
+      value = value.trimStart();
+
+      return { value, finalValue };
+    },
+
+    [ TYPE_LABEL ]: function( value /* , { flags={}, rules=[] }={} */ )
+    {
+      if( typeof value !== "string" )
+      {
+        return { error: new Error("Value should be a string") };
+      }
+
+      const finalValue = value.trim(); // trim value before test
+
+      if( !RE_LABEL.test( finalValue ) )
+      {
+        return { error: new Error("Value should be a valid 'label'") };
+      }
+
+      //
+      // @note trimEnd() not possible while typing e.g. fullname
+      //       because typing spaces between names is not possible
+      //
+      value = value.trimStart();
+
+      return { value, finalValue };
+    },
 
     [ TYPE_NAME ]: function( value /* , { flags={}, rules=[] }={} */ )
     {
