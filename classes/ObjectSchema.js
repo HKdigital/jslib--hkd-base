@@ -17,6 +17,7 @@ import { registeredParsers }
 /**
  * @typedef {Object} ObjectSchema~Property
  * @property {string} type
+ * @property {boolean} [optional=false]
  */
 
 export default class ObjectSchema
@@ -34,6 +35,8 @@ export default class ObjectSchema
 
   /**
    * Construct an ObjectSchema instance
+   * - ObjectSchema is inspired by Joi
+   * - Objectschema is less extended than Joi, so more lightweight
    *
    * @param {object} properties
    *   Object that contains key => ObjectSchema~Property entries
@@ -57,7 +60,8 @@ export default class ObjectSchema
   {
     // == Process properties
 
-    expectObject( properties, "Missing or invalid parameter [properties]" );
+    expectObject( properties,
+      "Missing or invalid parameter [properties]" );
 
     for( let key in properties )
     {
@@ -415,12 +419,23 @@ export default class ObjectSchema
         //
         // @see Joi.describe()
         //
-        // flags: { default: '' }
-        // rules: [ { name: "email" } ]
-        // rules: [
-        //  { name: 'trim', args: { enabled: true } },
-        //  { name: 'case', args: { direction: 'lower' } }
-        // ]
+        // @eg
+        //
+        // Flags:
+        //
+        //   flags: { default: '' }
+        //
+        // Single rule:
+        //
+        //   rules: [ { name: "email" } ]
+        //
+        // Multiple rules:
+        //
+        //   rules: [
+        //    { name: 'trim', args: { enabled: true } },
+        //    { name: 'case', args: { direction: 'lower' } }
+        //   ]
+        //
       };
 
     return description;
