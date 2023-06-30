@@ -5,8 +5,9 @@ import { expectString,
          expectObject } from "./expect.js";
 
 import { objectGet,
-         PATH_SEPARATOR }
-  from "./object.js";
+         PATH_SEPARATOR } from "./object.js";
+
+import { toArrayPath } from "./array.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -52,14 +53,19 @@ export function capitalizeFirstLetter( str )
  *
  * @param {string} template - Template string to interpolate
  * @param {object} templateData - Template data to use for interpolation
+ *
+ * @returns {string} interpolated string
  */
 export function interpolate(
   template,
   templateData,
   expressionRegexp=RE_MUSTACHE )
 {
-  expectString( template, "Missing or invalid variable [template]" );
-  expectObject( templateData, "Missing or invalid variable [templateData]" );
+  expectString( template,
+    "Missing or invalid variable [template]" );
+
+  expectObject( templateData,
+    "Missing or invalid variable [templateData]" );
 
   return template.replace( expressionRegexp,
 
@@ -68,7 +74,7 @@ export function interpolate(
     {
       let replacement;
 
-      let path = expression;
+      let path = toArrayPath( expression );
 
       replacement = objectGet( templateData, path, undefined);
 
