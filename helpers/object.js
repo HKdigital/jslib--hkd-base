@@ -5,6 +5,7 @@ import {
   expectString,
   expectObject,
   expectArray,
+  expectArrayOrSet,
   expectDefined,
   expectObjectNoFunction } from "./expect.js";
 
@@ -213,7 +214,7 @@ export function exportNotPrivate( obj, keepKeys )
  * - deletes all other key-value pairs in the object
  *
  * @param {object} obj
- * @param {string[]} keys
+ * @param {string[]|Set} keys
  * @param {boolean} [removeNullAndUndefined=true]
  *
  * @returns {object} object that only contains the specified keys
@@ -221,9 +222,9 @@ export function exportNotPrivate( obj, keepKeys )
 export function keep( obj, keys, removeNullAndUndefined=true )
 {
   expectObject( obj, "Invalid parameter [obj]" );
-  expectArray( obj, "Invalid parameter [properties]" );
+  expectArrayOrSet( keys, "Invalid parameter [keys]" );
 
-  const keep = new Set( keys );
+  const keep = (keys instanceof Set) ? keys : new Set( keys );
 
   for( const key in obj )
   {
@@ -1330,7 +1331,7 @@ export function updateObject( obj=null, updateData=null, options )
   {
     // Convert updateData to path-value pairs (iterable)
 
-    const walkArrays = options && options.replaceArrays ? true : false
+    const walkArrays = options && options.replaceArrays ? true : false;
 
     pathValuePairs =
       iterateObjectEntries(

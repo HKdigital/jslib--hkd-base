@@ -712,6 +712,23 @@ export function expectSet( value, errorText )
   }
 }
 
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Expect a value to be an Array or a Set
+ *
+ * @param {mixed} value - Value to check
+ * @param {string} errorText - Text of the error to throw
+ */
+export function expectArrayOrSet( value, errorText )
+{
+  if( !(value instanceof Array) && !(value instanceof Set) )
+  {
+    expected( errorText, "expected Array or Set", value );
+  }
+}
+
 // -----------------------------------------------------------------------------
 
 /**
