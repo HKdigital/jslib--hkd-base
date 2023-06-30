@@ -13,6 +13,9 @@ import { objectGet,
          objectSet }
   from "@hkd-base/helpers/object.js";
 
+import { toStringPath }
+  from "@hkd-base/helpers/string.js";
+
 import { equals }
   from "@hkd-base/helpers/compare.js";
 
@@ -225,11 +228,28 @@ export default class Config extends LogBase
    *
    * @param {string} objectPath
    *
+   * @param {*} [defaultValue]
+   *   Default value to return if no config value was found
+   *   (if not set an exception will be thrown)
+   *
    * @returns {object|undefined} data or undefined if not set
    */
-  get( objectPath )
+  get( objectPath, defaultValue )
   {
-    return objectGet( this.data, objectPath, undefined );
+    const value = objectGet( this.data, objectPath, undefined );
+
+    if( undefined !== value )
+    {
+      return value;
+    }
+
+    if( defaultValue )
+    {
+      return defaultValue;
+    }
+
+    throw new Error(
+      `No config value found at path [${toStringPath( objectPath)}]`);
   }
 
   // ---------------------------------------------------------------------------
