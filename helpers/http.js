@@ -549,50 +549,60 @@ export async function httpRequest(
     headers: requestHeaders
   };
 
-  switch( method )
+  // Allow search params also for other request types than GET
+
+  if( urlSearchParams )
   {
-    case METHOD_GET:
-      init.method = METHOD_GET;
+    if( !(urlSearchParams instanceof URLSearchParams) )
+    {
+      throw new Error(
+        `Invalid parameter [urlSearchParams] ` +
+        `(expected instanceof URLSearchParams)`);
+    }
 
-      if( urlSearchParams )
+    const existingParams = url.searchParams;
+
+    for( const [ name, value ] of urlSearchParams.entries() )
+    {
+      if( existingParams.has( name ) )
       {
-        if( !(urlSearchParams instanceof URLSearchParams) )
-        {
-          throw new Error(
-            `Invalid parameter [urlSearchParams] ` +
-            `(expected instanceof URLSearchParams)`);
-        }
-
-        const existingParams = url.searchParams;
-
-        for( const [ name, value ] of urlSearchParams.entries() )
-        {
-          if( existingParams.has( name ) )
-          {
-            throw new Error(
-              `Cannot set URL search parameter [${name}] ` +
-              `in url [${url.href}] (already set)`);
-          }
-
-          existingParams.set( name, value );
-        } // end for
+        throw new Error(
+          `Cannot set URL search parameter [${name}] ` +
+          `in url [${url.href}] (already set)`);
       }
-      break;
 
-    case METHOD_POST:
-      init.method = METHOD_POST;
-
-      init.body = body || null; /* : JSON.stringify( body ) */
-      break;
-
-    default:
-      throw new Error(`Invalid value for parameter [method=${method}]`);
+      existingParams.set( name, value );
+    } // end for
   }
 
   //
   // Sort search params to make the url nicer
   //
   url.searchParams.sort();
+
+  // console.log( "url", url );
+
+  init.method = method;
+
+  if( METHOD_POST === method )
+  {
+    init.body = body || null; /* : JSON.stringify( body ) */
+  }
+
+  // switch( method )
+  // {
+  //   case METHOD_GET:
+  //     init.method = METHOD_GET;
+  //     break;
+
+  //   case METHOD_POST:
+  //     init.method = METHOD_POST;
+  //     init.body = body || null; /* : JSON.stringify( body ) */
+  //     break;
+
+  //   default:
+  //     throw new Error(`Invalid value for parameter [method=${method}]`);
+  // }
 
   // @see https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
   // @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort

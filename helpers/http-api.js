@@ -22,6 +22,10 @@ import { decodePayload } from "@hkd-base/helpers/jwt-info.js";
 
 /* ------------------------------------------------------------------ Exports */
 
+export { METHOD_GET,
+         METHOD_POST }
+  from "@hkd-base/helpers/http.js";
+
 export const KEY_DEFAULT_HTTP_API = "default-http-api";
 
 // -----------------------------------------------------------------------------
@@ -224,6 +228,7 @@ export async function httpApiRequest(
   const { origin,
           apiPrefix,
           token,
+          basicAuth
           /*includeSessionId=false*/ } = config;
 
   const url = buildApiUrl( uri, { origin, apiPrefix } );
@@ -268,6 +273,24 @@ export async function httpApiRequest(
     // Add token as HTTP header
     //
     headers["authorization"] = `Bearer ${token}`;
+  }
+  else if( basicAuth )
+  {
+    expectObject( basicAuth,
+      "Invalid property [cnofig.basicAuth]" );
+
+    const {
+        username,
+        password
+      } = basicAuth;
+
+    expectString( username,
+      "Invalid property [config.basicAuth.username]" );
+
+    expectString( password,
+      "Invalid property [config.basicAuth.password]" );
+
+    headers["authorization"] = `Basic ${btoa( username+":"+password)}`;
   }
 
   // console.log( "json-api", { method, url, body, urlSearchParams, headers } );
