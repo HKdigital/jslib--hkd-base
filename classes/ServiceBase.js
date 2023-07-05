@@ -142,7 +142,7 @@ export default class ServiceBase extends LogBase
     this.__events = new ValueStore();
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Call the configure function that was supplied as constructor parameter
@@ -167,7 +167,7 @@ export default class ServiceBase extends LogBase
     this[ configured$ ] = true;
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Set a custom service name
@@ -183,7 +183,7 @@ export default class ServiceBase extends LogBase
     this.__logContext.className = this.serviceName();
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Get the name of the service
@@ -205,7 +205,7 @@ export default class ServiceBase extends LogBase
     return this.constructor.name;
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Set an event in the service's event stream
@@ -231,7 +231,7 @@ export default class ServiceBase extends LogBase
     this.__events.set( event );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Returns true if the service has been configured at least once
@@ -243,7 +243,7 @@ export default class ServiceBase extends LogBase
     return this[ configured$ ];
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Raises an exception if the service has not been configured yet
@@ -256,9 +256,11 @@ export default class ServiceBase extends LogBase
         `Service [${this.serviceName()}] has not been configured yet. ` +
         `Call [${this.serviceName()}.configure(..)] first`);
     }
+
+    return this;
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Raises an exception if the service is not in state RUNNING
@@ -273,9 +275,11 @@ export default class ServiceBase extends LogBase
         `Service [${this.serviceName()}] should be in state [running]. ` +
         `(current state [${displayState(currentState)}])`);
     }
+
+    return this;
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Raises an exception if the service is not in the state STOPPED
@@ -290,9 +294,30 @@ export default class ServiceBase extends LogBase
         `Service [${this.serviceName()}] should be in state [stopped]. ` +
         `(current state [${displayState(currentState)}])`);
     }
+
+    return this;
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Raises an exception if the service is not in the state STOPPED
+   */
+  expectAvailable()
+  {
+    const currentState = this.getState();
+
+    if( STOPPED !== currentState || !this[ allDependenciesAvailable$ ].get() )
+    {
+      throw new Error(
+        `Service [${this.serviceName()}] and all dependencies should be in ` +
+        `state [available] (current state [${displayState(currentState)}])`);
+    }
+
+    return this;
+  }
+
+  // ---------------------------------------------------------------------------
 
   // setDependenciesAvailable()
   // {
@@ -301,7 +326,7 @@ export default class ServiceBase extends LogBase
   //   this[ allDependenciesAvailable$ ].set( true );
   // }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   // setUnavailable()
   // {
@@ -312,7 +337,7 @@ export default class ServiceBase extends LogBase
   //   this[ allDependenciesAvailable$ ].set( UNAVAILABLE );
   // }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Returns true all dependencies are available
@@ -331,7 +356,7 @@ export default class ServiceBase extends LogBase
     return false;
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Set a dependency
@@ -427,7 +452,7 @@ export default class ServiceBase extends LogBase
         true /* true -> run upon registration */ );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Use InitService to get a dependency by name
@@ -447,7 +472,7 @@ export default class ServiceBase extends LogBase
     return InitService.service( name );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Set the current state of the service
@@ -480,7 +505,7 @@ export default class ServiceBase extends LogBase
     this[ stateStore$ ].set( state );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Get the current service state
@@ -510,7 +535,7 @@ export default class ServiceBase extends LogBase
     return displayState( state );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Register a callback that will be called when the state is updated
@@ -615,7 +640,7 @@ export default class ServiceBase extends LogBase
     };
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Set the target state of the service
@@ -657,7 +682,7 @@ export default class ServiceBase extends LogBase
     await this._transitionToState( targetState );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Get the target state of the service
@@ -669,7 +694,7 @@ export default class ServiceBase extends LogBase
     return this[ targetState$ ];
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Set a handler that handles the transition to a target state
@@ -748,7 +773,7 @@ export default class ServiceBase extends LogBase
     this[ stateStore$ ].set( state );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Transition to state
