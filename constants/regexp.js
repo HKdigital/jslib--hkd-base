@@ -49,19 +49,21 @@ export const RE_POSTCODE_DUTCH =
 
 export const RE_PLACE_DUTCH =
    new RegExp( "^['`]{0,1}" +
-               "[" + C.REP_LETTER_LC + "]{0,}" +
-               "[-\\s]{0,1}" +
-               "[" + C.REP_LETTER_LC + "]{2,}$",
+               `[${C.REP_LETTER_LC}]{0,}` +
+               `[-\\s]{0,1}` +
+               `[${C.REP_LETTER_LC}]{2,}$`,
                "i" );
 
 export const RE_NAME =
-  new RegExp( "^[" + C.REP_LETTER_LC + "\\s-]{2,}$", "i" );
+  new RegExp( `^[${C.REP_LETTER_LC}\\s-\`']{2,}$`, "i" );
+
+export const RE_NAME_OR_INITIALS =
+  new RegExp( `(^[${C.REP_LETTER_LC}\\s-\`'\\.]{2,}$)|` +
+              `(^([${C.REP_LETTER_LC}]{1}[\\. ]{0,1})+$)`, "i" );
 
 export const RE_FANTASY_NAME =
   new RegExp("^[" + C.REP_LETTER_NUMBER_LC +
-             "\\x20!@#\\$%\\^&\\*\\(\\)-_+=\\|:;'\"`~<,>.?/\\\\]{2,}$", "i" );
-
-// export const RE_KEY = RE_FANTASY_NAME;
+             "\\x20!@#\\$%\\^&\\*\\(\\)-_+=\\|:;'\"'`~<,>.?/\\\\]{2,}$", "i" );
 
 export const RE_ADDRESS =
   new RegExp( "^[" + C.REP_LETTER_NUMBER_LC + ".,°\\s-]{2,}$", "i" );
@@ -75,6 +77,9 @@ export const RE_LABEL = new RegExp('^[a-z0-9_-]{2,}$');
 
 export const RE_COLLECTION_NAME =
   new RegExp( "^[a-z0-9\\s-_]{1,}$", "i" );
+
+export const RE_URI_COMPONENT =
+  new RegExp( "^[" + C.REP_LETTER_LC + "\\s-_]{1,}$", "i" );
 
 //
 // @see https://usefulshortcuts.com/alt-codes/accents-alt-codes.php
