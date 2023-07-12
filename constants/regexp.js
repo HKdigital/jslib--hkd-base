@@ -54,12 +54,12 @@ export const RE_PLACE_DUTCH =
                `[${C.REP_LETTER_LC}]{2,}$`,
                "i" );
 
-export const RE_NAME =
-  new RegExp( `^[${C.REP_LETTER_LC}\\s-\`']{2,}$`, "i" );
+// export const RE_NAME =
+//   new RegExp( `^[${C.REP_LETTER_LC}\\s-\`']{2,}$`, "i" );
 
-export const RE_NAME_OR_INITIALS =
-  new RegExp( `(^[${C.REP_LETTER_LC}\\s-\`'\\.]{2,}$)|` +
-              `(^([${C.REP_LETTER_LC}]{1}[\\. ]{0,1})+$)`, "i" );
+export const RE_NAME =
+  new RegExp( `^[${C.REP_LETTER_LC}]{1}` +
+               `[${C.REP_LETTER_LC}\\s-\`'\\.]{0,}$`, "i" );
 
 export const RE_FANTASY_NAME =
   new RegExp("^[" + C.REP_LETTER_NUMBER_LC +
