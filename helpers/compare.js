@@ -8,8 +8,8 @@ import { objectGet } from "./object.js";
 /**
  * Check if the values of two variables should be considered the same
  *
- * @param  {mixed} value1 - First value for comparison
- * @param  {mixed} value2 - Second value for comparison
+ * @param  {*} value1 - First value for comparison
+ * @param  {*} value2 - Second value for comparison
  *
  * @return {boolean} true if the two values can be considered the same
  */
@@ -128,8 +128,8 @@ import { objectGet } from "./object.js";
 /**
  * Returns true if x is greater than y
  *
- * @param {mixed} x - First value
- * @param {mixed} y - Second value
+ * @param {*} x - First value
+ * @param {*} y - Second value
  */
 export function isGreaterThan( x, y )
 {
@@ -156,8 +156,8 @@ export function isGreaterThan( x, y )
 /**
  * Returns true if x is less than y
  *
- * @param {mixed} x - First value
- * @param {mixed} y - Second value
+ * @param {*} x - First value
+ * @param {*} y - Second value
  */
 export function isLessThan( x, y )
 {
@@ -185,8 +185,8 @@ export function isLessThan( x, y )
  * Compare function that can be used for sorting smallest values first
  * - undefined values are placed at the ...???FIXME???... of the sorted array
  *
- * @param {mixed} x - First value
- * @param {mixed} y - Second value
+ * @param {*} x - First value
+ * @param {*} y - Second value
  */
 export function smallestFirst( x, y )
 {
@@ -214,8 +214,8 @@ export function smallestFirst( x, y )
  * Compare function that can be used for sorting largest values first
  * - undefined values are placed at the ...???FIXME???... of the sorted array
  *
- * @param {mixed} x - First value
- * @param {mixed} y - Second value
+ * @param {*} x - First value
+ * @param {*} y - Second value
  */
 export function largestFirst( x, y )
 {
@@ -244,8 +244,8 @@ export function largestFirst( x, y )
  *
  * @param {function} compareFn - Function to use to compare the values
  *
- * @param {mixed} a - First value
- * @param {mixed} b - Second value
+ * @param {*} a - First value
+ * @param {*} b - Second value
  *
  * @param {string|string[]} path - Object path
  */
@@ -268,8 +268,8 @@ export function compareUsingPath( compareFn, a, b, path )
  * @param {function} compareFn - Function to use to compare the values
  * @param {string|string[]} path - Object path
  *
- * @param {mixed} x - First value
- * @param {mixed} y - Second value
+ * @param {*} x - First value
+ * @param {*} y - Second value
  */
 export function compareUsingKey( compareFn, key, a, b )
 {
