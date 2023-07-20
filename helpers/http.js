@@ -114,7 +114,7 @@ function setRequestHeaders( target, nameValuePairs )
  * @throws {Error} not found
  * @throws {Error} internal server error
  */
-function expectResponseOk( response, url )
+async function expectResponseOk( response, url )
 {
   expectObject( response, "Missing or invalid parameter [response]" );
 
@@ -156,16 +156,46 @@ function expectResponseOk( response, url )
       throw new ResponseError(
         `Server returned - 404 Not Found, [${decodeURI(url.href)}]`);
 
-    case 500:
-      throw new ResponseError(
-        `Server returned - 500 Internal server error, [${decodeURI(url.href)}]`);
+    case 400: // Bad Request
+    case 500: // Internal Server Error
+      {
+        let error;
 
-    default: // -> ok
+        try {
+          //
+          // Try to get `message` property if JSON has been returned
+          //
+          // ==> FIXME: check first if returned content-type is JSON?
+          //
+          const parsedResponse = await response.json();
+
+          if( parsedResponse &&
+              typeof parsedResponse.message === "string" )
+          {
+            error = new ResponseError(
+              `Server returned - ${response.status} ${response.statusText}, ` +
+              `[${decodeURI(url.href)}]: ${parsedResponse.message}` );
+          }
+        }
+        catch( e ) { /* do nothing */ }
+
+        if( error )
+        {
+          throw  error;
+        }
+        else {
+          throw new ResponseError(
+            `Server returned - ${response.status} ${response.statusText}, ` +
+            `[${decodeURI(url.href)}]`);
+        }
+      }
+
+    default: // -> ok (unless response.ok is false)
       if( !response.ok )
       {
         throw new ResponseError(
-          `Server returned - ${response.status} [response.ok=false], ` +
-          `[${decodeURI(url.href)}]`);
+          `Server returned - ${response.status} ${response.statusText} ` +
+          `[response.ok=false], [${decodeURI(url.href)}]`);
       }
       break;
   }
@@ -225,7 +255,7 @@ export async function waitForAndCheckResponse( responsePromise, url )
     }
   }
 
-  expectResponseOk( response, url );
+  await expectResponseOk( response, url );
 
   return response;
 }
@@ -519,50 +549,60 @@ export async function httpRequest(
     headers: requestHeaders
   };
 
-  switch( method )
+  // Allow search params also for other request types than GET
+
+  if( urlSearchParams )
   {
-    case METHOD_GET:
-      init.method = METHOD_GET;
+    if( !(urlSearchParams instanceof URLSearchParams) )
+    {
+      throw new Error(
+        `Invalid parameter [urlSearchParams] ` +
+        `(expected instanceof URLSearchParams)`);
+    }
 
-      if( urlSearchParams )
+    const existingParams = url.searchParams;
+
+    for( const [ name, value ] of urlSearchParams.entries() )
+    {
+      if( existingParams.has( name ) )
       {
-        if( !(urlSearchParams instanceof URLSearchParams) )
-        {
-          throw new Error(
-            `Invalid parameter [urlSearchParams] ` +
-            `(expected instanceof URLSearchParams)`);
-        }
-
-        const existingParams = url.searchParams;
-
-        for( const [ name, value ] of urlSearchParams.entries() )
-        {
-          if( existingParams.has( name ) )
-          {
-            throw new Error(
-              `Cannot set URL search parameter [${name}] ` +
-              `in url [${url.href}] (already set)`);
-          }
-
-          existingParams.set( name, value );
-        } // end for
+        throw new Error(
+          `Cannot set URL search parameter [${name}] ` +
+          `in url [${url.href}] (already set)`);
       }
-      break;
 
-    case METHOD_POST:
-      init.method = METHOD_POST;
-
-      init.body = body || null; /* : JSON.stringify( body ) */
-      break;
-
-    default:
-      throw new Error(`Invalid value for parameter [method=${method}]`);
+      existingParams.set( name, value );
+    } // end for
   }
 
   //
   // Sort search params to make the url nicer
   //
   url.searchParams.sort();
+
+  // console.log( "url", url );
+
+  init.method = method;
+
+  if( METHOD_POST === method )
+  {
+    init.body = body || null; /* : JSON.stringify( body ) */
+  }
+
+  // switch( method )
+  // {
+  //   case METHOD_GET:
+  //     init.method = METHOD_GET;
+  //     break;
+
+  //   case METHOD_POST:
+  //     init.method = METHOD_POST;
+  //     init.body = body || null; /* : JSON.stringify( body ) */
+  //     break;
+
+  //   default:
+  //     throw new Error(`Invalid value for parameter [method=${method}]`);
+  // }
 
   // @see https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
   // @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort

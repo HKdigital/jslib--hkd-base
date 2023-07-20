@@ -4,9 +4,11 @@
 import { expectBoolean,
          expectObject,
          expectFunction,
-         expectError } from "@hkd-base/helpers/expect.js";
+         expectError }
+  from "@hkd-base/helpers/expect.js";
 
-import { registeredParsers } from "@hkd-base/helpers/parse.js";
+import { registeredParsers }
+  from "@hkd-base/helpers/parse.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -15,6 +17,7 @@ import { registeredParsers } from "@hkd-base/helpers/parse.js";
 /**
  * @typedef {Object} ObjectSchema~Property
  * @property {string} type
+ * @property {boolean} [optional=false]
  */
 
 export default class ObjectSchema
@@ -32,11 +35,15 @@ export default class ObjectSchema
 
   /**
    * Construct an ObjectSchema instance
+   * - ObjectSchema is inspired by Joi
+   * - Objectschema is less extended than Joi, so more lightweight
    *
    * @param {object} properties
    *   Object that contains key => ObjectSchema~Property entries
    *
    * @param {object} options
+   * @param {boolean} [options.allowUnknown=false]
+   * @param {boolean} [options.stripUnknown=false]
    *
    * --
    *
@@ -53,7 +60,8 @@ export default class ObjectSchema
   {
     // == Process properties
 
-    expectObject( properties, "Missing or invalid parameter [properties]" );
+    expectObject( properties,
+      "Missing or invalid parameter [properties]" );
 
     for( let key in properties )
     {
@@ -337,7 +345,7 @@ export default class ObjectSchema
    * Validate a single object property
    *
    * @param {object} obj
-   * @param {string} key - Name of hte property to validate
+   * @param {string} key - Key of the property to validate
    *
    * @returns {object} { value: <*> [, error: <Error>] [, finalValue: <*>] }
    */
@@ -411,12 +419,23 @@ export default class ObjectSchema
         //
         // @see Joi.describe()
         //
-        // flags: { default: '' }
-        // rules: [ { name: "email" } ]
-        // rules: [
-        //  { name: 'trim', args: { enabled: true } },
-        //  { name: 'case', args: { direction: 'lower' } }
-        // ]
+        // @eg
+        //
+        // Flags:
+        //
+        //   flags: { default: '' }
+        //
+        // Single rule:
+        //
+        //   rules: [ { name: "email" } ]
+        //
+        // Multiple rules:
+        //
+        //   rules: [
+        //    { name: 'trim', args: { enabled: true } },
+        //    { name: 'case', args: { direction: 'lower' } }
+        //   ]
+        //
       };
 
     return description;

@@ -18,7 +18,11 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { TypeOrValueError } from "../types/error-types.js";
+import { TypeOrValueError }
+  from "../types/error-types.js";
+
+import { RE_URI_COMPONENT }
+  from "../constants/regexp.js";
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -414,6 +418,26 @@ export function expectNotEmptyString( value, errorText )
   }
 }
 
+// -----------------------------------------------------------------------------
+
+/**
+ * Expect a value to be a valid URI component
+ *
+ * @param {mixed} value - Value to check
+ * @param {string} errorText - Text of the error to throw
+ */
+export function expectUriComponent( value, errorText )
+{
+  if( typeof value !== "string" )
+  {
+    expected( errorText, "expected URI component", value );
+  }
+
+  if( !RE_URI_COMPONENT.test( value ) )
+  {
+    expected( errorText, "expected URI component (invalid character found)");
+  }
+}
 
 // -----------------------------------------------------------------------------
 
@@ -709,6 +733,23 @@ export function expectSet( value, errorText )
   if( !(value instanceof Set) )
   {
     expected( errorText, "expected Set", value );
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Expect a value to be an Array or a Set
+ *
+ * @param {mixed} value - Value to check
+ * @param {string} errorText - Text of the error to throw
+ */
+export function expectArrayOrSet( value, errorText )
+{
+  if( !(value instanceof Array) && !(value instanceof Set) )
+  {
+    expected( errorText, "expected Array or Set", value );
   }
 }
 

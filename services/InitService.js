@@ -77,7 +77,7 @@ class InitService extends ServiceBase
     this[ serviceStateUnsubscribers$ ] = new Map();
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Register a service
@@ -183,7 +183,7 @@ class InitService extends ServiceBase
     // this[ serviceStateUnsubscribers$ ].set( serviceName, unsubscribe );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Boot
@@ -209,7 +209,7 @@ class InitService extends ServiceBase
     }
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Shutdown
@@ -229,14 +229,17 @@ class InitService extends ServiceBase
     }
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Get a registered service
    *
    * @param {string} serviceName - Name of the service
+   * @param {boolean} [expectStateRunning=false]
+   *
+   * @returns {object} the specified service
    */
-  service( serviceName )
+  service( serviceName, expectStateRunning=false )
   {
     expectString( serviceName,
       "Missing or invalid parameter [serviceName]" );
@@ -247,14 +250,22 @@ class InitService extends ServiceBase
     {
       if( serviceName === name )
       {
-        return service;
+        if( !expectStateRunning || service.getState() === RUNNING )
+        {
+          return service;
+        }
+        else {
+          throw new Error(
+            `Service [${serviceName}] is in state [${service.getState(true)}]` +
+            `(expected state running)`);
+        }
       }
     } // end for
 
     throw new Error(`Service [${serviceName}] has not been registered`);
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Start the specified service
@@ -273,7 +284,7 @@ class InitService extends ServiceBase
     await service.setTargetState( RUNNING );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Stop the specified service
@@ -353,7 +364,7 @@ class InitService extends ServiceBase
     setState( RUNNING );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Transition to service state STOPPED
