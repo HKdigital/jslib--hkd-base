@@ -427,7 +427,7 @@ export const parsers =
 
       if( !RE_EMAIL.test( value ) )
       {
-        return { error: new Error("Value should be a valid e-mail address") };
+        return { error: new Error("Value should be a valid email address") };
       }
 
       return { value };
