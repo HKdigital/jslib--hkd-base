@@ -10,16 +10,16 @@ import { expectNotEmptyString,
  * Build a tree from flat tree data format, consisting of a root node
  * and branches (edge-vertex pairs)
  *
- * @param {object} branchGraphData - tree: { root, branches }
+ * @param {{ root: object[], branches: object[] }} flatTree - Flat tree data
  *
  * @returns {object} tree data
  */
-export function buildTreeFromBranches( branchGraphData, idKey="_id" )
+export function buildTree( flatTree, idKey="_id" )
 {
-  expectObject( branchGraphData,
-    "Missing or invalid parameter [branchGraphData]" );
+  expectObject( flatTree,
+    "Missing or invalid parameter [flatTree]" );
 
-  let { root, branches } = branchGraphData;
+  let { root, branches } = flatTree;
 
   if( !root )
   {
@@ -41,12 +41,12 @@ export function buildTreeFromBranches( branchGraphData, idKey="_id" )
   const rootId = root[ idKey ];
 
   expectNotEmptyString( rootId,
-    `Invalid property [ root[${idKey}] ] in branchGraphData` );
+    `Invalid property [ root[${idKey}] ] in flatTree` );
 
   root = { ...root };
 
   expectObject( root,
-    "Invalid property [root] in branchGraphData" );
+    "Invalid property [root] in flatTree" );
 
   // -- Build graph
 
@@ -65,20 +65,20 @@ export function buildTreeFromBranches( branchGraphData, idKey="_id" )
     if( from )
     {
       expectNotEmptyString( from,
-        "Invalid property [branch.from] in branchGraphData" );
+        "Invalid property [branch.from] in flatTree" );
     }
     else if( to )
     {
       expectNotEmptyString( to,
-        "Invalid property [branch.to] in branchGraphData" );
+        "Invalid property [branch.to] in flatTree" );
     }
     else {
       throw new Error(
-        `Missing property [branch.from] or [branch.to] in branchGraphData`);
+        `Missing property [branch.from] or [branch.to] in flatTree`);
     }
 
     // expectObject( node,
-    //   "Invalid property [branch.node] in branchGraphData" );
+    //   "Invalid property [branch.node] in flatTree" );
 
     if( !node )
     {
@@ -90,7 +90,7 @@ export function buildTreeFromBranches( branchGraphData, idKey="_id" )
     const nodeId = node[ idKey ];
 
     expectNotEmptyString( nodeId,
-      `Invalid property [ branch.node[${idKey}] ] in branchGraphData` );
+      `Invalid property [ branch.node[${idKey}] ] in flatTree` );
 
     allNodeIds.add( nodeId );
 
