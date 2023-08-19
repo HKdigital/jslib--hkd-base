@@ -28,7 +28,8 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectObjectOrNull } from "../helpers/expect.js";
+import { expectObjectOrNull }
+  from "@hkd-base/helpers/expect.js";
 
 /* ---------------------------------------------------------------- Internals */
 

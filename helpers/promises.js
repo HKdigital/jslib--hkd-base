@@ -14,13 +14,14 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import {
-  expectString,
-  expectArray,
-  expectObject,
-  expectFunction } from "./expect.js";
+import { expectString,
+         expectArray,
+         expectObject,
+         expectFunction }
+  from "@hkd-base/helpers/expect.js";
 
-import HkPromise from "../classes/HkPromise.js";
+import HkPromise
+  from "@hkd-base/classes/HkPromise.js";
 
 /* ---------------------------------------------------------------- Internals */
 

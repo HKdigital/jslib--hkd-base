@@ -16,9 +16,17 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectFunction } from "@hkd-base/helpers/expect.js";
+import { expectFunction }
+  from "@hkd-base/helpers/expect.js";
 
 /* ------------------------------------------------------------------ Exports */
+
+/**
+ * Function that does nothing
+ */
+export const noop = () => {};
+
+// -----------------------------------------------------------------------------
 
 /**
  * Wraps a function so that the callback function will be called only once

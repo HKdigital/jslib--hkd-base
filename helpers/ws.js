@@ -48,9 +48,11 @@ import {
   expectNotEmptyString,
   expectPositiveNumber,
   expectDefined,
-  expectObject } from "../helpers/expect.js";
+  expectObject }
+  from "@hkd-base/helpers/expect.js";
 
-import { getGlobalConfig } from "../helpers/global-config.js";
+import { getGlobalConfig }
+  from "@hkd-base/helpers/global-config.js";
 
 const stores = new Map();
 

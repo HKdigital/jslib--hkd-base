@@ -22,10 +22,12 @@
 /* ------------------------------------------------------------------ Imports */
 
 import {
-  expectString,
-  expectNumber,
-  expectArray,
-  expectFunction } from "../helpers/expect.js";
+    expectString,
+    expectNumber }
+  from "@hkd-base/helpers/expect.js";
+
+import { noop }
+  from "@hkd-base/helpers/function.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -44,8 +46,6 @@ const timeoutTimer$ = Symbol("timeoutTimer");
 const hasThen$ = Symbol("hasThen");
 
 /* ------------------------------------------------------------------- Export */
-
-const doNothing = () => {};
 
 /**
  * HkPromise extends the default javascript Promise class
@@ -221,7 +221,7 @@ export default class HkPromise extends Promise
       // No then (or await) has been used
       // add catch to prevent useless unhandled promise rejection
       //
-      this.catch( doNothing );
+      this.catch( noop );
     }
 
     // -- Check current Promise state

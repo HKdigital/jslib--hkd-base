@@ -10,8 +10,11 @@
 
 /* ------------------------------------------------------------------ Exports */
 
-export * from "../helpers/service-states.js";
+export *
+  from "@hkd-base/helpers/service-states.js";
 
-export { default as Base } from "../classes/ServiceBase.js";
+export { default as Base }
+  from "../classes/ServiceBase.js";
 
-export { default as Init } from "../services/InitService.js";
+export { default as Init }
+  from "../services/InitService.js";

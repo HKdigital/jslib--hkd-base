@@ -16,8 +16,11 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectFunction } from "../helpers/expect.js";
-import { defer } from "@hkd-base/helpers/process.js";
+import { expectFunction }
+  from "@hkd-base/helpers/expect.js";
+
+import { defer }
+  from "@hkd-base/helpers/process.js";
 
 /* ---------------------------------------------------------------- Internals */
 

@@ -23,22 +23,26 @@
 /* ------------------------------------------------------------------ Imports */
 
 import {
-  expectString,
-  expectStringOrUndefined,
-  expectBoolean,
-  expectObject,
-  expectArray } from "../helpers/expect.js";
+    expectString,
+    expectStringOrUndefined,
+    expectBoolean,
+    expectObject,
+    expectArray }
+  from "@hkd-base/helpers/expect.js";
 
 import {
-  STOPPED,
-  STARTING,
-  RUNNING,
-  STOPPING,
-  UNAVAILABLE,
-  ERROR,
-  /*displayState,*/ } from "../helpers/services.js";
+    STOPPED,
+    STARTING,
+    RUNNING,
+    STOPPING,
+    UNAVAILABLE,
+    ERROR,
+    /*displayState,*/ }
+  from "@hkd-base/helpers/services.js";
 
-import ServiceBase, { setInitService } from "../classes/ServiceBase.js";
+import ServiceBase,
+       { setInitService }
+  from "../classes/ServiceBase.js";
 
 /* ---------------------------------------------------------------- Internals */
 
