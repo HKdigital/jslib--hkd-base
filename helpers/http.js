@@ -4,10 +4,12 @@
 import { expectNotEmptyString,
          expectObject,
          expectObjectNoArray,
-         expectFunction } from "@hkd-base/helpers/expect.js";
+         expectFunction }
+  from "@hkd-base/helpers/expect.js";
 
 import { ResponseError,
-         TypeOrValueError } from "@hkd-base/types/error-types.js";
+         TypeOrValueError }
+  from "@hkd-base/types/error-types.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -35,6 +37,8 @@ function toURL( url )
   // already an URL instance
   return url;
 }
+
+// -----------------------------------------------------------------------------
 
 /**
  * Throws an exception if the URL object has any search parameter set
@@ -378,6 +382,10 @@ export async function jsonPost(
   if( !headers )
   {
     headers = {};
+  }
+  else {
+    expectObject( headers,
+      "Invalid value for parameter [headers]" );
   }
 
   headers[ "accept" ] = "application/json";
