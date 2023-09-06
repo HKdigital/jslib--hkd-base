@@ -40,10 +40,15 @@ export default class Feed
    *   the context `this` is set to the `this` context of the feed instance
    *
    *   The value returned by  the processor is set in the store `feed.data`
+   *
+   * @param {object} [EventSourceClass=EventSource]
+   *   EventSource class - especially for NodeJs where the global EventSource
+   *   class is not available and a custom module should be used.
    */
   constructor( processor, EventSourceClass )
   {
-    expectFunction( processor, "Missing or invalid parameter [processor]" );
+    expectFunction( processor,
+      "Missing or invalid parameter [processor]" );
 
     this[ processor$ ] = ( eventOrError ) => {
 
@@ -159,6 +164,7 @@ export default class Feed
    * Configure
    *
    * @param {string|null} url
+   * @param {boolean} [autoReconnect=false]
    */
   configure( { url, autoReconnect=false } )
   {
