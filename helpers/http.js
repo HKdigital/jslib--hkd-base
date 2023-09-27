@@ -446,14 +446,21 @@ export async function jsonPost(
  *
  * @returns {Promise<*>} responsePromise
  */
-export async function httpGet( { url, urlSearchParams, headers } )
+export async function httpGet(
+  {
+    url,
+    urlSearchParams,
+    headers,
+    requestHandler
+  } )
 {
   const responsePromise = httpRequest(
     {
       method: METHOD_GET,
       url,
       urlSearchParams,
-      headers
+      headers,
+      requestHandler
     } );
 
   return await waitForAndCheckResponse( responsePromise, url );
@@ -479,14 +486,21 @@ export async function httpGet( { url, urlSearchParams, headers } )
  *
  * @returns {Promise<*>} responsePromise
  */
-export async function httpPost( { url, body=null, headers } )
+export async function httpPost(
+  {
+    url,
+    body=null,
+    headers,
+    requestHandler
+  } )
 {
   const responsePromise = httpRequest(
     {
       method: METHOD_POST,
       url,
       body,
-      headers } );
+      headers,
+      requestHandler } );
 
   return await waitForAndCheckResponse( responsePromise, url );
 }
