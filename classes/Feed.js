@@ -227,6 +227,20 @@ export default class Feed
   // -------------------------------------------------------------------- Method
 
   /**
+   * Manually inject a value into the feed
+   *
+   * @param {*} [value] - Value to store
+   *
+   * @returns {*} the value that was set
+   */
+  set( value)
+  {
+    return this[ data$ ].set(value );
+  }
+
+  // -------------------------------------------------------------------- Method
+
+  /**
    * Shutdown the feed
    * - Disconnects from the event source
    * - Sets `null` as last data value

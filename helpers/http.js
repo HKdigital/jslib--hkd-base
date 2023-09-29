@@ -2,12 +2,15 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectNotEmptyString,
+         expectPositiveNumber,
          expectObject,
          expectObjectNoArray,
          expectFunction }
   from "@hkd-base/helpers/expect.js";
 
 import { ResponseError,
+         AbortError,
+         TimeoutError,
          TypeOrValueError }
   from "@hkd-base/types/error-types.js";
 
@@ -444,6 +447,10 @@ export async function jsonPost(
  * @param {function} [requestHandler]
  *   If defined, this function will receive the abort handler function
  *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
+ *
  * @returns {Promise<*>} responsePromise
  */
 export async function httpGet(
@@ -484,6 +491,10 @@ export async function httpGet(
  * @param {function} [requestHandler]
  *   If defined, this function will receive the abort handler function
  *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
+ *
  * @returns {Promise<*>} responsePromise
  */
 export async function httpPost(
@@ -512,9 +523,9 @@ export async function httpPost(
  * - This is a low level function, consider using
  *   httpGet, httpPost, jsonGet or jsonPost instead
  *
- * @param {string} method - Request method: METHOD_GET | METHOD_POST
- *
  * @param {string|URL} url - Url string or URL object
+ *
+ * @param {string} method - Request method: METHOD_GET | METHOD_POST
  *
  * @param {object} [urlSearchParams] - URL search parameters as key-value pairs
  *
@@ -528,6 +539,9 @@ export async function httpPost(
  * @param {function} [requestHandler]
  *   If defined, this function will receive the abort handler function
  *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
  *
  * --
  *
@@ -547,7 +561,8 @@ export async function httpRequest(
     urlSearchParams=null,
     body=null,
     headers,
-    requestHandler
+    requestHandler,
+    timeoutMs
   } )
 {
   url = toURL( url );
@@ -635,15 +650,6 @@ export async function httpRequest(
   const controller = new AbortController();
   const signal = controller.signal;
 
-  if( requestHandler )
-  {
-    expectFunction( requestHandler, "Invalid parameter [requestHandler]" );
-
-    const abort = controller.abort.bind( controller );
-
-    requestHandler( { abort } );
-  }
-
   //
   // A fetch() promise will reject with a TypeError when a network error
   // is encountered or CORS is misconfigured on the server-side,
@@ -663,6 +669,56 @@ export async function httpRequest(
   // .catch((error) => { .. }
   //
 
-  return /* promise */ fetch( request, { signal } );
+  const promise = fetch( request, { signal } );
 
+  if( requestHandler || timeoutMs )
+  {
+    const abort = ( reason ) =>
+      {
+        if( !reason )
+        {
+          reason = new AbortError(`Request [${url.href}] aborted`);
+        }
+
+        controller.abort( reason );
+      };
+
+    /**
+     * Function that can be used to set a timeout on a request
+     *
+     * @param {number} delayMs
+     */
+    const timeout = ( delayMs=10000 ) =>
+      {
+        expectPositiveNumber( delayMs, "Invalid value for [delayMs]" );
+
+        const timerId =
+          setTimeout( () =>
+            {
+              controller.abort(
+                new TimeoutError(
+                  `Request [${url.href}] timed out [${delayMs}]`) );
+            },
+            delayMs );
+
+        promise.finally( () => {
+          clearTimeout( timerId );
+        } );
+      };
+
+    if( timeoutMs )
+    {
+      timeout( timeoutMs );
+    }
+
+    if( requestHandler )
+    {
+      expectFunction( requestHandler,
+        "Invalid parameter [requestHandler]" );
+
+      requestHandler( { controller, abort, timeout } );
+    }
+  }
+
+  return promise;
 }

@@ -39,7 +39,7 @@ export const unsubscribers$ = Symbol("unsubscribers");
 
 /**
  * @callback {ValueStore~subscribeCallback}
- * @param {mixed} value
+ * @param {*} value
  * @param {function} unsubscribe
  */
 
@@ -58,7 +58,7 @@ export default class ValueStore
   /**
    * Constructor
    *
-   * @param {mixed} [initialValue]
+   * @param {*} [initialValue]
    *   Initial value to set
    *
    * @param {boolean} [enableHasSubscribers=true]
@@ -233,9 +233,9 @@ export default class ValueStore
   /**
    * Store a new value
    *
-   * @param {mixed} [value] - Value to store
+   * @param {*} [value] - Value to store
    *
-   * @returns {mixed} the value that was set
+   * @returns {*} the value that was set
    */
   set( value, deferCallSubscribers=false )
   {
@@ -295,7 +295,7 @@ export default class ValueStore
    * @param {function} [updateFn]
    *   Function that receives the current value and returns an updated value
    *
-   * @returns {mixed} the value that was set
+   * @returns {*} the value that was set
    */
   update( updateFn )
   {

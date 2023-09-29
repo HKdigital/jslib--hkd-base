@@ -98,9 +98,25 @@ export function buildApiUrl( uri, config )
  * @param {object} [urlSearchParams]
  *   Parameters that should be added to the request url
  *
+ * @param {function} [requestHandler]
+ *   If defined, this function will receive the abort handler function
+ *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
+ *
  * @param {object|string} [config=KEY_DEFAULT_HTTP_API]
  *   Config parameters or label of the global config entry that contains
  *   the remote API configuration.
+ *
+ *  e.g.
+ *
+ *  config = {
+ *    origin,
+ *    apiPrefix,
+ *    token,
+ *    basicAuth
+ *  }
  *
  * @returns {object} { abort, jsonResponsePromise }
  */
@@ -108,6 +124,8 @@ export async function httpApiGet(
   {
     uri,
     urlSearchParams,
+    requestHandler,
+    timeoutMs,
     config=KEY_DEFAULT_HTTP_API
   } )
 {
@@ -116,6 +134,8 @@ export async function httpApiGet(
       uri,
       urlSearchParams,
       method: METHOD_GET,
+      requestHandler,
+      timeoutMs,
       config
     } );
 }
@@ -140,9 +160,25 @@ export async function httpApiGet(
  * @param {*} body
  *   Data that will be converted to a JSON encoded and send to the server
  *
+ * @param {function} [requestHandler]
+ *   If defined, this function will receive the abort handler function
+ *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
+ *
  * @param {object|string} [config=KEY_DEFAULT_HTTP_API]
  *   Config parameters or label of the global config entry that contains
  *   the remote API configuration.
+ *
+ *  e.g.
+ *
+ *  config = {
+ *    origin,
+ *    apiPrefix,
+ *    token,
+ *    basicAuth
+ *  }
  *
  * @returns {mixed} parsed JSON response from backend server
  */
@@ -150,6 +186,8 @@ export async function httpApiPost(
   {
     uri,
     body=null,
+    requestHandler,
+    timeoutMs,
     config=KEY_DEFAULT_HTTP_API
   } )
 {
@@ -158,6 +196,7 @@ export async function httpApiPost(
       uri,
       body: JSON.stringify( body ),
       method: METHOD_POST,
+      requestHandler,
       config
     } );
 }
@@ -179,9 +218,35 @@ export async function httpApiPost(
  *
  * @param {string} uri - uri of the API method
  *
+ * @param {string} method - Request method: METHOD_GET | METHOD_POST
+ *
+ * @param {object} [urlSearchParams]
+ *   Parameters that should be added to the request url
+ *
+ * @param {*} [body] - POST data
+ *
+ * @param {object} [headers]
+ *   Object that contains custom headers. A header is a name, value pair.
+ *
+ * @param {function} [requestHandler]
+ *   If defined, this function will receive the abort handler function
+ *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
+ *
  * @param {object|string} [config=KEY_DEFAULT_HTTP_API]
  *   Config parameters or label of the global config entry that contains
  *   the remote API configuration.
+ *
+ *  e.g.
+ *
+ *  config = {
+ *    origin,
+ *    apiPrefix,
+ *    token,
+ *    basicAuth
+ *  }
  *
  * --
  *
@@ -213,6 +278,8 @@ export async function httpApiRequest(
     urlSearchParams,
     body,
     headers,
+    requestHandler,
+    timeoutMs,
     config=KEY_DEFAULT_HTTP_API
   } )
 {
@@ -296,7 +363,16 @@ export async function httpApiRequest(
   // console.log( "json-api", { method, url, body, urlSearchParams, headers } );
 
   const responsePromise =
-    httpRequest( { method, url, body, urlSearchParams, headers } );
+    httpRequest(
+      {
+        method,
+        url,
+        body,
+        urlSearchParams,
+        headers,
+        requestHandler,
+        timeoutMs
+      } );
 
   /**/
   const response = await waitForAndCheckResponse( responsePromise, url );
