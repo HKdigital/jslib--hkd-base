@@ -27,7 +27,7 @@ const destroyed$ = Symbol("destroyed");
 
 export default class Feed
 {
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Construct a Feed instance
@@ -121,7 +121,7 @@ export default class Feed
     } );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Get latest feed item
@@ -138,7 +138,7 @@ export default class Feed
     return this[ data$ ].get();
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Subscribe to feed
@@ -158,7 +158,7 @@ export default class Feed
     return this[ data$ ].subscribe( ...arguments );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Configure
@@ -224,7 +224,7 @@ export default class Feed
     }
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Manually inject a value into the feed
@@ -238,13 +238,15 @@ export default class Feed
     return this[ data$ ].set(value );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Shutdown the feed
    * - Disconnects from the event source
    * - Sets `null` as last data value
    * - Unsubscribes all listeners
+   *
+   * @throws {AlreadyDestroyedError} if
    */
   destroy()
   {
@@ -263,7 +265,25 @@ export default class Feed
     this[ destroyed$ ] = true;
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Shutdown the feed
+   * - Disconnects from the event source
+   * - Sets `null` as last data value
+   * - Unsubscribes all listeners
+   */
+  tryDestroy()
+  {
+    if( this[ destroyed$ ] )
+    {
+      return;
+    }
+
+    this.destroy();
+  }
+
+  // ---------------------------------------------------------------------------
 
   /**
    * Reconnect, e.g. after an error
@@ -289,7 +309,7 @@ export default class Feed
     delay );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Disconnect from server
@@ -326,7 +346,7 @@ export default class Feed
     }
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Create a new EventSource instance
