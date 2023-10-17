@@ -17,15 +17,24 @@ class Logic {
    * Creates a Logic instance
    * - The arguments are converted into a Set of paths that should be checked
    *   by the class that inherits from the Logic instance
+   *
+   * @param {string[]|(...string|...string[])}
+   *   Array path or multiple (array) paths
    */
   constructor()
   {
     if( 1 === arguments &&
         Array.isArray( arguments[0] ) )
     {
+      //
+      // Single array as argument: use as array path
+      //
       this.paths = this._createPathsSet( arguments[0] );
     }
     else {
+      //
+      //  Multiple (array) paths
+      //
       this.paths = this._createPathsSet( arguments );
     }
   }

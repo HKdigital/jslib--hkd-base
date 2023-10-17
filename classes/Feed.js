@@ -27,7 +27,7 @@ const destroyed$ = Symbol("destroyed");
 
 export default class Feed
 {
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Construct a Feed instance
@@ -40,10 +40,15 @@ export default class Feed
    *   the context `this` is set to the `this` context of the feed instance
    *
    *   The value returned by  the processor is set in the store `feed.data`
+   *
+   * @param {object} [EventSourceClass=EventSource]
+   *   EventSource class - especially for NodeJs where the global EventSource
+   *   class is not available and a custom module should be used.
    */
   constructor( processor, EventSourceClass )
   {
-    expectFunction( processor, "Missing or invalid parameter [processor]" );
+    expectFunction( processor,
+      "Missing or invalid parameter [processor]" );
 
     this[ processor$ ] = ( eventOrError ) => {
 
@@ -116,7 +121,7 @@ export default class Feed
     } );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Get latest feed item
@@ -133,7 +138,7 @@ export default class Feed
     return this[ data$ ].get();
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Subscribe to feed
@@ -153,12 +158,13 @@ export default class Feed
     return this[ data$ ].subscribe( ...arguments );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Configure
    *
    * @param {string|null} url
+   * @param {boolean} [autoReconnect=false]
    */
   configure( { url, autoReconnect=false } )
   {
@@ -218,13 +224,29 @@ export default class Feed
     }
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Manually inject a value into the feed
+   *
+   * @param {*} [value] - Value to store
+   *
+   * @returns {*} the value that was set
+   */
+  set( value)
+  {
+    return this[ data$ ].set(value );
+  }
+
+  // ---------------------------------------------------------------------------
 
   /**
    * Shutdown the feed
    * - Disconnects from the event source
    * - Sets `null` as last data value
    * - Unsubscribes all listeners
+   *
+   * @throws {AlreadyDestroyedError} if
    */
   destroy()
   {
@@ -243,7 +265,25 @@ export default class Feed
     this[ destroyed$ ] = true;
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Shutdown the feed
+   * - Disconnects from the event source
+   * - Sets `null` as last data value
+   * - Unsubscribes all listeners
+   */
+  tryDestroy()
+  {
+    if( this[ destroyed$ ] )
+    {
+      return;
+    }
+
+    this.destroy();
+  }
+
+  // ---------------------------------------------------------------------------
 
   /**
    * Reconnect, e.g. after an error
@@ -269,7 +309,7 @@ export default class Feed
     delay );
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Disconnect from server
@@ -306,7 +346,7 @@ export default class Feed
     }
   }
 
-  // -------------------------------------------------------------------- Method
+  // ---------------------------------------------------------------------------
 
   /**
    * Create a new EventSource instance

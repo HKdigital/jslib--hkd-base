@@ -56,9 +56,25 @@ export const KEY_DEFAULT_JSON_API = "default-json-api";
  * @param {object} [urlSearchParams]
  *   Parameters that should be added to the request url
  *
- * @param {object|string} [config=KEY_DEFAULT_JSON_API]
+ * @param {function} [requestHandler]
+ *   If defined, this function will receive the abort handler function
+ *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
+ *
+ * @param {object|string} [config=KEY_DEFAULT_HTTP_API]
  *   Config parameters or label of the global config entry that contains
  *   the remote API configuration.
+ *
+ *  e.g.
+ *
+ *  config = {
+ *    origin,
+ *    apiPrefix,
+ *    token,
+ *    basicAuth
+ *  }
  *
  * @returns {object} { abort, jsonResponsePromise }
  */
@@ -66,6 +82,8 @@ export async function jsonApiGet(
   {
     uri,
     urlSearchParams,
+    requestHandler,
+    timeoutMs,
     config=KEY_DEFAULT_JSON_API
   } )
 {
@@ -74,6 +92,8 @@ export async function jsonApiGet(
       uri,
       urlSearchParams,
       method: METHOD_GET,
+      requestHandler,
+      timeoutMs,
       config
     } );
 }
@@ -98,9 +118,25 @@ export async function jsonApiGet(
  * @param {*} body
  *   Data that will be converted to a JSON encoded and send to the server
  *
- * @param {object|string} [config=KEY_DEFAULT_JSON_API]
+ * @param {function} [requestHandler]
+ *   If defined, this function will receive the abort handler function
+ *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
+ *
+ * @param {object|string} [config=KEY_DEFAULT_HTTP_API]
  *   Config parameters or label of the global config entry that contains
  *   the remote API configuration.
+ *
+ *  e.g.
+ *
+ *  config = {
+ *    origin,
+ *    apiPrefix,
+ *    token,
+ *    basicAuth
+ *  }
  *
  * @returns {mixed} parsed JSON response from backend server
  */
@@ -108,14 +144,19 @@ export async function jsonApiPost(
   {
     uri,
     body=null,
+    requestHandler,
+    timeoutMs,
     config=KEY_DEFAULT_JSON_API
   } )
 {
+
   return jsonApiRequest(
     {
       uri,
       body: JSON.stringify( body ),
       method: METHOD_POST,
+      requestHandler,
+      timeoutMs,
       config
     } );
 }
@@ -137,9 +178,25 @@ export async function jsonApiPost(
  *
  * @param {string} uri - uri of the API method
  *
- * @param {object|string} [config=KEY_DEFAULT_JSON_API]
+ * @param {function} [requestHandler]
+ *   If defined, this function will receive the abort handler function
+ *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
+ *
+ * @param {object|string} [config=KEY_DEFAULT_HTTP_API]
  *   Config parameters or label of the global config entry that contains
  *   the remote API configuration.
+ *
+ *  e.g.
+ *
+ *  config = {
+ *    origin,
+ *    apiPrefix,
+ *    token,
+ *    basicAuth
+ *  }
  *
  * --
  *
@@ -170,6 +227,8 @@ export async function jsonApiRequest(
     method,
     urlSearchParams,
     body,
+    requestHandler,
+    timeoutMs,
     config=KEY_DEFAULT_JSON_API
   } )
 {
@@ -181,6 +240,8 @@ export async function jsonApiRequest(
         urlSearchParams,
         body,
         // headers,
+        requestHandler,
+        timeoutMs,
         config
       } );
 
