@@ -421,6 +421,30 @@ export function expectNotEmptyString( value, errorText )
 // -----------------------------------------------------------------------------
 
 /**
+ * Expect a value to be an Arango collection id
+ * - A collection id is formatted as <CollectionName>/<key>
+ *
+ * @param {mixed} value - Value to check
+ * @param {string} errorText - Text of the error to throw
+ */
+export function expectArangoCollectionId( value, errorText )
+{
+  if( typeof value !== "string" )
+  {
+    expected( errorText, "expected not empty string", value );
+  }
+
+  const x = value.indexOf("/");
+
+  if( -1 === x || x === value.length - 1 )
+  {
+    expected( errorText, "expected collection id (invalid string)");
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+/**
  * Expect a value to be a valid URI component
  *
  * @param {mixed} value - Value to check
