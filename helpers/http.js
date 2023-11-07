@@ -168,6 +168,8 @@ async function expectResponseOk( response, url )
       {
         let error;
 
+        console.log( 123, response );
+
         try {
           //
           // Try to get `message` property if JSON has been returned
@@ -458,7 +460,8 @@ export async function httpGet(
     url,
     urlSearchParams,
     headers,
-    requestHandler
+    requestHandler,
+    timeoutMs
   } )
 {
   const responsePromise = httpRequest(
@@ -467,7 +470,8 @@ export async function httpGet(
       url,
       urlSearchParams,
       headers,
-      requestHandler
+      requestHandler,
+      timeoutMs
     } );
 
   return await waitForAndCheckResponse( responsePromise, url );
@@ -502,7 +506,8 @@ export async function httpPost(
     url,
     body=null,
     headers,
-    requestHandler
+    requestHandler,
+    timeoutMs
   } )
 {
   const responsePromise = httpRequest(
@@ -511,7 +516,8 @@ export async function httpPost(
       url,
       body,
       headers,
-      requestHandler } );
+      requestHandler,
+      timeoutMs } );
 
   return await waitForAndCheckResponse( responsePromise, url );
 }
