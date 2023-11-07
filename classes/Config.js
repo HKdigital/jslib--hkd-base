@@ -427,6 +427,18 @@ export default class Config extends LogBase
     }
   }
 
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Export all conmfig data as plain object
+   *
+   * @returns {object} export data
+   */
+  export()
+  {
+    return clone( this.data );
+  }
+
   /* ------------------------------------------------------- Internal methods */
 
 
