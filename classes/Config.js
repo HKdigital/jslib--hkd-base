@@ -243,7 +243,7 @@ export default class Config extends LogBase
       return value;
     }
 
-    if( defaultValue )
+    if( arguments.length >= 2 )
     {
       return defaultValue;
     }
