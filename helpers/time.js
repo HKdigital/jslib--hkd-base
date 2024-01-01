@@ -70,7 +70,24 @@ export const DAY_NAME_LABELS_EN =
     MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
   ];
 
-// -------------------------------------------------------------------- Function
+// -- Intervals
+
+export const HOURLY = "hourly";
+export const DAILY = "daily";
+export const WEEKLY = "weekly";
+// export const TWO_WEEKLY = "two-weekly";
+// export const FOUR_WEEKLY = "four-weekly";
+
+export const INTERVALS_MS =
+  {
+    [ HOURLY ]: HOUR_MS,
+    [ DAILY ]: DAY_MS,
+    [ WEEKLY ]: WEEK_MS,
+    // [ TWO_WEEKLY ]: WEEK_MS * 2,
+    // [ FOUR_WEEKLY ]: WEEK_MS * 4,
+  };
+
+// -----------------------------------------------------------------------------
 
 /**
  * Returns a server synchronized time stamp like `Date.now()`
@@ -91,7 +108,7 @@ export function getSynchedTime()
   return now;
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Set reference time
@@ -108,7 +125,7 @@ export function setReferenceTime( referenceTimeMs )
   _aheadOfReferenceTimeMs = Date.now() - referenceTimeMs;
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Returns a promise that resolves after a specified timeout
@@ -168,7 +185,7 @@ export function delay( delayOrMinDelayMs, maxDelayMs )
   return promise;
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Get the number of milliseconds since the specified time stamp of the default
@@ -183,7 +200,7 @@ export function sinceMs( sinceMs=TIME_2020_01_01 )
   return Date.now() - sinceMs;
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Get a string that represents the time in a readable
@@ -230,7 +247,7 @@ export function timeToString( timeMs )
   return str;
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Returns a Date object
@@ -255,7 +272,7 @@ export function toDate( dateOrTimestamp )
   throw new Error("Missing or invalid parameter [dateOrTimestamp]");
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Get the ISO 8601 week number of the specified date
@@ -314,7 +331,7 @@ export function getWeekNumber( dateOrTimestamp )
   return 1 + Math.ceil( (firstThursday - target) / 604800000 );
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Get the name of the month
@@ -341,7 +358,7 @@ export function getMonthName( dateOrTimestamp )
   return MONTH_NAME_LABELS_EN[ toDate( dateOrTimestamp ).getMonth() ];
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Get the name of the day

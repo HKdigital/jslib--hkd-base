@@ -530,7 +530,25 @@ export function expectPositiveNumber( value, errorText )
 // -----------------------------------------------------------------------------
 
 /**
- * Expect a value to be an integer and greater than zero
+ * Expect a value to be a number and greater or equal to zero
+ *
+ * @param {mixed} value - Value to check
+ * @param {string} errorText - Text of the error to throw
+ */
+export function expectNotNegativeNumber( value, errorText )
+{
+  if( typeof value !== "number" ||
+      value < 0 ||
+      Number.isNaN( value ) )
+  {
+    expected( errorText, "expected not negative number", value );
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Expect a value to be an integer and greater or equal to zero
  *
  * @param {mixed} value - Value to check
  * @param {string} errorText - Text of the error to throw
@@ -538,11 +556,30 @@ export function expectPositiveNumber( value, errorText )
 export function expectPositiveInteger( value, errorText )
 {
   if( typeof value !== "number" ||
-      value <= 0 ||
+      value < 0 ||
       !Number.isInteger( value ) ||
       Number.isNaN( value ) )
   {
     expected( errorText, "expected positive integer", value );
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Expect a value to be an integer and greater or equal to zero
+ *
+ * @param {mixed} value - Value to check
+ * @param {string} errorText - Text of the error to throw
+ */
+export function expectNotNegativeInteger( value, errorText )
+{
+  if( typeof value !== "number" ||
+      value < 0 ||
+      !Number.isInteger( value ) ||
+      Number.isNaN( value ) )
+  {
+    expected( errorText, "expected not negative integer", value );
   }
 }
 
