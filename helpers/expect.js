@@ -139,7 +139,8 @@ export function expectDefined( value, errorText )
 {
   if( typeof value === "undefined" )
   {
-    expected( errorText, "expected a definined value" );
+    expected( errorText,
+      "expected a definined value" );
   }
 }
 
@@ -221,12 +222,13 @@ export function expectArrayBuffer( value, errorText )
 {
   if( typeof value === "function" )
   {
-    expected( errorText, "expected Object, not a function", value );
+    expected( errorText,
+      "expected Object, not a function" );
   }
 
   if( !(value instanceof ArrayBuffer) )
   {
-    expected( errorText, "expected ArrayBuffer",  );
+    expected( errorText, "expected ArrayBuffer", value );
   }
 }
 
@@ -454,12 +456,14 @@ export function expectUriComponent( value, errorText )
 {
   if( typeof value !== "string" )
   {
-    expected( errorText, "expected URI component", value );
+    expected( errorText,
+      "expected URI component", value );
   }
 
   if( !RE_URI_COMPONENT.test( value ) )
   {
-    expected( errorText, "expected URI component (invalid character found)");
+    expected( errorText,
+      "expected URI component (invalid character found)");
   }
 }
 
@@ -475,12 +479,14 @@ export function expectNotEmptyStringOrNull( value, errorText )
 {
   if( typeof value !== "string" && null !== value )
   {
-    expected( errorText, "expected not empty string or null", value );
+    expected( errorText,
+      "expected not empty string or null", value );
   }
 
-  if( !value.length )
+  if( value !== null && !value.length )
   {
-    expected( errorText, "expected not empty string or null, got empty string");
+    expected( errorText,
+      "expected not empty string or null, got empty string");
   }
 }
 
@@ -498,12 +504,14 @@ export function expectNumber( value, errorText )
 {
   if( typeof value !== "number" )
   {
-    expected( errorText, "expected number", value );
+    expected( errorText,
+      "expected number", value );
   }
 
   if( Number.isNaN(value) )
   {
-    expected( errorText, "(expected number, got [NaN]" );
+    expected( errorText,
+      "(expected number, got [NaN]" );
   }
 
   // TODO: What to do with Infinity and -Infinity?
@@ -523,7 +531,8 @@ export function expectPositiveNumber( value, errorText )
       value <= 0 ||
       Number.isNaN( value ) )
   {
-    expected( errorText, "expected positive number", value );
+    expected( errorText,
+      "expected positive number", value );
   }
 }
 
@@ -617,7 +626,8 @@ export function expectObjectNoArray( value, errorText )
        (value instanceof Promise) ||
        Array.isArray(value) )
   {
-    expected( errorText, "expected object but not an array", value );
+    expected( errorText,
+      "expected object but not an array", value );
   }
 }
 
@@ -636,7 +646,8 @@ export function expectObjectNoFunction( value, errorText )
        (value instanceof Promise) ||
        typeof value === "function" )
   {
-    expected( errorText, "expected object but not a function", value );
+    expected( errorText,
+      "expected object but not a function", value );
   }
 }
 
@@ -682,7 +693,8 @@ export function expectObjectOrUndefined( value, errorText )
   if( !(value instanceof Object || (value && typeof value === "object") ) ||
        (value instanceof Promise) )
   {
-    expected( errorText, "expected object or undefined", value );
+    expected( errorText,
+      "expected object or undefined", value );
   }
 }
 
@@ -708,7 +720,8 @@ export function expectObjectOrString( value, errorText )
 
   if( notAnObject && typeof value !== "string" )
   {
-    expected( errorText, "expected object or string", value );
+    expected( errorText,
+      "expected object or string", value );
   }
 }
 
@@ -835,7 +848,8 @@ export function expectSetOfStrings( value, errorText )
   {
     if( typeof current !== "string" )
     {
-      expected( errorText, "expected all Set values to be strings" );
+      expected( errorText,
+        "expected all Set values to be strings", current );
     }
   }
 }
@@ -967,7 +981,7 @@ export function expectError( value, errorText )
 {
   if( !(value instanceof Error) )
   {
-    expected( errorText, "expected an Error instance" );
+    expected( errorText, "expected an Error instance", value );
   }
 }
 

@@ -389,18 +389,60 @@ export function getDayName( dateOrTimestamp )
 
 /**
  * Return the timestamp of the start of the day
- * - Midnight + 1 millisecond
+ * - Midnight
  *
- * @returns {number} timestamp of start of the day
+ * @param {Date|number} dateOrTimestamp
+ *
+ * @returns {number} timestamp of start of the day (00:00:00:0000)
  */
-export function getTimeAtStartOfDay()
+export function getTimeAtStartOfDay( dateOrTimestamp )
 {
-  const d = new Date();
+  let d;
+
+  if( dateOrTimestamp )
+  {
+    d = toDate( dateOrTimestamp );
+  }
+  else {
+    // today, now
+    d = new Date();
+  }
+
   d.setHours(0);
   d.setMinutes(0);
   d.setSeconds(0);
-  d.setMilliseconds(1);
+  d.setMilliseconds(0);
 
   return d.getTime();
 }
 
+// -----------------------------------------------------------------------------
+
+/**
+ * Return the timestamp of the end of the day
+ * - Midnight - 1 millisecond
+ *
+ * @param {Date|number} dateOrTimestamp
+ *
+ * @returns {number} timestamp of start of the day
+ */
+export function getTimeAtEndOfDay( dateOrTimestamp )
+{
+  let d;
+
+  if( dateOrTimestamp )
+  {
+    d = toDate( dateOrTimestamp );
+  }
+  else {
+    // today, now
+    d = new Date();
+  }
+
+  d.setHours(23);
+  d.setMinutes(59);
+  d.setSeconds(59);
+  d.setMilliseconds(999);
+
+  return d.getTime();
+}
