@@ -18,6 +18,16 @@
  *   }
  */
 
+/**
+ * FIXME: use Intl.DateTimeFormat instead of custom conversions
+ *
+ *  e.g.
+ *   return new Intl.DateTimeFormat('nl-NL', {
+ *     month: "long",
+ *    timeZone: 'Europe/Amsterdam'
+ *   }).format(d);
+ */
+
 /* ------------------------------------------------------------------ Imports */
 
 import { expectPositiveNumber } from "./expect.js";
