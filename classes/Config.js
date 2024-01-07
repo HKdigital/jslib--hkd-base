@@ -243,7 +243,7 @@ export default class Config extends LogBase
       return value;
     }
 
-    if( defaultValue )
+    if( arguments.length >= 2 )
     {
       return defaultValue;
     }
@@ -425,6 +425,18 @@ export default class Config extends LogBase
           "(should only contain not-emtpy strings)");
       }
     }
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Export all conmfig data as plain object
+   *
+   * @returns {object} export data
+   */
+  export()
+  {
+    return clone( this.data );
   }
 
   /* ------------------------------------------------------- Internal methods */

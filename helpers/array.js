@@ -33,7 +33,7 @@ export { smallestFirst, largestFirst };
 
 export { arraySlice, arrayConcat };
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Convert a value to an array
@@ -107,7 +107,7 @@ export function toArray( value, start, end )
   }
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Convert an async iterator to an array
@@ -141,7 +141,7 @@ export async function toArrayAsync( value )
   }
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Convert a path string to an array path
@@ -174,7 +174,7 @@ export function toArrayPath( path, pathSeparator=PATH_SEPARATOR )
   }
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Loop over the supplied array and call the callback for every element
@@ -230,7 +230,7 @@ export function loop( arr, callback, additionalArguments )
   }
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Get a list of all values from the items in the array at the
@@ -301,7 +301,7 @@ export function pathValues( items, path, options={} )
   return values;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Sort function that sorts a list of objects by values encountered at the
@@ -333,7 +333,39 @@ export function sortByKeyValue( items, key, compareFn=smallestFirst )
   } );
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
+
+/**
+ * Sort function that sorts a list of objects by values encountered at the
+ * specified key values of the object.
+ * - Sorts array inline (no new array is returned)
+ * - This method is faster than `sortByPathValue` since the value lookup in the
+ *   items can be done faster
+ *
+ * @param {Object[]} items - List of items to sort
+ *
+ * @param {string} key
+ *   Object key to use for getting the values in the items to compare.
+ *
+ * @param {function} [compareFn=smallestFirst]
+ *   Function to use to compare values. See `compare.js`.
+ */
+export function sortByKeyValueReversed( items, key, compareFn=largestFirst )
+{
+  expectFunction( compareFn,
+    "Missing or invalid parameter [compareFn]" );
+
+  expectArray( items, "Invalid or missing parameter [items]" );
+
+  expectString( key, "Invalid parameter [key]");
+
+  items.sort( ( itemA, itemB ) => {
+
+    return compareFn( itemA[ key ], itemB[ key ] );
+  } );
+}
+
+// -----------------------------------------------------------------------------
 
 /**
  * Sort function that sorts a list of objects by values encountered at the
@@ -400,7 +432,7 @@ export function sortByPathValue( items, path, compareFn=smallestFirst )
   cache.clear();
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Find the first item in the list of objects that matches the selector
@@ -418,7 +450,7 @@ export function findFirst( arr, selector )
   return selectorObj.findFirst( arr );
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Returns all items from the list of items that match the selector
@@ -436,7 +468,7 @@ export function findAll( arr, selector )
   return selectorObj.findAll( arr );
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Convert array to an object using a list of keys for each index

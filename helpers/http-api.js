@@ -2,21 +2,35 @@
 
 import { expectString,
          expectNotEmptyString,
-         expectObject } from "@hkd-base/helpers/expect.js";
+         expectObject }
+  from "@hkd-base/helpers/expect.js";
 
 import { ResponseError,
-         TokenExpiredError } from "@hkd-base/types/error-types.js";
+         TokenExpiredError }
+  from "@hkd-base/types/error-types.js";
 
-import { isObject } from "@hkd-base/helpers/is.js";
+import { ACCEPT,
+         CONTENT_TYPE }
+  from "@hkd-base/constants/http-headers.js";
 
-import { getGlobalConfig } from "@hkd-base/helpers/global-config.js";
+import { TEXT_HTML,
+         APPLICATION_JSON }
+  from "@hkd-base/constants/mime-types.js";
+
+import { isObject }
+  from "@hkd-base/helpers/is.js";
+
+import { getGlobalConfig }
+  from "@hkd-base/helpers/global-config.js";
 
 import { waitForAndCheckResponse,
          httpRequest,
          METHOD_GET,
-         METHOD_POST } from "@hkd-base/helpers/http.js";
+         METHOD_POST }
+  from "@hkd-base/helpers/http.js";
 
-import { decodePayload } from "@hkd-base/helpers/jwt-info.js";
+import { decodePayload }
+  from "@hkd-base/helpers/jwt-info.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -302,12 +316,19 @@ export async function httpApiRequest(
 
   if( !headers )
   {
+    //
+    // Set default headers to make the request work ok
+    //
     headers =
     {
       /* Added `accept "text/html"` to prevent 406 Not Acceptable issues */
-      "accept": "text/html,application/json",
-      "content-type": "application/json"
+      [ ACCEPT ]: `${TEXT_HTML}, ${APPLICATION_JSON}`
     };
+
+    if( method === METHOD_POST )
+    {
+      headers[ CONTENT_TYPE ] = APPLICATION_JSON;
+    }
   }
   else {
     expectObject( headers,
@@ -344,7 +365,7 @@ export async function httpApiRequest(
   else if( basicAuth )
   {
     expectObject( basicAuth,
-      "Invalid property [cnofig.basicAuth]" );
+      "Invalid property [config.basicAuth]" );
 
     const {
         username,
@@ -381,7 +402,7 @@ export async function httpApiRequest(
 
   for( let [ key, value ] of response.headers )
   {
-    if( key === "content-type" )
+    if( key === CONTENT_TYPE )
     {
       const x = value.indexOf(";");
 

@@ -14,6 +14,12 @@ import { ResponseError,
          TypeOrValueError }
   from "@hkd-base/types/error-types.js";
 
+import { CONTENT_TYPE }
+  from "@hkd-base/constants/http-headers.js";
+
+import { APPLICATION_JSON }
+  from "@hkd-base/constants/mime-types.js";
+
 /* ---------------------------------------------------------------- Internals */
 
 const METHOD_GET = "GET";
@@ -104,12 +110,104 @@ function setRequestHeaders( target, nameValuePairs )
 
     const value = nameValuePairs[ name ];
 
-    expectNotEmptyString( value, `Invalid value for header [${name}]` );
+    expectNotEmptyString( value,
+      `Invalid value for header [${name}]` );
 
+    // Headers should encoded lowercase in HTTP2
+    let nameLower = name.toLowerCase();
 
-    target.set( name, value ); /* overwrites existing value */
+    target.set( nameLower, value ); /* overwrites existing value */
   }
 }
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Try to get error information from the server response
+ *
+ * In case of JSON try properties:
+ * - message
+ * - error
+ * - messages (array)
+ * - errors (array)
+ *
+ * Otherwise try plain text
+ *
+ * @param {object} response
+ *
+ * @returns {Error} error
+ */
+async function getErrorFromResponse( response )
+{
+  let message;
+  let details = null;
+
+  const headers = response.headers;
+  const contentType = headers.get( CONTENT_TYPE );
+
+  let content;
+
+  if( contentType === APPLICATION_JSON )
+  {
+    content = await response.json();
+
+    if( typeof content === "object" )
+    {
+      if( typeof content.message === "string" )
+      {
+        message = content.message;
+      }
+      else if( typeof content.error === "string" )
+      {
+        message = content.error;
+      }
+      else {
+        if( Array.isArray( content.errors ) )
+        {
+          details = content.errors;
+        }
+        else if( Array.isArray( content.messages ) )
+        {
+          details = content.messages;
+        }
+
+        if( details )
+        {
+          let tmp = [];
+
+          for( const current of details )
+          {
+            if( typeof current === "object" && current.message )
+            {
+              tmp.push( current.message );
+            }
+            else if( typeof tmp.message === "string" )
+            {
+              tmp.push( current );
+            }
+            else {
+              tmp.push( JSON.stringify( current ) );
+            }
+          } // end for
+
+          message = tmp.join(", ");
+        }
+      }
+    }
+  }
+  else {
+    message = await response.text();
+  }
+
+  // console.log( "message", message );
+
+  const error = new Error( message );
+
+  //error.details = details;
+
+  return error;
+}
+
 
 // -----------------------------------------------------------------------------
 
@@ -127,85 +225,55 @@ async function expectResponseOk( response, url )
 
   url = toURL( url );
 
-  switch( response.status )
+  if( 200 === response.status )
   {
-    case 401:
-      {
-        let errorMessage = "Server returned [401] Unauthorized";
-
-        const authValue = response.headers.get("www-authenticate");
-
-        if( authValue )
-        {
-          const from = authValue.indexOf("error=");
-
-          if( from !== -1 )
-          {
-            let to = authValue.indexOf(",", from);
-
-            if( -1 === to )
-            {
-              to = authValue.length;
-            }
-
-            errorMessage += ` (${authValue.slice( from, to )})`;
-          }
-        }
-
-        throw new Error( errorMessage );
-      }
-
-    case 403:
+    if( !response.ok )
+    {
       throw new ResponseError(
-        `Server returned - 403 Forbidden, [${decodeURI(url.href)}]`);
+        `Server returned - ${response.status} ${response.statusText} ` +
+        `[response.ok=false], [${decodeURI(url.href)}]`);
+    }
 
-    case 404:
-      throw new ResponseError(
-        `Server returned - 404 Not Found, [${decodeURI(url.href)}]`);
-
-    case 400: // Bad Request
-    case 500: // Internal Server Error
-      {
-        let error;
-
-        try {
-          //
-          // Try to get `message` property if JSON has been returned
-          //
-          // ==> FIXME: check first if returned content-type is JSON?
-          //
-          const parsedResponse = await response.json();
-
-          if( parsedResponse &&
-              typeof parsedResponse.message === "string" )
-          {
-            error = new ResponseError(
-              `Server returned - ${response.status} ${response.statusText}, ` +
-              `[${decodeURI(url.href)}]: ${parsedResponse.message}` );
-          }
-        }
-        catch( e ) { /* do nothing */ }
-
-        if( error )
-        {
-          throw  error;
-        }
-        else {
-          throw new ResponseError(
-            `Server returned - ${response.status} ${response.statusText}, ` +
-            `[${decodeURI(url.href)}]`);
-        }
-      }
-
-    default: // -> ok (unless response.ok is false)
-      if( !response.ok )
-      {
-        throw new ResponseError(
-          `Server returned - ${response.status} ${response.statusText} ` +
-          `[response.ok=false], [${decodeURI(url.href)}]`);
-      }
-      break;
+    // All ok
+    return;
   }
+
+  // -- Give additional info in case of 401 Unauthorized response
+
+  if( 401 === response.status )
+  {
+    let errorMessage = "Server returned [401] Unauthorized";
+
+    const authValue = response.headers.get("www-authenticate");
+
+    if( authValue )
+    {
+      const from = authValue.indexOf("error=");
+
+      if( from !== -1 )
+      {
+        let to = authValue.indexOf(",", from);
+
+        if( -1 === to )
+        {
+          to = authValue.length;
+        }
+
+        errorMessage += ` (${authValue.slice( from, to )})`;
+      }
+    }
+
+    throw new Error( errorMessage );
+  }
+
+  // -- Gather additional info for all other responses
+
+  let error = await getErrorFromResponse( response );
+
+  throw new ResponseError(
+    `Server returned - ${response.status} ${response.statusText}, ` +
+    `[${decodeURI(url.href)}]`, { cause: error } );
+
 }
 
 
@@ -314,6 +382,8 @@ export async function jsonGet( { url, urlSearchParams, headers } )
 
   const response = await waitForAndCheckResponse( responsePromise, url );
 
+
+
   let parsedResponse;
 
   try {
@@ -326,7 +396,6 @@ export async function jsonGet( { url, urlSearchParams, headers } )
   }
   catch( e )
   {
-    // console.log( response );
     throw new ResponseError(
       `Failed to JSON decode server response from [${decodeURI(url.href)}]`,
       { cause: e } );
@@ -458,7 +527,8 @@ export async function httpGet(
     url,
     urlSearchParams,
     headers,
-    requestHandler
+    requestHandler,
+    timeoutMs
   } )
 {
   const responsePromise = httpRequest(
@@ -467,7 +537,8 @@ export async function httpGet(
       url,
       urlSearchParams,
       headers,
-      requestHandler
+      requestHandler,
+      timeoutMs
     } );
 
   return await waitForAndCheckResponse( responsePromise, url );
@@ -502,7 +573,8 @@ export async function httpPost(
     url,
     body=null,
     headers,
-    requestHandler
+    requestHandler,
+    timeoutMs
   } )
 {
   const responsePromise = httpRequest(
@@ -511,7 +583,8 @@ export async function httpPost(
       url,
       body,
       headers,
-      requestHandler } );
+      requestHandler,
+      timeoutMs } );
 
   return await waitForAndCheckResponse( responsePromise, url );
 }
@@ -575,6 +648,15 @@ export async function httpRequest(
   if( headers )
   {
     setRequestHeaders( requestHeaders, headers );
+
+    if( headers[ CONTENT_TYPE ] === APPLICATION_JSON &&
+        typeof body !== "string" )
+    {
+      throw new Error(
+        `Trying to send request with [content-type:${APPLICATION_JSON}], ` +
+        `but body is not a (JSON encoded) string.`);
+    }
+    // IDEA: try to decode the body to catch errors on client side
   }
 
   const init = {
@@ -626,26 +708,15 @@ export async function httpRequest(
     init.body = body || null; /* : JSON.stringify( body ) */
   }
 
-  // switch( method )
-  // {
-  //   case METHOD_GET:
-  //     init.method = METHOD_GET;
-  //     break;
-
-  //   case METHOD_POST:
-  //     init.method = METHOD_POST;
-  //     init.body = body || null; /* : JSON.stringify( body ) */
-  //     break;
-
-  //   default:
-  //     throw new Error(`Invalid value for parameter [method=${method}]`);
-  // }
-
   // @see https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
-  // @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
+
+  // console.log( "init", init );
+  // console.log( "headers", init.headers );
 
   // eslint-disable-next-line no-undef
   const request = new Request( url, init );
+
+  // @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
 
   const controller = new AbortController();
   const signal = controller.signal;
