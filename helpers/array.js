@@ -22,13 +22,16 @@ import Selector from "../classes/Selector.js";
 
 /* ---------------------------------------------------------------- Internals */
 
-const array_slice = Array.prototype.slice;
+const arraySlice = Array.prototype.slice;
+const arrayConcat = Array.prototype.concat;
 
 /* ------------------------------------------------------------------ Exports */
 
 export { PATH_SEPARATOR } from "./object.js";
 
 export { smallestFirst, largestFirst };
+
+export { arraySlice, arrayConcat };
 
 // ---------------------------------------------------------------------- Method
 
@@ -100,7 +103,7 @@ export function toArray( value, start, end )
     return Array.from( value );
   }
   else {
-    return array_slice( value, start, end );
+    return arraySlice( value, start, end );
   }
 }
 
