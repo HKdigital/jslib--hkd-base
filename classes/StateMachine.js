@@ -11,6 +11,9 @@ import { expectNotEmptyString,
 import { delay }
   from "@hkd-base/helpers/time.js";
 
+import { defer }
+  from "@hkd-base/helpers/process.js";
+
 import { setReadOnlyProperty,
          objectGet }
   from "@hkd-base/helpers/object.js";
@@ -125,6 +128,15 @@ export default class StateMachine extends ValueStore
       this.transitionsFromTo[ label ] = {};
     }
 
+    if( !this.get().current )
+    {
+      //
+      // No current state yet
+      // => Set first added state as current state
+      //
+      this.jumpTo( label );
+    }
+
     return this;
   }
 
@@ -136,6 +148,9 @@ export default class StateMachine extends ValueStore
    * @param {String} from - From state label
    * @param {String} to - To state label
    * @param {StateTransition} [transition]
+   *
+   * @param {Object[]} [steps]
+   *   List of step functions to create a transition
    *
    * @param {number} [delayMs]
    *   If specified, a "delay transition" will be created instead of a
@@ -149,7 +164,7 @@ export default class StateMachine extends ValueStore
    *
    * @returns {StateMachine} this (for daisy chaining)
    */
-  addTransition( { from, to, transition, delayMs, onStart, onEnded } )
+  addTransition( { from, to, transition, steps, delayMs, onStart, onEnded } )
   {
     expectNotEmptyString( from,
       "Missing or invalid parameter [from]" );
@@ -165,7 +180,7 @@ export default class StateMachine extends ValueStore
       if( transition )
       {
         throw new Error(
-          `Parameters [transition] and [delayMs] are mutually exclusive`);
+          `Parameters [transition] and [delayMs] should not be used both`);
       }
 
       transition = new StateTransition();
@@ -174,6 +189,22 @@ export default class StateMachine extends ValueStore
         {
           await delay( delayMs );
         }  );
+    }
+
+    if( Array.isArray( steps ) )
+    {
+      if( transition )
+      {
+        throw new Error(
+          `Parameters [transition] and [steps] should not be used both`);
+      }
+
+      transition = new StateTransition();
+
+      for( const stepFn of steps )
+      {
+        transition.addStep( stepFn );
+      }
     }
 
     expectObject( transition,
@@ -272,6 +303,16 @@ export default class StateMachine extends ValueStore
     if( !toState )
     {
       throw new Error(`State [${toLabel}] does not exist`);
+    }
+
+    if( this.get()?.next )
+    {
+      defer( () => {
+        this.gotoState( toLabel );
+      } );
+
+      return;
+      //throw new Error(`Do not call [gotoState] when in a transition`);
     }
 
     const fromState = this.get()?.current;

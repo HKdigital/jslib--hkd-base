@@ -423,6 +423,23 @@ export function expectNotEmptyString( value, errorText )
 // -----------------------------------------------------------------------------
 
 /**
+ * Expect a value to be a store instance
+ *
+ * @param {mixed} value - Value to check
+ * @param {string} errorText - Text of the error to throw
+ */
+export function expectStore( value, errorText )
+{
+  if( !(value instanceof Object || (value && typeof value === "object") ) ||
+      typeof value.subscribe !== "function" )
+  {
+    expected( errorText, "expected store", value );
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+/**
  * Expect a value to be an Arango collection id
  * - A collection id is formatted as <CollectionName>/<key>
  *

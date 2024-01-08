@@ -11,7 +11,21 @@ import "@hkd-base/typedef/StateMachineTransition.type.js";
 
 /* ---------------------------------------------------------------- Internals */
 
+/**
+ * Constructor function that is easier to use for chaining
+ *
+ * @param {function|number} nextStepFnOrDelayMs
+ *
+ * @returns {StateTransition}
+ */
+function newStateTransition()
+{
+  return new StateTransition( ...arguments );
+}
+
 /* ------------------------------------------------------------------ Exports */
+
+export { newStateTransition };
 
 /* ------------------------------------------------------------- Export class */
 
@@ -88,8 +102,7 @@ export default class StateTransition
    */
   addStep( nextStepFn )
   {
-    expectFunction( nextStepFn,
-      "Missing or invalid parameter [nextStepFn]" );
+    expectFunction( nextStepFn );
 
     this.steps.push( nextStepFn );
 
@@ -107,8 +120,7 @@ export default class StateTransition
    */
   setCancelFunction( cancelFn )
   {
-    expectFunction( cancelFn,
-      "Missing or invalid parameter [cancelFn]" );
+    expectFunction( cancelFn );
 
     this.cancelFn = cancelFn;
 
@@ -233,8 +245,7 @@ export default class StateTransition
    */
   registerOnStartCallback( callbackFn )
   {
-    expectFunction( callbackFn,
-      "Missing or invalid parameter [callbackFn]" );
+    expectFunction( callbackFn );
 
     this.onStartFns.push( callbackFn );
   }
@@ -249,8 +260,7 @@ export default class StateTransition
    */
   registerOnEndedCallback( callbackFn )
   {
-    expectFunction( callbackFn,
-      "Missing or invalid parameter [callbackFn]" );
+    expectFunction( callbackFn );
 
     this.onEndedFns.push( callbackFn );
   }
