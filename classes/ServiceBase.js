@@ -22,27 +22,34 @@ import {
   expectNotEmptyString,
   expectSymbolOrString,
   expectObject,
-  expectFunction } from "@hkd-base/helpers/expect.js";
+  expectFunction }
+  from "@hkd-base/helpers/expect.js";
 
-import DedupValueStore from "./DedupValueStore.js";
+import DedupValueStore
+  from "./DedupValueStore.js";
 
-import HkPromise from "@hkd-base/classes/HkPromise.js";
+import HkPromise
+  from "@hkd-base/classes/HkPromise.js";
 
 import {
-  STOPPED,
-  // STARTING,
-  RUNNING,
-  // STOPPING,
-  UNAVAILABLE,
-  ERROR,
-  stateLabel,
-  displayState } from "@hkd-base/helpers/service-states.js";
+    STOPPED,
+    // STARTING,
+    RUNNING,
+    // STOPPING,
+    UNAVAILABLE,
+    ERROR,
+    stateLabel,
+    displayState }
+  from "@hkd-base/helpers/service-states.js";
 
-import LogBase from "@hkd-base/classes/LogBase.js";
+import LogBase
+  from "@hkd-base/classes/LogBase.js";
 
-import Offs from "@hkd-base/classes/Offs.js";
+import Offs
+  from "@hkd-base/classes/Offs.js";
 
-import ValueStore from "@hkd-base/classes/ValueStore.js";
+import ValueStore
+  from "@hkd-base/classes/ValueStore.js";
 
 /* ---------------------------------------------------------------- Internals */
 

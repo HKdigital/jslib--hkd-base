@@ -267,7 +267,7 @@ export default class StateMachine extends ValueStore
    *
    * @returns {StateMachine} this (for daisy chaining)
    */
-  async jumpTo( toLabel )
+  jumpTo( toLabel )
   {
     expectNotEmptyString( toLabel,
       "Missing or invalid parameter [toLabel]" );
