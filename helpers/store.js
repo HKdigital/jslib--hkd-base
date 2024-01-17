@@ -63,9 +63,9 @@ export async function waitForStoreValue(
     expectObjectPath( path );
   }
 
-  if( timeout )
+  if( !timeout || timeout === -1 )
   {
-    expectPositiveNumber( timeout );
+    timeout = 0;
   }
 
   const promise = new HkPromise();
@@ -95,7 +95,7 @@ export async function waitForStoreValue(
       }
     } );
 
-  if( timeout )
+  if( timeout > 0 )
   {
     expectPositiveNumber( timeout );
 

@@ -978,7 +978,7 @@ export function expectSymbol( value, errorText )
  * @param {mixed} value - Value to check
  * @param {string} errorText - Text of the error to throw
  */
-export function expectSymbolOrString( value, errorText )
+export function expectNotEmptyStringOrSymbol( value, errorText )
 {
   if( typeof value !== "symbol" && typeof value !== "string" )
   {

@@ -20,7 +20,7 @@
 
 import {
   expectNotEmptyString,
-  expectSymbolOrString,
+  expectNotEmptyStringOrSymbol,
   expectObject,
   expectFunction }
   from "@hkd-base/helpers/expect.js";
@@ -492,7 +492,7 @@ export default class ServiceBase extends LogBase
   {
     this.expectConfigured();
 
-    expectSymbolOrString( state, "Missing or invalid parameter [state]" );
+    expectNotEmptyStringOrSymbol( state, "Missing or invalid parameter [state]" );
 
     state = stateLabel( state );
 
@@ -716,7 +716,7 @@ export default class ServiceBase extends LogBase
    */
   setTransitionHandler( targetState, callback )
   {
-    expectSymbolOrString( targetState,
+    expectNotEmptyStringOrSymbol( targetState,
       "Missing or invalid parameter [targetState]" );
 
     expectFunction( callback, "Missing or invalid parameter [callback]" );
@@ -760,7 +760,7 @@ export default class ServiceBase extends LogBase
   {
     this.expectConfigured();
 
-    expectSymbolOrString( state, "Missing or invalid parameter [state]" );
+    expectNotEmptyStringOrSymbol( state, "Missing or invalid parameter [state]" );
 
     state = stateLabel( state );
 
@@ -790,7 +790,7 @@ export default class ServiceBase extends LogBase
    */
   async _transitionToState( targetState )
   {
-    expectSymbolOrString( targetState,
+    expectNotEmptyStringOrSymbol( targetState,
       "Missing or invalid parameter [targetState]" );
 
     const currentState = this[ stateStore$ ].get();
