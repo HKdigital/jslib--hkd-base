@@ -25,6 +25,10 @@ import HkPromise
 
 import "@hkd-base/typedef/Store.type.js";
 
+/* ---------------------------------------------------------------- Internals */
+
+const TRUTHY = Symbol("truthy");
+
 /* ------------------------------------------------------------------ Exports */
 
 /**
@@ -88,7 +92,12 @@ export async function waitForStoreValue(
 
       // console.log( { value, _value } );
 
-      if( _value === value )
+      if( value === TRUTHY && _value )
+      {
+        unsubscribeFn && defer( unsubscribeFn );
+        promise.resolve( value );
+      }
+      else if( _value === value )
       {
         unsubscribeFn && defer( unsubscribeFn );
         promise.resolve( value );
@@ -107,4 +116,38 @@ export async function waitForStoreValue(
   return promise;
 }
 
+// -----------------------------------------------------------------------------
+
+/**
+ * Wait until the store contains a truthy value
+ *
+ * @example
+ *   await waitForStoreValue(
+ *     {
+ *       store: urlStore,
+ *       timeout: 2000
+ *     } );
+ *
+ * @param {object} _
+
+ * @param {Store} _.store
+ * @param {*} _.value
+ *
+ * @param {string|string[]} [_.path]
+ *   If specified the value will be compared with a store value at the
+ *   specified object path.
+ *
+ * @param {number} [_.timeout]
+ *
+ * @returns {Promise<true>}
+ */
+export async function waitForAnyStoreValue(
+  { store, path, timeout }={} )
+{
+  expectStore( store );
+
+  const value = TRUTHY;
+
+  return waitForStoreValue( { store, value, path, timeout } );
+}
 
