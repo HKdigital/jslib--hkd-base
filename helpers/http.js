@@ -113,7 +113,9 @@ function setRequestHeaders( target, nameValuePairs )
     expectNotEmptyString( value,
       `Invalid value for header [${name}]` );
 
-    // Headers should encoded lowercase in HTTP2
+    //
+    // Headers should be encoded lowercase in HTTP2
+    //
     let nameLower = name.toLowerCase();
 
     target.set( nameLower, value ); /* overwrites existing value */
