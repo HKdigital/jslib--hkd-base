@@ -316,12 +316,19 @@ export async function httpApiRequest(
 
   if( !headers )
   {
+    //
+    // Set default headers to make the request work ok
+    //
     headers =
     {
       /* Added `accept "text/html"` to prevent 406 Not Acceptable issues */
-      [ ACCEPT ]: `${TEXT_HTML}, ${APPLICATION_JSON}`,
-      [ CONTENT_TYPE ]: APPLICATION_JSON
+      [ ACCEPT ]: `${TEXT_HTML}, ${APPLICATION_JSON}`
     };
+
+    if( method === METHOD_POST )
+    {
+      headers[ CONTENT_TYPE ] = APPLICATION_JSON;
+    }
   }
   else {
     expectObject( headers,

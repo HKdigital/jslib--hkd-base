@@ -437,36 +437,4 @@ export default class HkPromise extends Promise
     return super.catch( ...arguments );
   }
 
-  // -------------------------------------------------------------------- Method
-
-  /**
-   * Execute a list of supplied functions in order
-   *
-   * @param {function[]} fns - Functions that should be chained
-   * @param {array} [args] - Arguments to pass to all chained functions
-   */
-  // static async chain( fns, args )
-  // {
-  //   expectArray( fns, "Missing or invalid parameter [fns]" );
-
-  //   if( args )
-  //   {
-  //     expectArray( args, "Missing or invalid parameter [args]" );
-  //   }
-
-  //   for( const fn of fns )
-  //   {
-  //     expectFunction( fn,
-  //       "Invalid parameter [fns] (expected list of functions)" );
-
-  //     if( args )
-  //     {
-  //       await fn();
-  //     }
-  //     else {
-  //       await fn( ...args );
-  //     }
-  //   }
-  // }
-
 } // end class

@@ -13,10 +13,14 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { isObject } from "@hkd-base/helpers/is.js";
-import { systemLog } from "@hkd-base/helpers/log.js";
+import { isObject }
+  from "@hkd-base/helpers/is.js";
 
-// import { onLoad } from "@hkd-fe/helpers/browser-events.js";
+import { arrayConcat }
+  from "@hkd-base/helpers/array.js";
+
+import { systemLog }
+  from "@hkd-base/helpers/log.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -492,27 +496,47 @@ export function catchUncaughtExceptions( exitProcess=true )
 /**
  * Converts the cause property that may contain a chain of errors to an array
  *
- * @param {Error} error
+ * @param {Error|Error[]} cause (error or list of errors)
  *
- * @returns {object} list of errors that caused the error (if any)
+ * @returns {object[]} list of errors that caused the error (if any)
  */
 export function errorCauseToArray( error )
 {
-  if( !isObject( error ) )
+  if( !(error instanceof Error) )
   {
-    throw new Error(`Invalid parameter [error] (expected object)`);
+    throw new Error(`Invalid parameter [cause] (expected Error)`);
+  }
+
+  const cause = error.cause;
+
+  if( Array.isArray( cause ) )
+  {
+    const parts = [];
+
+    for( const current of cause )
+    {
+      const part = errorCauseToArray( current );
+
+      //
+      // Set flag to mark start of next error chain
+      //
+      part._isErrorRoot = true;
+
+      parts.push( part );
+    }
+
+    return arrayConcat( ...parts );
   }
 
   const out = [];
 
-  let cause = error.cause;
+  let nextError = cause;
 
-  while( cause )
+  while( nextError )
   {
+    out.push( nextError );
 
-    out.push( cause );
-
-    cause = cause.cause;
+    nextError = nextError.cause;
   }
 
   return out;

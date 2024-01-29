@@ -2,6 +2,7 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectNotEmptyString,
+         expectNotEmptyStringOrSymbol,
          expectNumber,
          expectFunction } from "@hkd-base/helpers/expect.js";
 
@@ -142,7 +143,7 @@ export default class Offs
    */
   tryUnregister( label )
   {
-    expectNotEmptyString( label,
+    expectNotEmptyStringOrSymbol( label,
       "Missing or invalid parameter [label]" );
 
     const fn = this._offs[ label ];

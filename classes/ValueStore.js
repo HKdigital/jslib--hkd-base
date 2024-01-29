@@ -234,6 +234,11 @@ export default class ValueStore
    * Store a new value
    *
    * @param {*} [value] - Value to store
+   * @param {boolean} [deferCallSubscribers=false]
+   *   Set to true if call to subscribers should be defered
+   *   (e.g. useful when subscribing using $ in SVELTE and setting new values
+   *    in the same reactive block. SVELTE will not react on those changes
+   *    otherwise)
    *
    * @returns {*} the value that was set
    */

@@ -18,6 +18,16 @@
  *   }
  */
 
+/**
+ * FIXME: use Intl.DateTimeFormat instead of custom conversions
+ *
+ *  e.g.
+ *   return new Intl.DateTimeFormat('nl-NL', {
+ *     month: "long",
+ *    timeZone: 'Europe/Amsterdam'
+ *   }).format(d);
+ */
+
 /* ------------------------------------------------------------------ Imports */
 
 import { expectPositiveNumber } from "./expect.js";
@@ -70,7 +80,24 @@ export const DAY_NAME_LABELS_EN =
     MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
   ];
 
-// -------------------------------------------------------------------- Function
+// -- Intervals
+
+export const HOURLY = "hourly";
+export const DAILY = "daily";
+export const WEEKLY = "weekly";
+// export const TWO_WEEKLY = "two-weekly";
+// export const FOUR_WEEKLY = "four-weekly";
+
+export const INTERVALS_MS =
+  {
+    [ HOURLY ]: HOUR_MS,
+    [ DAILY ]: DAY_MS,
+    [ WEEKLY ]: WEEK_MS,
+    // [ TWO_WEEKLY ]: WEEK_MS * 2,
+    // [ FOUR_WEEKLY ]: WEEK_MS * 4,
+  };
+
+// -----------------------------------------------------------------------------
 
 /**
  * Returns a server synchronized time stamp like `Date.now()`
@@ -91,7 +118,7 @@ export function getSynchedTime()
   return now;
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Set reference time
@@ -108,7 +135,7 @@ export function setReferenceTime( referenceTimeMs )
   _aheadOfReferenceTimeMs = Date.now() - referenceTimeMs;
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Returns a promise that resolves after a specified timeout
@@ -168,7 +195,7 @@ export function delay( delayOrMinDelayMs, maxDelayMs )
   return promise;
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Get the number of milliseconds since the specified time stamp of the default
@@ -183,7 +210,7 @@ export function sinceMs( sinceMs=TIME_2020_01_01 )
   return Date.now() - sinceMs;
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Get a string that represents the time in a readable
@@ -230,7 +257,7 @@ export function timeToString( timeMs )
   return str;
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Returns a Date object
@@ -255,7 +282,7 @@ export function toDate( dateOrTimestamp )
   throw new Error("Missing or invalid parameter [dateOrTimestamp]");
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Get the ISO 8601 week number of the specified date
@@ -314,7 +341,7 @@ export function getWeekNumber( dateOrTimestamp )
   return 1 + Math.ceil( (firstThursday - target) / 604800000 );
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Get the name of the month
@@ -341,7 +368,7 @@ export function getMonthName( dateOrTimestamp )
   return MONTH_NAME_LABELS_EN[ toDate( dateOrTimestamp ).getMonth() ];
 }
 
-// -------------------------------------------------------------------- Function
+// -----------------------------------------------------------------------------
 
 /**
  * Get the name of the day
@@ -372,18 +399,60 @@ export function getDayName( dateOrTimestamp )
 
 /**
  * Return the timestamp of the start of the day
- * - Midnight + 1 millisecond
+ * - Midnight
  *
- * @returns {number} timestamp of start of the day
+ * @param {Date|number} dateOrTimestamp
+ *
+ * @returns {number} timestamp of start of the day (00:00:00:0000)
  */
-export function getTimeAtStartOfDay()
+export function getTimeAtStartOfDay( dateOrTimestamp )
 {
-  const d = new Date();
+  let d;
+
+  if( dateOrTimestamp )
+  {
+    d = toDate( dateOrTimestamp );
+  }
+  else {
+    // today, now
+    d = new Date();
+  }
+
   d.setHours(0);
   d.setMinutes(0);
   d.setSeconds(0);
-  d.setMilliseconds(1);
+  d.setMilliseconds(0);
 
   return d.getTime();
 }
 
+// -----------------------------------------------------------------------------
+
+/**
+ * Return the timestamp of the end of the day
+ * - Midnight - 1 millisecond
+ *
+ * @param {Date|number} dateOrTimestamp
+ *
+ * @returns {number} timestamp of start of the day
+ */
+export function getTimeAtEndOfDay( dateOrTimestamp )
+{
+  let d;
+
+  if( dateOrTimestamp )
+  {
+    d = toDate( dateOrTimestamp );
+  }
+  else {
+    // today, now
+    d = new Date();
+  }
+
+  d.setHours(23);
+  d.setMinutes(59);
+  d.setSeconds(59);
+  d.setMilliseconds(999);
+
+  return d.getTime();
+}
