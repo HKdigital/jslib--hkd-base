@@ -227,7 +227,10 @@ async function expectResponseOk( response, url )
 
   url = toURL( url );
 
-  if( 200 === response.status )
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201
+
+  if( 200 === response.status || 201 === response.status )
   {
     if( !response.ok )
     {
