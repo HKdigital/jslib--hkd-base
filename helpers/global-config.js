@@ -59,12 +59,3 @@ export function getGlobalConfig( label, defaultValue )
 
   return config;
 }
-
-/* --------------------------------------------- Hot Module Replacement (dev) */
-
-if( import.meta.hot )
-{
-  import.meta.hot.accept( () => {
-    import.meta.hot.invalidate(); // Force page reload
-  } );
-}
