@@ -13,6 +13,9 @@
  *   } );
  */
 
+import { expectFunction }
+  from "@hkd-base/helpers/expect.js";
+
 /* ---------------------------------------------------------------- Internals */
 
 /**
@@ -53,6 +56,8 @@ function set_immediate_implementation()
 
       return function nextTickUsingPostMessage( fn )
         {
+          expectFunction( fn );
+
           queue.push(fn);
           window.postMessage('hkd-process-next-tick', '*');
         };

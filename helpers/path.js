@@ -1,7 +1,8 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectString } from "../helpers/helpers/expect.js";
+import { expectString }
+  from "@hkd-base/helpers/expect.js";
 
 /* ---------------------------------------------------------------- Internals */
 

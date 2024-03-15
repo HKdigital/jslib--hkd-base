@@ -19,10 +19,15 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { value$, default as ValueStore } from "./ValueStore.js";
-import { defer } from "@hkd-base/helpers/process.js";
+import { value$,
+         default as ValueStore }
+  from "./ValueStore.js";
 
-import { equals } from "@hkd-base/helpers/compare.js";
+import { defer }
+  from "@hkd-base/helpers/process.js";
+
+import { equals }
+  from "@hkd-base/helpers/compare.js";
 
 
 /* ------------------------------------------------------------------- Export */

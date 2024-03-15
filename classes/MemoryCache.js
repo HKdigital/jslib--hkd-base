@@ -20,7 +20,8 @@
 
 import { expectArrayOfStrings,
          expectPositiveNumber,
-         expectDefined } from "../helpers/expect.js";
+         expectDefined }
+  from "@hkd-base/helpers/expect.js";
 
 /* ---------------------------------------------------------------- Internals */
 

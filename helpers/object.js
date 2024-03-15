@@ -5,12 +5,15 @@ import {
   expectString,
   expectObject,
   expectArray,
+  expectArrayOrSet,
   expectDefined,
   expectObjectNoFunction } from "./expect.js";
 
 import { equals } from "./compare.js";
 
 import { toArrayPath } from "./array.js";
+
+import { toStringPath } from "./string.js";
 
 import { isIterable } from "./is.js";
 
@@ -44,7 +47,7 @@ const has_own_property = Object.prototype.hasOwnProperty;
 
 export { PATH_SEPARATOR };
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Returns true
@@ -80,7 +83,7 @@ export function isEmpty( obj )
   return true;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Get the number of (iterable) key value pairs in the specified object
@@ -105,7 +108,7 @@ export function objectSize( obj )
   return count;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Returns a shallow copy of the object without the properties that
@@ -114,13 +117,18 @@ export function objectSize( obj )
  * @param {object} obj
  *
  * @param {string[]} [onlyKeys]
- *   If specified, only the selected keys will be exported
+ *   If specified, only the specified keys will be exported
  *
  * @returns {object} new object without the null properties
  */
 export function exportNotNull( obj, onlyKeys )
 {
   expectObject( obj, "Invalid parameter [obj]" );
+
+  // if( onlyKeys )
+  // {
+  //   expectArray( onlyKeys, "Invalid parameter [onlyKeys]" );
+  // }
 
   const newObj = {};
 
@@ -144,18 +152,69 @@ export function exportNotNull( obj, onlyKeys )
   return newObj;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
+
+/**
+ * Returns a shallow copy of the object without the properties that
+ * are `private`
+ * - Private properties are properties that start with an underscore
+ *   `_`.
+ *
+ * @param {object} obj
+ *
+ * @param {string[]} [keepKeys]
+ *   If specified, the sprecified private keys will be exported (e.g. `_id`)
+ *
+ * @returns {object} new object without the null properties
+ */
+export function exportNotPrivate( obj, keepKeys )
+{
+  expectObject( obj, "Invalid parameter [obj]" );
+
+  const newObj = {};
+
+  const keepKeysSet = keepKeys ? new Set( keepKeys ) : null;
+
+  for( const key in obj )
+  {
+    const value = obj[ key ];
+
+    if( !key.startsWith("_") )
+    {
+      newObj[ key ] = value;
+    }
+    else if( keepKeysSet && keepKeysSet.has( key ) )
+    {
+      //
+      // Add key to keep as read only property
+      //
+      Object.defineProperty(
+        newObj,
+        key,
+        {
+          value,
+          writable: false,
+          enumerable: true
+        } );
+    }
+
+  } // end for
+
+  return newObj;
+}
+
+// -----------------------------------------------------------------------------
 
 // export function removeNull()
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Keep only the specified keys in the object
  * - deletes all other key-value pairs in the object
  *
  * @param {object} obj
- * @param {string[]} keys
+ * @param {string[]|Set} keys
  * @param {boolean} [removeNullAndUndefined=true]
  *
  * @returns {object} object that only contains the specified keys
@@ -163,9 +222,9 @@ export function exportNotNull( obj, onlyKeys )
 export function keep( obj, keys, removeNullAndUndefined=true )
 {
   expectObject( obj, "Invalid parameter [obj]" );
-  expectArray( obj, "Invalid parameter [properties]" );
+  expectArrayOrSet( keys, "Invalid parameter [keys]" );
 
-  const keep = new Set( keys );
+  const keep = (keys instanceof Set) ? keys : new Set( keys );
 
   for( const key in obj )
   {
@@ -190,7 +249,7 @@ export function keep( obj, keys, removeNullAndUndefined=true )
   return obj;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Freezes an object recursively
@@ -238,7 +297,7 @@ export function deepFreeze( value, _found )
   return value;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Set a value in an object using a path and value pair.
@@ -318,7 +377,7 @@ export function objectSet( obj, path, value )
   return false;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Removes a value at the specified object path from the object.
@@ -455,11 +514,11 @@ export function deletePath( obj, path )
   } // end for
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Get a value from an object using a path
- * - Returns a default
+ * - Returns a default value if not found, with is [undefined] by default
  *
  * @param {object} obj - Object to get the value from
  * @param {string|Array} path - Dot separated string path or array path
@@ -467,7 +526,7 @@ export function deletePath( obj, path )
  * @param {mixed} [defaultValue=undefined]
  *   Value to return if the value does not exist
  *
- * @return {mixed} value found at path, defaultValue or undefined
+ * @return {*} value found at path, defaultValue or undefined
  */
 export function objectGet( obj, path, defaultValue )
 {
@@ -500,7 +559,52 @@ export function objectGet( obj, path, defaultValue )
   return value;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
+
+/**
+ * Get a value from an object using a path
+ * - Throws an exception if the path does not exist or the value is undefined
+ *
+ * @param {object} obj - Object to get the value from
+ * @param {string|Array} path - Dot separated string path or array path
+ *
+ * @param {function} [parseFn]
+ *   Optional parser function that checks and converts the value
+ *
+ * @throws No value found at path
+ * @throws Invalid value
+ *
+ * @return {*} value found at path
+ */
+export function objectGetWithThrow( obj, path, parseFn )
+{
+  let value = objectGet( obj, path );
+
+  if( parseFn )
+  {
+    const { value: parsedValue,
+            error } = parseFn( value );
+
+    if( error )
+    {
+      throw new Error(
+        `Invalid value found at path [${toStringPath( path )}]`,
+        { cause: error } );
+    }
+
+    value = parsedValue;
+  }
+
+  if( value === undefined )
+  {
+    throw new Error(
+      `No value found at path [${toStringPath( path )}]` );
+  }
+
+  return value;
+}
+
+// -----------------------------------------------------------------------------
 
 // DEV >>>>
 
@@ -551,7 +655,7 @@ export function objectGet( obj, path, defaultValue )
 
 // <<< DEV
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Returns a list of differences between the object before and the object
@@ -660,7 +764,7 @@ export function objectDiff( objBefore, objAfter, options={}, _recursion )
   return changes;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Applies a list of differences to the input object
@@ -746,7 +850,7 @@ export function patchObject( obj, changes, options={} )
   } // end for
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Extend the target object with methods and properties from the source
@@ -800,7 +904,7 @@ export function extend( target, source )
   return;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Get a list of property names of the specified object
@@ -829,7 +933,7 @@ export function getPrototypeNames( obj )
   return names;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Get a tree of values from an object
@@ -902,7 +1006,7 @@ export function getTree( obj, tree, options )
   return result;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Deep clone an object or any kind of other variable
@@ -1055,7 +1159,7 @@ export function clone( objectToBeCloned, _seenObjects )
 }
 
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Set a read only property in an object
@@ -1085,7 +1189,7 @@ export function setReadOnlyProperty( obj, propertyName, value )
     } );
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Returns a clone of a (nested) object that has a maximum depth
@@ -1189,7 +1293,7 @@ export function shallowClone( objectOrArray )
   }
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Update an object
@@ -1227,7 +1331,7 @@ export function updateObject( obj=null, updateData=null, options )
   {
     // Convert updateData to path-value pairs (iterable)
 
-    const walkArrays = options && options.replaceArrays ? true : false
+    const walkArrays = options && options.replaceArrays ? true : false;
 
     pathValuePairs =
       iterateObjectEntries(
@@ -1255,7 +1359,7 @@ export function updateObject( obj=null, updateData=null, options )
   return obj;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Copy own properties from an object to another object if they do not
@@ -1311,7 +1415,7 @@ export function copyOwnProperties( from, to )
   // >>> FIXME? TODO? copy Symbols too? <<<
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Convert string with dot separated values to a list of values
@@ -1340,7 +1444,7 @@ export function ensureArrayPath( path )
 
 /* ----------------------------------------------------- Internal methods */
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Create all parent objects on the object path if they do not yet exist yet
@@ -1412,7 +1516,7 @@ export function _ensureParent( obj, arrPath )
   return current;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Get parent object at the specified path

@@ -22,10 +22,12 @@
 /* ------------------------------------------------------------------ Imports */
 
 import {
-  expectString,
-  expectNumber,
-  expectArray,
-  expectFunction } from "../helpers/expect.js";
+    expectString,
+    expectNumber }
+  from "@hkd-base/helpers/expect.js";
+
+import { noop }
+  from "@hkd-base/helpers/function.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -44,8 +46,6 @@ const timeoutTimer$ = Symbol("timeoutTimer");
 const hasThen$ = Symbol("hasThen");
 
 /* ------------------------------------------------------------------- Export */
-
-const doNothing = () => {};
 
 /**
  * HkPromise extends the default javascript Promise class
@@ -155,6 +155,8 @@ export default class HkPromise extends Promise
    * Resolve the promise
    *
    * @param {mixed} [value] - Value to pass to the "then" callbacks
+   *
+   * @returns {object} this
    */
   resolve( /* value */ )
   {
@@ -188,6 +190,8 @@ export default class HkPromise extends Promise
     this[ pending$ ] = false;
 
     this[ resolveFn$ ]( ...arguments );
+
+    return this;
   }
 
   // -------------------------------------------------------------------- Method
@@ -196,6 +200,8 @@ export default class HkPromise extends Promise
    * Resolve the promise if the promise is still pending
    *
    * @param {mixed} [value] - Value to pass to the "catch" callbacks
+   *
+   * @returns {object} this
    */
   tryResolve( /* value */ )
   {
@@ -203,6 +209,8 @@ export default class HkPromise extends Promise
     {
       this.resolve( ...arguments );
     }
+
+    return this;
   }
 
   // -------------------------------------------------------------------- Method
@@ -212,6 +220,8 @@ export default class HkPromise extends Promise
    *
    * @param {Object} [errorOrInfo]
    *   Object to pass to the "catch" callbacks, usually an Error object
+   *
+   * @returns {object} this
    */
   reject( /* errorOrInfo */ )
   {
@@ -221,7 +231,7 @@ export default class HkPromise extends Promise
       // No then (or await) has been used
       // add catch to prevent useless unhandled promise rejection
       //
-      this.catch( doNothing );
+      this.catch( noop );
     }
 
     // -- Check current Promise state
@@ -254,6 +264,8 @@ export default class HkPromise extends Promise
     this[ pending$ ] = false;
 
     this[ rejectFn$ ]( ...arguments );
+
+    return this;
   }
 
   // -------------------------------------------------------------------- Method
@@ -263,6 +275,8 @@ export default class HkPromise extends Promise
    *
    * @param {Object} [errorOrInfo]
    *   Object to pass to the "catch" callbacks, usually an Error object
+   *
+   * @returns {object} this
    */
   tryReject( /* errorOrInfo */ )
   {
@@ -270,6 +284,8 @@ export default class HkPromise extends Promise
     {
       this.reject( ...arguments );
     }
+
+    return this;
   }
 
   // -------------------------------------------------------------------- Method
@@ -279,6 +295,8 @@ export default class HkPromise extends Promise
    *
    * @param {Object} [errorOrInfo]
    *   Object to pass to the "catch" callbacks, usually an Error object
+   *
+   * @returns {object} this
    */
   cancel( errorOrInfo )
   {
@@ -298,6 +316,8 @@ export default class HkPromise extends Promise
 
     this[ cancelled$ ] = true;
     this.reject( ...arguments );
+
+    return this;
   }
 
   // -------------------------------------------------------------------- Method
@@ -307,6 +327,8 @@ export default class HkPromise extends Promise
    *
    * @param {Object} [errorOrInfo]
    *   Object to pass to the "catch" callbacks, usually an Error object
+   *
+   * @returns {object} this
    */
   tryCancel( /*errorOrInfo*/ )
   {
@@ -314,6 +336,8 @@ export default class HkPromise extends Promise
     {
       this.cancel( ...arguments );
     }
+
+    return this;
   }
 
   // -------------------------------------------------------------------- Method
@@ -412,37 +436,5 @@ export default class HkPromise extends Promise
   {
     return super.catch( ...arguments );
   }
-
-  // -------------------------------------------------------------------- Method
-
-  /**
-   * Execute a list of supplied functions in order
-   *
-   * @param {function[]} fns - Functions that should be chained
-   * @param {array} [args] - Arguments to pass to all chained functions
-   */
-  // static async chain( fns, args )
-  // {
-  //   expectArray( fns, "Missing or invalid parameter [fns]" );
-
-  //   if( args )
-  //   {
-  //     expectArray( args, "Missing or invalid parameter [args]" );
-  //   }
-
-  //   for( const fn of fns )
-  //   {
-  //     expectFunction( fn,
-  //       "Invalid parameter [fns] (expected list of functions)" );
-
-  //     if( args )
-  //     {
-  //       await fn();
-  //     }
-  //     else {
-  //       await fn( ...args );
-  //     }
-  //   }
-  // }
 
 } // end class

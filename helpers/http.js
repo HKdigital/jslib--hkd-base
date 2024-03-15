@@ -2,12 +2,23 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectNotEmptyString,
+         expectPositiveNumber,
          expectObject,
          expectObjectNoArray,
-         expectFunction } from "@hkd-base/helpers/expect.js";
+         expectFunction }
+  from "@hkd-base/helpers/expect.js";
 
 import { ResponseError,
-         TypeOrValueError } from "@hkd-base/types/error-types.js";
+         AbortError,
+         TimeoutError,
+         TypeOrValueError }
+  from "@hkd-base/types/error-types.js";
+
+import { CONTENT_TYPE }
+  from "@hkd-base/constants/http-headers.js";
+
+import { APPLICATION_JSON }
+  from "@hkd-base/constants/mime-types.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -35,6 +46,8 @@ function toURL( url )
   // already an URL instance
   return url;
 }
+
+// -----------------------------------------------------------------------------
 
 /**
  * Throws an exception if the URL object has any search parameter set
@@ -97,12 +110,106 @@ function setRequestHeaders( target, nameValuePairs )
 
     const value = nameValuePairs[ name ];
 
-    expectNotEmptyString( value, `Invalid value for header [${name}]` );
+    expectNotEmptyString( value,
+      `Invalid value for header [${name}]` );
 
+    //
+    // Headers should be encoded lowercase in HTTP2
+    //
+    let nameLower = name.toLowerCase();
 
-    target.set( name, value ); /* overwrites existing value */
+    target.set( nameLower, value ); /* overwrites existing value */
   }
 }
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Try to get error information from the server response
+ *
+ * In case of JSON try properties:
+ * - message
+ * - error
+ * - messages (array)
+ * - errors (array)
+ *
+ * Otherwise try plain text
+ *
+ * @param {object} response
+ *
+ * @returns {Error} error
+ */
+async function getErrorFromResponse( response )
+{
+  let message;
+  let details = null;
+
+  const headers = response.headers;
+  const contentType = headers.get( CONTENT_TYPE );
+
+  let content;
+
+  if( contentType === APPLICATION_JSON )
+  {
+    content = await response.json();
+
+    if( typeof content === "object" )
+    {
+      if( typeof content.message === "string" )
+      {
+        message = content.message;
+      }
+      else if( typeof content.error === "string" )
+      {
+        message = content.error;
+      }
+      else {
+        if( Array.isArray( content.errors ) )
+        {
+          details = content.errors;
+        }
+        else if( Array.isArray( content.messages ) )
+        {
+          details = content.messages;
+        }
+
+        if( details )
+        {
+          let tmp = [];
+
+          for( const current of details )
+          {
+            if( typeof current === "object" && current.message )
+            {
+              tmp.push( current.message );
+            }
+            else if( typeof tmp.message === "string" )
+            {
+              tmp.push( current );
+            }
+            else {
+              tmp.push( JSON.stringify( current ) );
+            }
+          } // end for
+
+          message = tmp.join(", ");
+        }
+      }
+    }
+  }
+  else {
+    message = await response.text();
+  }
+
+  // console.log( "message", message );
+
+  const error = new Error( message );
+
+  //error.details = details;
+
+  return error;
+}
+
 
 // -----------------------------------------------------------------------------
 
@@ -114,61 +221,64 @@ function setRequestHeaders( target, nameValuePairs )
  * @throws {Error} not found
  * @throws {Error} internal server error
  */
-function expectResponseOk( response, url )
+async function expectResponseOk( response, url )
 {
   expectObject( response, "Missing or invalid parameter [response]" );
 
   url = toURL( url );
 
-  switch( response.status )
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201
+
+  if( 200 === response.status || 201 === response.status )
   {
-    case 401:
+    if( !response.ok )
+    {
+      throw new ResponseError(
+        `Server returned - ${response.status} ${response.statusText} ` +
+        `[response.ok=false], [${decodeURI(url.href)}]`);
+    }
+
+    // All ok
+    return;
+  }
+
+  // -- Give additional info in case of 401 Unauthorized response
+
+  if( 401 === response.status )
+  {
+    let errorMessage = "Server returned [401] Unauthorized";
+
+    const authValue = response.headers.get("www-authenticate");
+
+    if( authValue )
+    {
+      const from = authValue.indexOf("error=");
+
+      if( from !== -1 )
       {
-        let errorMessage = "Server returned [401] Unauthorized";
+        let to = authValue.indexOf(",", from);
 
-        const authValue = response.headers.get("www-authenticate");
-
-        if( authValue )
+        if( -1 === to )
         {
-          const from = authValue.indexOf("error=");
-
-          if( from !== -1 )
-          {
-            let to = authValue.indexOf(",", from);
-
-            if( -1 === to )
-            {
-              to = authValue.length;
-            }
-
-            errorMessage += ` (${authValue.slice( from, to )})`;
-          }
+          to = authValue.length;
         }
 
-        throw new Error( errorMessage );
+        errorMessage += ` (${authValue.slice( from, to )})`;
       }
+    }
 
-    case 403:
-      throw new ResponseError(
-        `Server returned - 403 Forbidden, [${decodeURI(url.href)}]`);
-
-    case 404:
-      throw new ResponseError(
-        `Server returned - 404 Not Found, [${decodeURI(url.href)}]`);
-
-    case 500:
-      throw new ResponseError(
-        `Server returned - 500 Internal server error, [${decodeURI(url.href)}]`);
-
-    default: // -> ok
-      if( !response.ok )
-      {
-        throw new ResponseError(
-          `Server returned - ${response.status} [response.ok=false], ` +
-          `[${decodeURI(url.href)}]`);
-      }
-      break;
+    throw new Error( errorMessage );
   }
+
+  // -- Gather additional info for all other responses
+
+  let error = await getErrorFromResponse( response );
+
+  throw new ResponseError(
+    `Server returned - ${response.status} ${response.statusText}, ` +
+    `[${decodeURI(url.href)}]`, { cause: error } );
+
 }
 
 
@@ -225,7 +335,7 @@ export async function waitForAndCheckResponse( responsePromise, url )
     }
   }
 
-  expectResponseOk( response, url );
+  await expectResponseOk( response, url );
 
   return response;
 }
@@ -277,6 +387,8 @@ export async function jsonGet( { url, urlSearchParams, headers } )
 
   const response = await waitForAndCheckResponse( responsePromise, url );
 
+
+
   let parsedResponse;
 
   try {
@@ -289,7 +401,6 @@ export async function jsonGet( { url, urlSearchParams, headers } )
   }
   catch( e )
   {
-    // console.log( response );
     throw new ResponseError(
       `Failed to JSON decode server response from [${decodeURI(url.href)}]`,
       { cause: e } );
@@ -349,6 +460,10 @@ export async function jsonPost(
   {
     headers = {};
   }
+  else {
+    expectObject( headers,
+      "Invalid value for parameter [headers]" );
+  }
 
   headers[ "accept" ] = "application/json";
   headers[ "content-type" ] = "application/json";
@@ -406,16 +521,29 @@ export async function jsonPost(
  * @param {function} [requestHandler]
  *   If defined, this function will receive the abort handler function
  *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
+ *
  * @returns {Promise<*>} responsePromise
  */
-export async function httpGet( { url, urlSearchParams, headers } )
+export async function httpGet(
+  {
+    url,
+    urlSearchParams,
+    headers,
+    requestHandler,
+    timeoutMs
+  } )
 {
   const responsePromise = httpRequest(
     {
       method: METHOD_GET,
       url,
       urlSearchParams,
-      headers
+      headers,
+      requestHandler,
+      timeoutMs
     } );
 
   return await waitForAndCheckResponse( responsePromise, url );
@@ -439,16 +567,29 @@ export async function httpGet( { url, urlSearchParams, headers } )
  * @param {function} [requestHandler]
  *   If defined, this function will receive the abort handler function
  *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
+ *
  * @returns {Promise<*>} responsePromise
  */
-export async function httpPost( { url, body=null, headers } )
+export async function httpPost(
+  {
+    url,
+    body=null,
+    headers,
+    requestHandler,
+    timeoutMs
+  } )
 {
   const responsePromise = httpRequest(
     {
       method: METHOD_POST,
       url,
       body,
-      headers } );
+      headers,
+      requestHandler,
+      timeoutMs } );
 
   return await waitForAndCheckResponse( responsePromise, url );
 }
@@ -460,9 +601,9 @@ export async function httpPost( { url, body=null, headers } )
  * - This is a low level function, consider using
  *   httpGet, httpPost, jsonGet or jsonPost instead
  *
- * @param {string} method - Request method: METHOD_GET | METHOD_POST
- *
  * @param {string|URL} url - Url string or URL object
+ *
+ * @param {string} method - Request method: METHOD_GET | METHOD_POST
  *
  * @param {object} [urlSearchParams] - URL search parameters as key-value pairs
  *
@@ -476,6 +617,9 @@ export async function httpPost( { url, body=null, headers } )
  * @param {function} [requestHandler]
  *   If defined, this function will receive the abort handler function
  *
+ * @param {number} [timeoutMs]
+ *   If defined, this request will abort after the specified number of
+ *   milliseconds. Values above the the built-in request timeout won't work.
  *
  * --
  *
@@ -495,7 +639,8 @@ export async function httpRequest(
     urlSearchParams=null,
     body=null,
     headers,
-    requestHandler
+    requestHandler,
+    timeoutMs
   } )
 {
   url = toURL( url );
@@ -508,6 +653,15 @@ export async function httpRequest(
   if( headers )
   {
     setRequestHeaders( requestHeaders, headers );
+
+    if( headers[ CONTENT_TYPE ] === APPLICATION_JSON &&
+        typeof body !== "string" )
+    {
+      throw new Error(
+        `Trying to send request with [content-type:${APPLICATION_JSON}], ` +
+        `but body is not a (JSON encoded) string.`);
+    }
+    // IDEA: try to decode the body to catch errors on client side
   }
 
   const init = {
@@ -519,44 +673,30 @@ export async function httpRequest(
     headers: requestHeaders
   };
 
-  switch( method )
+  // Allow search params also for other request types than GET
+
+  if( urlSearchParams )
   {
-    case METHOD_GET:
-      init.method = METHOD_GET;
+    if( !(urlSearchParams instanceof URLSearchParams) )
+    {
+      throw new Error(
+        `Invalid parameter [urlSearchParams] ` +
+        `(expected instanceof URLSearchParams)`);
+    }
 
-      if( urlSearchParams )
+    const existingParams = url.searchParams;
+
+    for( const [ name, value ] of urlSearchParams.entries() )
+    {
+      if( existingParams.has( name ) )
       {
-        if( !(urlSearchParams instanceof URLSearchParams) )
-        {
-          throw new Error(
-            `Invalid parameter [urlSearchParams] ` +
-            `(expected instanceof URLSearchParams)`);
-        }
-
-        const existingParams = url.searchParams;
-
-        for( const [ name, value ] of urlSearchParams.entries() )
-        {
-          if( existingParams.has( name ) )
-          {
-            throw new Error(
-              `Cannot set URL search parameter [${name}] ` +
-              `in url [${url.href}] (already set)`);
-          }
-
-          existingParams.set( name, value );
-        } // end for
+        throw new Error(
+          `Cannot set URL search parameter [${name}] ` +
+          `in url [${url.href}] (already set)`);
       }
-      break;
 
-    case METHOD_POST:
-      init.method = METHOD_POST;
-
-      init.body = body || null; /* : JSON.stringify( body ) */
-      break;
-
-    default:
-      throw new Error(`Invalid value for parameter [method=${method}]`);
+      existingParams.set( name, value );
+    } // end for
   }
 
   //
@@ -564,23 +704,27 @@ export async function httpRequest(
   //
   url.searchParams.sort();
 
+  // console.log( "url", url );
+
+  init.method = method;
+
+  if( METHOD_POST === method )
+  {
+    init.body = body || null; /* : JSON.stringify( body ) */
+  }
+
   // @see https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
-  // @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
+
+  // console.log( "init", init );
+  // console.log( "headers", init.headers );
 
   // eslint-disable-next-line no-undef
   const request = new Request( url, init );
 
+  // @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
+
   const controller = new AbortController();
   const signal = controller.signal;
-
-  if( requestHandler )
-  {
-    expectFunction( requestHandler, "Invalid parameter [requestHandler]" );
-
-    const abort = controller.abort.bind( controller );
-
-    requestHandler( { abort } );
-  }
 
   //
   // A fetch() promise will reject with a TypeError when a network error
@@ -601,6 +745,56 @@ export async function httpRequest(
   // .catch((error) => { .. }
   //
 
-  return /* promise */ fetch( request, { signal } );
+  const promise = fetch( request, { signal } );
 
+  if( requestHandler || timeoutMs )
+  {
+    const abort = ( reason ) =>
+      {
+        if( !reason )
+        {
+          reason = new AbortError(`Request [${url.href}] aborted`);
+        }
+
+        controller.abort( reason );
+      };
+
+    /**
+     * Function that can be used to set a timeout on a request
+     *
+     * @param {number} delayMs
+     */
+    const timeout = ( delayMs=10000 ) =>
+      {
+        expectPositiveNumber( delayMs, "Invalid value for [delayMs]" );
+
+        const timerId =
+          setTimeout( () =>
+            {
+              controller.abort(
+                new TimeoutError(
+                  `Request [${url.href}] timed out [${delayMs}]`) );
+            },
+            delayMs );
+
+        promise.finally( () => {
+          clearTimeout( timerId );
+        } );
+      };
+
+    if( timeoutMs )
+    {
+      timeout( timeoutMs );
+    }
+
+    if( requestHandler )
+    {
+      expectFunction( requestHandler,
+        "Invalid parameter [requestHandler]" );
+
+      requestHandler( { controller, abort, timeout } );
+    }
+  }
+
+  return promise;
 }

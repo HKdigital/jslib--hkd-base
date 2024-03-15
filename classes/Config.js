@@ -3,22 +3,36 @@
 
 import { expectNotEmptyString,
          expectObjectPath,
+         expectObject,
          expectArray,
          expectDefined,
-         expectFunction } from "@hkd-base/helpers/expect.js";
+         expectFunction }
+  from "@hkd-base/helpers/expect.js";
 
 import { objectGet,
-         objectSet } from "@hkd-base/helpers/object.js";
+         objectSet }
+  from "@hkd-base/helpers/object.js";
 
-import { equals } from "@hkd-base/helpers/compare.js";
+import { toStringPath }
+  from "@hkd-base/helpers/string.js";
 
-import { clone } from "@hkd-base/helpers/object.js";
+import { equals }
+  from "@hkd-base/helpers/compare.js";
 
-import { toArrayPath } from "@hkd-base/helpers/array.js";
+import { clone }
+  from "@hkd-base/helpers/object.js";
 
-import ValueStore from "@hkd-base/classes/ValueStore.js";
+import { toArrayPath }
+  from "@hkd-base/helpers/array.js";
 
-import LogBase from "@hkd-base/classes/LogBase.js";
+import ValueStore
+  from "@hkd-base/classes/ValueStore.js";
+
+import LogBase
+  from "@hkd-base/classes/LogBase.js";
+
+import ObjectSchema
+  from "@hkd-base/classes/ObjectSchema.js";
 
 /* ------------------------------------------------------------- Export class */
 
@@ -28,12 +42,33 @@ export default class Config extends LogBase
   events = new ValueStore();
 
   _parsers = {};
+  _schema;
 
   /**
    * Construct Config instance
    *
+   * @param {object} schemaOrSchemaProperties
+   *   Schema (instanceof ObjectSchema) or object that contains schema
+   *   properties
    */
-  // constructor() { super(...arguments); }
+  constructor( schemaOrSchemaProperties )
+  {
+    super(...arguments);
+
+    // -- Store schema if supplied
+
+    if( schemaOrSchemaProperties )
+    {
+      expectObject( schemaOrSchemaProperties,
+        "Missing or invalid parameter [schemaOrSchemaProperties]" );
+
+      if( !(schemaOrSchemaProperties instanceof ObjectSchema) )
+      {
+        schemaOrSchemaProperties =
+          new ObjectSchema( schemaOrSchemaProperties );
+      }
+    }
+  }
 
   // ---------------------------------------------------------------------------
 
@@ -68,9 +103,15 @@ export default class Config extends LogBase
    * @param {*} newValue
    *
    * @param {boolean} [options.triggerEvent=true]
+   *   DEPRECEATED:
    *   Triggers a "configure event" if true
+   *
+   * @param {string|Symbol} [options.triggeredBy]
+   *   Specify a `triggeredBy` property that will be supplied to the event
+   *   subscribers. This can be used to `break` loops created by code that both
+   *   sets configuration data and subscribes to configuration data changes
    */
-  set( objectPath, newValue, { triggerEvent=true }={} )
+  set( objectPath, newValue, { triggerEvent=true, triggeredBy }={} )
   {
     // this.log.debug( objectPath );
 
@@ -105,8 +146,19 @@ export default class Config extends LogBase
 
       if( parser )
       {
+        //
+        // A parser validates a single `topLevel` property
+        //
         try {
-          newData = parser( newData[ topLevelPath ] );
+          newData = parser( newData );
+
+          if( 1 === objectPath.length )
+          {
+            newValue = newData;
+          }
+          else {
+            newValue = objectGet( newData || {}, objectPath, null );
+          }
         }
         catch(e)
         {
@@ -114,19 +166,60 @@ export default class Config extends LogBase
             `Failed to parse config [${topLevelPath}]`, { cause: e } );
         }
       }
+      else if( this._schema )
+      {
+        //
+        // Use the schema to validate the
+        //
+        const { // value,
+                finalValue,
+                error } =
+          this._schema.validateProperty( newData, topLevelPath );
+
+        if( error )
+        {
+          throw new Error(
+            `Failed to parse config [${topLevelPath}]`, { cause: error } );
+        }
+
+        newData = finalValue;
+
+        newValue = objectGet( newData, objectPath );
+      }
 
       objectSet( data, objectPath, newValue );
 
-      if( triggerEvent )
+      if( triggeredBy )
       {
+        this.events.set(
+          {
+            objectPath,
+            triggeredBy
+          } );
+      }
+      else if ( triggerEvent )
+      {
+        //
+        // DEPRECEATED
+        //
         this.events.set(
           {
             objectPath
           } );
       }
+
+      return { updated: true, newValue };
     }
     // else value not changed => nothing to do
+
+    return { updated: false, newValue };
   }
+
+  // ---------------------------------------------------------------------------
+
+  // clear( { triggeredBy }={} )
+  // {
+  // }
 
   // ---------------------------------------------------------------------------
 
@@ -135,11 +228,141 @@ export default class Config extends LogBase
    *
    * @param {string} objectPath
    *
+   * @param {*} [defaultValue]
+   *   Default value to return if no config value was found
+   *   (if not set an exception will be thrown)
+   *
    * @returns {object|undefined} data or undefined if not set
    */
-  get( objectPath )
+  get( objectPath, defaultValue )
   {
-    return objectGet( this.data, objectPath, undefined );
+    const value = objectGet( this.data, objectPath, undefined );
+
+    if( undefined !== value )
+    {
+      return value;
+    }
+
+    if( arguments.length >= 2 )
+    {
+      return defaultValue;
+    }
+
+    throw new Error(
+      `No config value found at path [${toStringPath( objectPath)}]`);
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Get the data at the top level path of the specified object path
+   * as key-value pair
+   *
+   * @returns {{ key: string, value: * }}
+   */
+  getTopLevelKeyValue( objectPath )
+  {
+    const key = this.getTopLevelPath( objectPath );
+    const value = this.get( key );
+
+    return { key, value };
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Get the top level path of an object path
+   * - The top level
+   *
+   * @param {string} objectPath
+   *
+   * @returns {string} top level path
+   */
+  getTopLevelPath( objectPath )
+  {
+    expectObjectPath( objectPath,
+      "Missing or invalid parameter [objectPath]" );
+
+    objectPath = toArrayPath( objectPath );
+
+    if( !objectPath.length )
+    {
+      throw new Error("Invalid parameter [objectPath] (path is empty)");
+    }
+
+    return objectPath[0];
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Get the value at the root path of the specified object path
+   *
+   * @param {string} objectPath
+   *
+   * @returns {*} data or undefined if not set
+   */
+  getValueAtTopLevelPath( objectPath )
+  {
+    expectObjectPath( objectPath,
+      "Missing or invalid parameter [objectPath]" );
+
+    objectPath = toArrayPath( objectPath );
+
+    if( !objectPath.length )
+    {
+      throw new Error("Invalid parameter [objectPath] (path is empty)");
+    }
+
+    const topLevelPath = objectPath[0];
+
+    return this.data[ topLevelPath ];
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Get the data at the specified path
+   * - Throws an error if no value has been defined
+   *
+   * @param {string} objectPath
+   *
+   * @throws data not defined
+   *
+   * @returns {object|undefined} data or undefined if not set
+   */
+  getDefined( objectPath )
+  {
+    const value = objectGet( this.data, objectPath, undefined );
+
+    if( undefined === value )
+    {
+      throw new Error(`Config value [${objectPath}] has not been set`);
+    }
+
+    return value;
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Get the data at the specified path
+   * - Throws an error if the value is empty
+   *
+   * @param {string} objectPath
+   *
+   * @returns {object|undefined} data or undefined if not set
+   */
+  getNotEmpty( objectPath )
+  {
+    const value = objectGet( this.data, objectPath, undefined );
+
+    if( !value )
+    {
+      throw new Error(`Config value [${objectPath}] is empty`);
+    }
+
+    return value;
   }
 
   // ---------------------------------------------------------------------------
@@ -202,6 +425,18 @@ export default class Config extends LogBase
           "(should only contain not-emtpy strings)");
       }
     }
+  }
+
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Export all conmfig data as plain object
+   *
+   * @returns {object} export data
+   */
+  export()
+  {
+    return clone( this.data );
   }
 
   /* ------------------------------------------------------- Internal methods */

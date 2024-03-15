@@ -18,9 +18,9 @@
  * So websocket connections must be defined first in the global config:
  *
  * @example
- *   import { CONFIG_LABEL_DEFAULT_WS_SERVER } from "@hkd-base/helpers/ws.js";
+ *   import { KEY_DEFAULT_WS_SERVER } from "@hkd-base/helpers/ws.js";
  *
- *   setGlobalConfig( CONFIG_LABEL_DEFAULT_WS_SERVER,
+ *   setGlobalConfig( KEY_DEFAULT_WS_SERVER,
  *     {
  *       url: "ws://localhost:12302"
  *     } );
@@ -48,26 +48,28 @@ import {
   expectNotEmptyString,
   expectPositiveNumber,
   expectDefined,
-  expectObject } from "../helpers/expect.js";
+  expectObject }
+  from "@hkd-base/helpers/expect.js";
 
-import { getGlobalConfig } from "../helpers/global-config.js";
+import { getGlobalConfig }
+  from "@hkd-base/helpers/global-config.js";
 
 const stores = new Map();
 
 /* ------------------------------------------------------------------ Exports */
 
-export const CONFIG_LABEL_DEFAULT_WS_SERVER = "default-ws-server";
+export const KEY_DEFAULT_WS_SERVER = "default-ws-server";
 
 // -----------------------------------------------------------------------------
 
 /**
  * Get an existing websocket store
  *
- * @param {string} [label=CONFIG_LABEL_DEFAULT_WS_SERVER]
+ * @param {string} [label=KEY_DEFAULT_WS_SERVER]
  *
  * @returns {object|null} WebsocketStore or null if not found
  */
-export function getWebsocketStore( label=CONFIG_LABEL_DEFAULT_WS_SERVER )
+export function getWebsocketStore( label=KEY_DEFAULT_WS_SERVER )
 {
   expectNotEmptyString( label, "Missing or invalid parameter [label]" );
 
@@ -86,9 +88,9 @@ export function getWebsocketStore( label=CONFIG_LABEL_DEFAULT_WS_SERVER )
 /**
  * Delete an existing websocket store
  *
- * @param {string} [label=CONFIG_LABEL_DEFAULT_WS_SERVER]
+ * @param {string} [label=KEY_DEFAULT_WS_SERVER]
  */
-export function deleteWebsocketStore( label=CONFIG_LABEL_DEFAULT_WS_SERVER )
+export function deleteWebsocketStore( label=KEY_DEFAULT_WS_SERVER )
 {
   stores.delete( label );
 }
@@ -100,16 +102,16 @@ export function deleteWebsocketStore( label=CONFIG_LABEL_DEFAULT_WS_SERVER )
  * Data is transferred as JSON.
  * Keeps socket open (reopens if closed) as long as there are subscriptions.
  *
- * @param {string} [label=CONFIG_LABEL_DEFAULT_WS_SERVER]
+ * @param {string} [label=KEY_DEFAULT_WS_SERVER]
  *
  * @returns {object} Store instance
  */
-export function createWebsocketStore( label=CONFIG_LABEL_DEFAULT_WS_SERVER )
+export function createWebsocketStore( label=KEY_DEFAULT_WS_SERVER )
 {
   const config = getGlobalConfig( label );
 
   expectObject( config,
-    `Missing global config [${CONFIG_LABEL_DEFAULT_WS_SERVER}]` );
+    `Missing global config [${KEY_DEFAULT_WS_SERVER}]` );
 
 
   const {

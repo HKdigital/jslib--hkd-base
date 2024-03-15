@@ -2,9 +2,12 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectString,
-         expectObject } from "@hkd-base/helpers/expect.js";
+         expectObject } from "./expect.js";
 
-import { objectGet } from "@hkd-base/helpers/object.js";
+import { objectGet,
+         PATH_SEPARATOR } from "./object.js";
+
+import { toArrayPath } from "./array.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -13,7 +16,7 @@ import { objectGet } from "@hkd-base/helpers/object.js";
 export const RE_JS_EXPRESSION = /\$\{([^${}]*)\}/g;
 export const RE_MUSTACHE = /\{\{([^{}]*)\}\}/g;
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Captizalize the first letter of a string
@@ -32,30 +35,37 @@ export function capitalizeFirstLetter( str )
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Interpolate: substitute variables in a string
  *
- * - Uses es6 template style expression substitution:
- *   Variables and expressions are surrounded by ${...}
+ * - Uses mustache template style expression substitution:
+ *   Variables and expressions are surrounded by {{...}}
+ *
+ *  TODO: full mustache support, see https://github.com/janl/mustache.js
  *
  * --
  *
- * @eg const template = `Hello ${name}`;
+ * @eg const template = `Hello {{name}}`;
  *
  * --
  *
  * @param {string} template - Template string to interpolate
  * @param {object} templateData - Template data to use for interpolation
+ *
+ * @returns {string} interpolated string
  */
 export function interpolate(
   template,
   templateData,
   expressionRegexp=RE_MUSTACHE )
 {
-  expectString( template, "Missing or invalid variable [template]" );
-  expectObject( templateData, "Missing or invalid variable [templateData]" );
+  expectString( template,
+    "Missing or invalid variable [template]" );
+
+  expectObject( templateData,
+    "Missing or invalid variable [templateData]" );
 
   return template.replace( expressionRegexp,
 
@@ -64,7 +74,7 @@ export function interpolate(
     {
       let replacement;
 
-      let path = expression;
+      let path = toArrayPath( expression );
 
       replacement = objectGet( templateData, path, undefined);
 
@@ -81,7 +91,7 @@ export function interpolate(
     } );
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
 
 /**
  * Remove strange characters from a string and replace whitespace by
@@ -101,7 +111,54 @@ export function toUriName( str )
   return str;
 }
 
-// ---------------------------------------------------------------------- Method
+// -----------------------------------------------------------------------------
+
+/**
+ * Convert a path string to an array path
+ * - The path string will be spit at the `pathSeparator` token
+ * - If the supplied path is already an array, the original array will
+ *   be returned
+ *
+ * @param {string|string[]} path
+ *   String or array path (e.g. "some.path.to")
+ *
+ * @param {string} [pathSeparator=PATH_SEPARATOR]
+ *   A custom path separator to use instead of the default "."
+ *
+ * @returns {string[]} array path (e.g. ["some", "path", "to"])
+ */
+export function toStringPath( path, pathSeparator=PATH_SEPARATOR )
+{
+  if( Array.isArray( path ) )
+  {
+    return path.join( pathSeparator );
+  }
+  else if( typeof path === "string" )
+  {
+    // path is already a string
+    return path;
+  }
+  else {
+    throw new Error(
+      "Missing or invalid parameter [path] (expected string or array)");
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Prefix a numeric string with 0's
+ *
+ * @param {string|number} input
+ *
+ * @returns {string}
+ */
+export function padDigits( input, targetLength=2, padString="0" )
+{
+  return ("" + input).padStart( targetLength, padString);
+}
+
+// -----------------------------------------------------------------------------
 
 /**
  * Make sure that the outputted path is an array path

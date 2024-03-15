@@ -1,18 +1,24 @@
 /* ------------------------------------------------------------------ Imports */
 
-import { expectNotEmptyString }
+import { expectString,
+         expectNotEmptyString,
+         expectObject }
   from "@hkd-base/helpers/expect.js";
 
 import { ResponseError,
          TokenExpiredError }
   from "@hkd-base/types/error-types.js";
 
+import { ACCEPT,
+         CONTENT_TYPE }
+  from "@hkd-base/constants/http-headers.js";
+
+import { TEXT_HTML,
+         APPLICATION_JSON }
+  from "@hkd-base/constants/mime-types.js";
+
 import { isObject }
   from "@hkd-base/helpers/is.js";
-
-import { buildApiUrl,
-         httpApiRequest }
-  from "@hkd-base/helpers/http-api.js";
 
 import { getGlobalConfig }
   from "@hkd-base/helpers/global-config.js";
@@ -30,11 +36,61 @@ import { decodePayload }
 
 /* ------------------------------------------------------------------ Exports */
 
-export const KEY_DEFAULT_JSON_API = "default-json-api";
+export { METHOD_GET,
+         METHOD_POST }
+  from "@hkd-base/helpers/http.js";
 
-// export const KEY_AUTH_JSON_API = "auth-api";
+export const KEY_DEFAULT_HTTP_API = "default-http-api";
 
-// export const KEY_LIVE_JSON_API = "live-api";
+// -----------------------------------------------------------------------------
+
+/**
+ * Build an URL object by using `origin` and `apiPrefix` from the specified
+ * config and a custom `uri`.
+ *
+ * @param {string} uri - Custom uri part to append
+ *
+ * @param {object} config - API Config { origin: <string>, apiPrefix: <string> }
+ *
+ * @returns {object} URI object
+ */
+export function buildApiUrl( uri, config )
+{
+  expectNotEmptyString( uri,
+    "Missing or invalid parameter [uri]");
+
+  expectObject( config,
+    "Missing or invalid parameter [config]");
+
+  const { origin, apiPrefix="" } = config;
+
+  expectNotEmptyString( origin,
+    `Missing or invalid parameter [config.origin]` );
+
+  expectString( apiPrefix,
+    `Invalid parameter [config.apiPrefix]` );
+
+  // console.log( { apiPrefix, uri, origin } );
+
+  if( origin )
+  {
+    const x = origin.indexOf("://");
+
+    if( x !== -1 )
+    {
+      const y = origin.indexOf( "/", x + 3 );
+
+      if( y !== -1 && origin.length !== y + 1 )
+      {
+        throw new Error(
+          `Invalid parameter [config.origin=${origin}] ` +
+          `(should not contain a path)` );
+      }
+    }
+  }
+
+  return new URL( apiPrefix + uri, origin );
+}
 
 // -----------------------------------------------------------------------------
 
@@ -78,16 +134,16 @@ export const KEY_DEFAULT_JSON_API = "default-json-api";
  *
  * @returns {object} { abort, jsonResponsePromise }
  */
-export async function jsonApiGet(
+export async function httpApiGet(
   {
     uri,
     urlSearchParams,
     requestHandler,
     timeoutMs,
-    config=KEY_DEFAULT_JSON_API
+    config=KEY_DEFAULT_HTTP_API
   } )
 {
-  return jsonApiRequest(
+  return httpApiRequest(
     {
       uri,
       urlSearchParams,
@@ -140,23 +196,21 @@ export async function jsonApiGet(
  *
  * @returns {mixed} parsed JSON response from backend server
  */
-export async function jsonApiPost(
+export async function httpApiPost(
   {
     uri,
     body=null,
     requestHandler,
     timeoutMs,
-    config=KEY_DEFAULT_JSON_API
+    config=KEY_DEFAULT_HTTP_API
   } )
 {
-
-  return jsonApiRequest(
+  return httpApiRequest(
     {
       uri,
       body: JSON.stringify( body ),
       method: METHOD_POST,
       requestHandler,
-      timeoutMs,
       config
     } );
 }
@@ -177,6 +231,16 @@ export async function jsonApiPost(
  * --
  *
  * @param {string} uri - uri of the API method
+ *
+ * @param {string} method - Request method: METHOD_GET | METHOD_POST
+ *
+ * @param {object} [urlSearchParams]
+ *   Parameters that should be added to the request url
+ *
+ * @param {*} [body] - POST data
+ *
+ * @param {object} [headers]
+ *   Object that contains custom headers. A header is a name, value pair.
  *
  * @param {function} [requestHandler]
  *   If defined, this function will receive the abort handler function
@@ -221,37 +285,167 @@ export async function jsonApiPost(
  *
  * @returns {mixed} response data: parsed JSON response from backend server
  */
-export async function jsonApiRequest(
+export async function httpApiRequest(
   {
     uri,
     method,
     urlSearchParams,
     body,
+    headers,
     requestHandler,
     timeoutMs,
-    config=KEY_DEFAULT_JSON_API
+    config=KEY_DEFAULT_HTTP_API
   } )
 {
-  const parsedResponse =
-    await httpApiRequest(
-      {
-        uri,
-        method,
-        urlSearchParams,
-        body,
-        // headers,
-        requestHandler,
-        timeoutMs,
-        config
-      } );
+  expectNotEmptyString( uri, "Missing or invalid parameter [uri]" );
 
-  if( parsedResponse.error )
+  if( !isObject( config ) )
+  {
+    expectNotEmptyString( config, "Invalid parameter [config]" );
+
+    config = getGlobalConfig( config );
+  }
+
+  const { origin,
+          apiPrefix,
+          token,
+          basicAuth
+          /*includeSessionId=false*/ } = config;
+
+  const url = buildApiUrl( uri, { origin, apiPrefix } );
+
+  if( !headers )
   {
     //
-    // @note this is specific for the API implementation, not all API's
-    //       return an `error` property`
+    // Set default headers to make the request work ok
     //
-    throw new ResponseError( parsedResponse.error );
+    headers =
+    {
+      /* Added `accept "text/html"` to prevent 406 Not Acceptable issues */
+      [ ACCEPT ]: `${TEXT_HTML}, ${APPLICATION_JSON}`
+    };
+
+    if( method === METHOD_POST )
+    {
+      headers[ CONTENT_TYPE ] = APPLICATION_JSON;
+    }
+  }
+  else {
+    expectObject( headers,
+      "Missing or invalid parameter [headers]" );
+  }
+
+  if( token )
+  {
+    //
+    // A JSON Web Token should be used for authentication
+    //
+
+    //
+    // Check if token has not expired before doing a request
+    //
+    const decodedToken = decodePayload(token);
+
+    if( "exp" in decodedToken )
+    {
+      const expiredMs = Date.now() - decodedToken.exp * 1000;
+
+      if( expiredMs > 0 )
+      {
+        throw new TokenExpiredError(
+          `Token has expired (${Math.round(expiredMs/1000)} seconds ago)`);
+      }
+    }
+
+    //
+    // Add token as HTTP header
+    //
+    headers["authorization"] = `Bearer ${token}`;
+  }
+  else if( basicAuth )
+  {
+    expectObject( basicAuth,
+      "Invalid property [config.basicAuth]" );
+
+    const {
+        username,
+        password
+      } = basicAuth;
+
+    expectString( username,
+      "Invalid property [config.basicAuth.username]" );
+
+    expectString( password,
+      "Invalid property [config.basicAuth.password]" );
+
+    headers["authorization"] = `Basic ${btoa( username+":"+password)}`;
+  }
+
+  // console.log( "json-api", { method, url, body, urlSearchParams, headers } );
+
+  const responsePromise =
+    httpRequest(
+      {
+        method,
+        url,
+        body,
+        urlSearchParams,
+        headers,
+        requestHandler,
+        timeoutMs
+      } );
+
+  /**/
+  const response = await waitForAndCheckResponse( responsePromise, url );
+
+  let contentType;
+
+  for( let [ key, value ] of response.headers )
+  {
+    if( key === CONTENT_TYPE )
+    {
+      const x = value.indexOf(";");
+
+      if( x === -1 )
+      {
+        contentType = value;
+      }
+      else {
+        contentType = value.slice( 0, x );
+      }
+      break;
+    }
+  }
+
+  let parsedResponse;
+
+  try {
+    //
+    // @note when security on the client side fails, an `opaque` response
+    //       is returned by the browser (empty body) -> parsing fails
+    //       (use CORS to fix this)
+    //
+
+    switch( contentType )
+    {
+      case "application/json":
+        parsedResponse = await response.json();
+        break;
+
+      case "text/plain":
+        parsedResponse = await response.text();
+        break;
+
+      default:
+        parsedResponse = await response.blob();
+        break;
+    }
+  }
+  catch( e )
+  {
+    throw new ResponseError(
+      `Failed to decode server response [contentType=${contentType}] ` +
+      `from [${decodeURI(url.href)}]`);
   }
 
   return parsedResponse;

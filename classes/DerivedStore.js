@@ -31,8 +31,11 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectFunction } from "../helpers/expect.js";
-import ValueStore from "./ValueStore.js";
+import { expectFunction }
+  from "@hkd-base/helpers/expect.js";
+
+import ValueStore
+  from "@hkd-base/classes/ValueStore.js";
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -59,7 +62,12 @@ export default class DerivedStore
   /**
    * Constructor
    *
-   * @param {Map<string,object>|object[]} [stores] - Input store instances
+   * @param {Map<string,object>|object[]} [stores]
+   *   Input store instances
+   *
+   *   @note It is easy to just supply a list of stores (array).
+   *         But for better readablility of your code, you can also choose to
+   *         add a Map or an object with `storeName` => `storeInstance` entries.
    *
    * @param {DerivedStore~deriveFn} [deriveFn]
    *   Function that will be called to generate the derived value
@@ -73,22 +81,77 @@ export default class DerivedStore
   {
     if( stores instanceof Array )
     {
-      const m = new Map();
+      //
+      // Stores are supplied as Array => convert
+      //
+      const map = new Map();
 
       for( let j = 0, n = stores.length; j < n; j = j + 1 )
       {
-        m.set( j, stores[j] );
+        map.set( j, stores[j] );
       }
 
-      this[ stores$ ] = m;
+      this[ stores$ ] = map;
     }
     else if( stores instanceof Map )
     {
+      //
+      // Stores are supplied as Map
+      //
       this[ stores$ ] = stores;
+    }
+    else if( stores instanceof Object )
+    {
+      //
+      // Stores are supplied as Object with
+      // `storeName` => `storeInstance` pairs
+      //
+      const map = new Map();
+
+      for( const storeName in stores )
+      {
+        map.set( storeName, stores[ storeName ] );
+      }
+
+      this[ stores$ ] = map;
     }
     else {
       throw new Error("Invalid parameter [stores] (expected Map or Array)");
     }
+
+    // -- Ensure `storesMap` only contains store instances
+
+    for( const [ label, store ] of this[ stores$ ].entries() )
+    {
+      if( !(store instanceof Object) ||
+          typeof store.subscribe !== "function" )
+      {
+        throw new Error(
+          `Invalid parameter [stores]. ` +
+          `Store[${label}] has no method subscribe` );
+      }
+    }
+
+    // -- Add handy function to `storesMap`
+
+    /**
+     * Get value from the specified store
+     *
+     * @param {[type]} keyOrIndex [description]
+     *
+     * @returns {[type]}       [description]
+     */
+    this[ stores$ ].getValueFromStore = ( keyOrIndex ) =>
+      {
+        const store = this[ stores$ ].get( keyOrIndex );
+
+        if( !store )
+        {
+          throw new Error(`Store [${keyOrIndex}] does not exist`);
+        }
+
+        return  store.get();
+      };
 
     expectFunction( deriveFn,
       "Missing or invalid parameter [deriveFn]" );

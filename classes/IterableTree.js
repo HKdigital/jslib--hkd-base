@@ -1,9 +1,11 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectObject } from "../helpers/expect.js";
+import { expectObject }
+  from "@hkd-base/helpers/expect.js";
 
-import { PATH_SEPARATOR } from "../helpers/object.js";
+import { PATH_SEPARATOR }
+  from "@hkd-base/helpers/object.js";
 
 /* ------------------------------------------------------------------ Exports */
 
