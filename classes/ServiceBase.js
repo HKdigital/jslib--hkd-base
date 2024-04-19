@@ -23,13 +23,13 @@ import {
   expectNotEmptyStringOrSymbol,
   expectObject,
   expectFunction }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import DedupValueStore
-  from "./DedupValueStore.js";
+  from './DedupValueStore.js';
 
 import HkPromise
-  from "@hkd-base/classes/HkPromise.js";
+  from '@hkd-base/classes/HkPromise.js';
 
 import {
     STOPPED,
@@ -40,35 +40,35 @@ import {
     ERROR,
     stateLabel,
     displayState }
-  from "@hkd-base/helpers/service-states.js";
+  from '@hkd-base/helpers/service-states.js';
 
 import LogBase
-  from "@hkd-base/classes/LogBase.js";
+  from '@hkd-base/classes/LogBase.js';
 
 import Offs
-  from "@hkd-base/classes/Offs.js";
+  from '@hkd-base/classes/Offs.js';
 
 import ValueStore
-  from "@hkd-base/classes/ValueStore.js";
+  from '@hkd-base/classes/ValueStore.js';
 
 /* ---------------------------------------------------------------- Internals */
 
 const WAIT_FOR_DEPENDENCIES_TIMEOUT = 30 * 1000;
 
-const customServiceName$ = Symbol("customServiceName");
+const customServiceName$ = Symbol('customServiceName');
 
-const allDependenciesAvailable$ = Symbol("availabilityStore");
+const allDependenciesAvailable$ = Symbol('availabilityStore');
 
-const stateStore$ = Symbol("stateStore");
+const stateStore$ = Symbol('stateStore');
 
-const targetState$ = Symbol("targetState");
+const targetState$ = Symbol('targetState');
 
-const dependencies$ = Symbol("dependencies");
+const dependencies$ = Symbol('dependencies');
 
-const transitionHandlers$ = Symbol("transitionHandlers");
+const transitionHandlers$ = Symbol('transitionHandlers');
 
-const configureFn$ = Symbol("configureFn");
-const configured$ = Symbol("configured");
+const configureFn$ = Symbol('configureFn');
+const configured$ = Symbol('configured');
 
 let InitService;
 
@@ -165,7 +165,7 @@ export default class ServiceBase extends LogBase
       {
         throw new Error(
           `Cannot configure service [${this.serviceName()}]. ` +
-          `Service should be in state [STOPPED]`);
+          'Service should be in state [STOPPED]');
       }
 
       await this[ configureFn$ ]( config );
@@ -184,7 +184,7 @@ export default class ServiceBase extends LogBase
   setServiceName( serviceName )
   {
     expectNotEmptyString( serviceName,
-      "Missing or invalid parameter [serviceName]" );
+      'Missing or invalid parameter [serviceName]' );
 
     this[ customServiceName$ ] = serviceName;
     this.__logContext.className = this.serviceName();
@@ -223,7 +223,7 @@ export default class ServiceBase extends LogBase
   {
     let event;
 
-    if( typeof messageOrEvent === "string" )
+    if( typeof messageOrEvent === 'string' )
     {
       event = { message: messageOrEvent };
     }
@@ -231,8 +231,8 @@ export default class ServiceBase extends LogBase
       event = messageOrEvent;
 
       expectObject( event,
-        "Missing or invalid parameter [messageOrEvent] " +
-        "(expected object or string)" );
+        'Missing or invalid parameter [messageOrEvent] ' +
+        '(expected object or string)' );
     }
 
     this.__events.set( event );
@@ -378,7 +378,7 @@ export default class ServiceBase extends LogBase
   {
     // this.expectConfigured();
 
-    if( typeof dependency === "string" )
+    if( typeof dependency === 'string' )
     {
       //
       // Use InitService to get the Service by name
@@ -386,17 +386,17 @@ export default class ServiceBase extends LogBase
       dependency = this.getServiceByName( { name: dependency } );
     }
     else {
-      expectObject( dependency, "Missing or invalid parameter [dependency]" );
+      expectObject( dependency, 'Missing or invalid parameter [dependency]' );
     }
 
     expectFunction( dependency.subscribeToState,
-      "Invalid parameter [dependency] (missing method [subscribeToState])" );
+      'Invalid parameter [dependency] (missing method [subscribeToState])' );
 
     const dependencyName =
       dependency.serviceName ? dependency.serviceName() : dependency.name;
 
     expectNotEmptyString( dependencyName,
-      "Missing or invalid [dependency.serviceName()] or [dependency.name]" );
+      'Missing or invalid [dependency.serviceName()] or [dependency.name]' );
 
     const dependencies = this[ dependencies$ ];
 
@@ -469,11 +469,11 @@ export default class ServiceBase extends LogBase
    */
   getServiceByName( { name } )
   {
-    expectNotEmptyString( name, "Missing or invalid parameter [name]" );
+    expectNotEmptyString( name, 'Missing or invalid parameter [name]' );
 
     if( !InitService )
     {
-      throw new Error("Missing [InitService] (use [setInitService] first)");
+      throw new Error('Missing [InitService] (use [setInitService] first)');
     }
 
     return InitService.service( name );
@@ -492,7 +492,7 @@ export default class ServiceBase extends LogBase
   {
     this.expectConfigured();
 
-    expectNotEmptyStringOrSymbol( state, "Missing or invalid parameter [state]" );
+    expectNotEmptyStringOrSymbol( state, 'Missing or invalid parameter [state]' );
 
     state = stateLabel( state );
 
@@ -558,7 +558,7 @@ export default class ServiceBase extends LogBase
   {
     // this.expectConfigured();
 
-    expectFunction( callback, "Missing or invalid parameter [callback]" );
+    expectFunction( callback, 'Missing or invalid parameter [callback]' );
 
     let previousState =
       callOnRegistration ? null : this[ stateStore$ ].get();
@@ -665,8 +665,8 @@ export default class ServiceBase extends LogBase
         break;
       default:
         throw new Error(
-          `Invalid value for parameter [targetState] ` +
-          `(expected RUNNING, STOPPED)`);
+          'Invalid value for parameter [targetState] ' +
+          '(expected RUNNING, STOPPED)');
     }
 
     const currentState = this[ stateStore$ ].get();
@@ -717,9 +717,9 @@ export default class ServiceBase extends LogBase
   setTransitionHandler( targetState, callback )
   {
     expectNotEmptyStringOrSymbol( targetState,
-      "Missing or invalid parameter [targetState]" );
+      'Missing or invalid parameter [targetState]' );
 
-    expectFunction( callback, "Missing or invalid parameter [callback]" );
+    expectFunction( callback, 'Missing or invalid parameter [callback]' );
 
     targetState = stateLabel( targetState );
 
@@ -729,7 +729,7 @@ export default class ServiceBase extends LogBase
     {
       throw new Error(
         `Transition handler [${displayState(targetState)}] ` +
-        `has already been registered` );
+        'has already been registered' );
     }
 
     handlers[ targetState ] = callback;
@@ -760,7 +760,7 @@ export default class ServiceBase extends LogBase
   {
     this.expectConfigured();
 
-    expectNotEmptyStringOrSymbol( state, "Missing or invalid parameter [state]" );
+    expectNotEmptyStringOrSymbol( state, 'Missing or invalid parameter [state]' );
 
     state = stateLabel( state );
 
@@ -791,7 +791,7 @@ export default class ServiceBase extends LogBase
   async _transitionToState( targetState )
   {
     expectNotEmptyStringOrSymbol( targetState,
-      "Missing or invalid parameter [targetState]" );
+      'Missing or invalid parameter [targetState]' );
 
     const currentState = this[ stateStore$ ].get();
 
@@ -902,8 +902,8 @@ export default class ServiceBase extends LogBase
         this.log.error(
           new Error(
             `Service [${this.serviceName()}] waiting for ` +
-            `${notAvailable.length === 1 ? "dependency" : "dependencies"} ` +
-            `[${notAvailable.join(",")}] timed out [${timeoutMs}]`) );
+            `${notAvailable.length === 1 ? 'dependency' : 'dependencies'} ` +
+            `[${notAvailable.join(',')}] timed out [${timeoutMs}]`) );
       } );
 
     promise.setTimeout( timeoutMs );
@@ -941,7 +941,7 @@ export default class ServiceBase extends LogBase
    */
   _listNotAvailableDependencyNames()
   {
-    let notAvailable = [];
+    const notAvailable = [];
 
     const dependencies = this[ dependencies$ ];
 

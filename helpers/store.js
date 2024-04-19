@@ -12,22 +12,22 @@ import { expectDefined,
          expectPositiveNumber,
          expectObjectPath,
          expectStore }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { defer }
-  from "@hkd-base/helpers/process.js";
+  from '@hkd-base/helpers/process.js';
 
 import { objectGet }
-  from "@hkd-base/helpers/object.js";
+  from '@hkd-base/helpers/object.js';
 
 import HkPromise
-  from "@hkd-base/classes/HkPromise.js";
+  from '@hkd-base/classes/HkPromise.js';
 
-import "@hkd-base/typedef/Store.type.js";
+import '@hkd-base/typedef/Store.type.js';
 
 /* ---------------------------------------------------------------- Internals */
 
-const TRUTHY = Symbol("truthy");
+const TRUTHY = Symbol('truthy');
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -74,9 +74,7 @@ export async function waitForStoreValue(
 
   const promise = new HkPromise();
 
-  let unsubscribeFn;
-
-  unsubscribeFn = store.subscribe( ( _value ) =>
+  const unsubscribeFn = store.subscribe( ( _value ) =>
     {
       if( promise.resolved )
       {
@@ -84,7 +82,7 @@ export async function waitForStoreValue(
         return;
       }
 
-      if( path && _value && typeof _value === "object" )
+      if( path && _value && typeof _value === 'object' )
       {
         // Use object path to get store value
         _value = objectGet( _value, path );

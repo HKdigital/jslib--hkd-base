@@ -15,10 +15,10 @@ export function toBoolean( value, returnValueForEmptyString=false )
 {
   switch( typeof value )
   {
-    case "string":
+    case 'string':
       switch( value )
       {
-        case "1", "true":
+        case '1', 'true':
           return true;
 
         default:
@@ -29,11 +29,11 @@ export function toBoolean( value, returnValueForEmptyString=false )
 
           return false;
       }
-    case "number":
+    case 'number':
       // Everything but 0 is truthy
       return value === 0 ? false : true;
 
-    case "boolean":
+    case 'boolean':
       return value;
 
     default:

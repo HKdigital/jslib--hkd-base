@@ -22,12 +22,12 @@
 // {
 // }
 
-console.log("TODO: import custom aliases");
+console.log('TODO: import custom aliases');
 
 export default async () => {
   return {
     verbose: true,
-    rootDir: "../",
+    rootDir: '../',
     // testRegex: '.spec.js$',
     testEnvironment: 'node', // 'node' and 'jsdom' support out of the box
 
@@ -38,10 +38,10 @@ export default async () => {
     //     setting-up-a-mono-repo-part-2-adding-jest-with-a-breeze-16e08596f0de
     //
     moduleNameMapper: {
-      "\\@rootDir/(.*)$": "<rootDir>/$1",
+      '\\@rootDir/(.*)$': '<rootDir>/$1',
       // "\\./(.*)$": "<rootDir>/$1",
-      "\\@hkd-base/(.*)$": "<rootDir>/$1",
-      "\\@platform/(.*)$": "<rootDir>/$1"
+      '\\@hkd-base/(.*)$': '<rootDir>/$1',
+      '\\@platform/(.*)$': '<rootDir>/$1'
 
       //"\\@hkd-some-other-lib(.*)$": "<rootDir>/../jslib--hkd-some-other-lib/$1",
     }

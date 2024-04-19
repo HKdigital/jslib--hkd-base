@@ -7,22 +7,22 @@ import {
   expectArray,
   expectArrayOrSet,
   expectDefined,
-  expectObjectNoFunction } from "./expect.js";
+  expectObjectNoFunction } from './expect.js';
 
-import { equals } from "./compare.js";
+import { equals } from './compare.js';
 
-import { toArrayPath } from "./array.js";
+import { toArrayPath } from './array.js';
 
-import { toStringPath } from "./string.js";
+import { toStringPath } from './string.js';
 
-import { isIterable } from "./is.js";
+import { isIterable } from './is.js';
 
 import { iterateObjectPaths,
-         iterateObjectEntries } from "./iterate.js";
+         iterateObjectEntries } from './iterate.js';
 
 // ------------------------------------------------------------------- Internals
 
-const PATH_SEPARATOR = ".";
+const PATH_SEPARATOR = '.';
 
 /**
  * Create a human friendly string representation of an array path
@@ -68,7 +68,7 @@ export function isEmpty( obj )
     return true;
   }
 
-  expectObject( obj, "Invalid parameter [obj]" );
+  expectObject( obj, 'Invalid parameter [obj]' );
 
   if( /*obj instanceof Array && */ 0 === obj.length )
   {
@@ -94,16 +94,16 @@ export function isEmpty( obj )
  */
 export function objectSize( obj )
 {
-  expectObject( obj, "Invalid parameter [obj]" );
+  expectObject( obj, 'Invalid parameter [obj]' );
 
   let count = 0;
 
-  /* eslint-disable no-unused-vars */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for( const key in obj )
   {
     count = count + 1;
   }
-  /* eslint-enable no-unused-vars */
+
 
   return count;
 }
@@ -123,7 +123,7 @@ export function objectSize( obj )
  */
 export function exportNotNull( obj, onlyKeys )
 {
-  expectObject( obj, "Invalid parameter [obj]" );
+  expectObject( obj, 'Invalid parameter [obj]' );
 
   // if( onlyKeys )
   // {
@@ -169,7 +169,7 @@ export function exportNotNull( obj, onlyKeys )
  */
 export function exportNotPrivate( obj, keepKeys )
 {
-  expectObject( obj, "Invalid parameter [obj]" );
+  expectObject( obj, 'Invalid parameter [obj]' );
 
   const newObj = {};
 
@@ -179,7 +179,7 @@ export function exportNotPrivate( obj, keepKeys )
   {
     const value = obj[ key ];
 
-    if( !key.startsWith("_") )
+    if( !key.startsWith('_') )
     {
       newObj[ key ] = value;
     }
@@ -221,8 +221,8 @@ export function exportNotPrivate( obj, keepKeys )
  */
 export function keep( obj, keys, removeNullAndUndefined=true )
 {
-  expectObject( obj, "Invalid parameter [obj]" );
-  expectArrayOrSet( keys, "Invalid parameter [keys]" );
+  expectObject( obj, 'Invalid parameter [obj]' );
+  expectArrayOrSet( keys, 'Invalid parameter [keys]' );
 
   const keep = (keys instanceof Set) ? keys : new Set( keys );
 
@@ -283,9 +283,9 @@ export function deepFreeze( value, _found )
 
   Object.freeze( value );
 
-  for( let key in value )
+  for( const key in value )
   {
-    let childObj = value[ key ];
+    const childObj = value[ key ];
 
     if( childObj instanceof Object )
     {
@@ -311,13 +311,13 @@ export function deepFreeze( value, _found )
  */
 export function objectSet( obj, path, value )
 {
-  expectObject( obj, "Missing or invalid parameter [obj]");
+  expectObject( obj, 'Missing or invalid parameter [obj]');
 
   const arrPath = toArrayPath( path );
 
   if( arguments.length < 3 )
   {
-    throw new Error("Missing or invalid parameter [value]");
+    throw new Error('Missing or invalid parameter [value]');
   }
 
   let parentNode;
@@ -340,8 +340,8 @@ export function objectSet( obj, path, value )
       if( Number.isNaN(keyAsInt) )
       {
         throw new Error(
-          "Cannot delete property [" + arrPath.join( PATH_SEPARATOR ) + "] " +
-          "from data node of type [Array]");
+          'Cannot delete property [' + arrPath.join( PATH_SEPARATOR ) + '] ' +
+          'from data node of type [Array]');
       }
 
       if( keyAsInt < parentNode.length )
@@ -389,7 +389,7 @@ export function objectSet( obj, path, value )
  */
 export function deletePath( obj, path )
 {
-  expectObject( obj, "Missing or invalid parameter [obj]");
+  expectObject( obj, 'Missing or invalid parameter [obj]');
 
   const arrPath = toArrayPath( path );
 
@@ -530,7 +530,7 @@ export function deletePath( obj, path )
  */
 export function objectGet( obj, path, defaultValue )
 {
-  expectObject( obj, "Missing or invalid parameter [obj]");
+  expectObject( obj, 'Missing or invalid parameter [obj]');
 
   const arrPath = toArrayPath( path );
 
@@ -697,7 +697,7 @@ export function objectDiff( objBefore, objAfter, options={}, _recursion )
 
   let deleteValue = null;
 
-  if( "deletevalue" in options )
+  if( 'deletevalue' in options )
   {
     // Might be [undefined]
     deleteValue = options.deleteValue;
@@ -707,7 +707,7 @@ export function objectDiff( objBefore, objAfter, options={}, _recursion )
 
   for( const key in objAfter )
   {
-    if( ignorePrivate && key.startsWith("_") )
+    if( ignorePrivate && key.startsWith('_') )
     {
       continue;
     }
@@ -783,8 +783,8 @@ export function objectDiff( objBefore, objAfter, options={}, _recursion )
  */
 export function patchObject( obj, changes, options={} )
 {
-  expectObject( obj, "Missing or invalid parameter [obj]" );
-  expectArray( changes, "Missing or invalid parameter [changes]" );
+  expectObject( obj, 'Missing or invalid parameter [obj]' );
+  expectArray( changes, 'Missing or invalid parameter [changes]' );
 
   const ignoreAdd =
     undefined === options.ignoreAdd ? false : options.ignoreAdd;
@@ -806,14 +806,12 @@ export function patchObject( obj, changes, options={} )
 
     // FIXME: recursion
 
-    if( ignorePrivate && path.startsWith("_") )
+    if( ignorePrivate && path.startsWith('_') )
     {
       continue;
     }
 
-    let newValue;
-
-    if( "unset" in change )
+    if( 'unset' in change )
     {
       if( ignoreDelete )
       {
@@ -825,7 +823,7 @@ export function patchObject( obj, changes, options={} )
       continue;
     }
 
-    newValue = change.set;
+    const newValue = change.set;
 
     if( undefined === newValue )
     {
@@ -868,14 +866,14 @@ export function patchObject( obj, changes, options={} )
  */
 export function extend( target, source )
 {
-  expectObjectNoFunction( target, "Invalid parameter [target]" );
+  expectObjectNoFunction( target, 'Invalid parameter [target]' );
 
   if( Object.isFrozen(target) )
   {
-    throw new Error("Invalid parameter [target] (object is immutable)");
+    throw new Error('Invalid parameter [target] (object is immutable)');
   }
 
-  expectObjectNoFunction( source, "Invalid parameter [source]" );
+  expectObjectNoFunction( source, 'Invalid parameter [source]' );
 
   // let sourceProto = source.prototype;
 
@@ -915,7 +913,7 @@ export function extend( target, source )
  */
 export function getPrototypeNames( obj )
 {
-  expectObject( obj, "Missing or invalid parameter [obj]" );
+  expectObject( obj, 'Missing or invalid parameter [obj]' );
 
   let proto = obj.prototype || obj;
 
@@ -958,8 +956,8 @@ export function getPrototypeNames( obj )
  */
 export function getTree( obj, tree, options )
 {
-  expectObject( obj, "Missing or invalid parameter [obj]");
-  expectObject( tree, "Missing or invalid parameter [tree]");
+  expectObject( obj, 'Missing or invalid parameter [obj]');
+  expectObject( tree, 'Missing or invalid parameter [tree]');
 
   let shallowLeaves = false;
 
@@ -984,7 +982,7 @@ export function getTree( obj, tree, options )
 
     // -- Get value from object at current path
 
-    let leaveValue = objectGet( obj, arrPath );
+    const leaveValue = objectGet( obj, arrPath );
 
     // -- Set value in result object at current path
 
@@ -1061,7 +1059,7 @@ export function clone( objectToBeCloned, _seenObjects )
   const typeString = object_to_string.call( objectToBeCloned );
 
   if( Array.isArray(objectToBeCloned) ||
-      "[object Arguments]" === typeString )
+      '[object Arguments]' === typeString )
   {
     const objectClone = [];
 
@@ -1078,7 +1076,7 @@ export function clone( objectToBeCloned, _seenObjects )
 
   // -- Handle not clonable objects
 
-  if( "[object Object]" !==  typeString ||
+  if( '[object Object]' !==  typeString ||
        objectToBeCloned instanceof Error )
   {
     // Functions, Browser objects, ...
@@ -1137,7 +1135,7 @@ export function clone( objectToBeCloned, _seenObjects )
   _seenObjects.clones.push(objectClone);
 
 
-  for( let prop in objectToBeCloned )
+  for( const prop in objectToBeCloned )
   {
     if( has_own_property.call( objectToBeCloned,  prop ) )
     {
@@ -1171,13 +1169,13 @@ export function clone( objectToBeCloned, _seenObjects )
 export function setReadOnlyProperty( obj, propertyName, value )
 {
   expectObject( obj,
-    "Missing or invalid parameter [obj]" );
+    'Missing or invalid parameter [obj]' );
 
   expectString( propertyName,
-    "Missing or invalid parameter [propertyName]");
+    'Missing or invalid parameter [propertyName]');
 
   expectDefined( value,
-    "Missing or invalid parameter [value]" );
+    'Missing or invalid parameter [value]' );
 
   Object.defineProperty(
     obj,
@@ -1201,7 +1199,7 @@ export function setReadOnlyProperty( obj, propertyName, value )
 export function shallowClone( objectOrArray )
 {
   expectObject( objectOrArray,
-    "Missing or invalid parameter [objectOrArray]" );
+    'Missing or invalid parameter [objectOrArray]' );
 
   if( Array.isArray( objectOrArray ) )
   {
@@ -1319,9 +1317,9 @@ export function updateObject( obj=null, updateData=null, options )
 {
   // -- Check parameter [obj]
 
-  expectObject( obj, "Missing or invalid parameter [obj]");
+  expectObject( obj, 'Missing or invalid parameter [obj]');
 
-  expectObject( updateData, "Missing or invalid parameter [updateData]");
+  expectObject( updateData, 'Missing or invalid parameter [updateData]');
 
   // -- Update cloned object
 
@@ -1381,14 +1379,14 @@ export function copyOwnProperties( from, to )
   }
 
   const firstIsConstructor =
-    ("constructor" === propertyNames[0]) ? true : false;
+    ('constructor' === propertyNames[0]) ? true : false;
 
   if( 1 === nProperties && firstIsConstructor )
   {
     return;
   }
 
-  let startAt = firstIsConstructor ? 1 : 0;
+  const startAt = firstIsConstructor ? 1 : 0;
 
   // console.log("propertyNames", from, propertyNames, startAt);
 
@@ -1427,7 +1425,7 @@ export function copyOwnProperties( from, to )
  */
 export function ensureArrayPath( path )
 {
-  if( typeof path === "string" )
+  if( typeof path === 'string' )
   {
     return path.split( PATH_SEPARATOR );
   }
@@ -1438,7 +1436,7 @@ export function ensureArrayPath( path )
   }
   else {
     throw new Error(
-      "Missing or invalid parameter [path] (expected string or array)");
+      'Missing or invalid parameter [path] (expected string or array)');
   }
 }
 
@@ -1468,7 +1466,7 @@ export function _ensureParent( obj, arrPath )
 
   for( let j = 0, n_1 = arrPath.length - 1; j < n_1; j = j + 1 )
   {
-    let key = arrPath[ j ];
+    const key = arrPath[ j ];
 
     current = current[ key ];
 
@@ -1496,7 +1494,7 @@ export function _ensureParent( obj, arrPath )
           // console.log("CHECK", { obj, arrPath, j, current, nextKey } );
           throw new Error(
             `Cannot set property [${nextKey}] ` +
-            "on data node of type [Array]");
+            'on data node of type [Array]');
         }
       }
     }
@@ -1506,7 +1504,7 @@ export function _ensureParent( obj, arrPath )
       throw new Error(
         `Cannot set property [${nextKey}] from ` +
         `path [${display_array_path(arrPath)}] on data node that is not ` +
-        "an object or an array");
+        'an object or an array');
     }
 
     prev = current;
@@ -1536,7 +1534,7 @@ export function _getParent( obj, arrPath )
 
     current = current[key];
 
-    if( typeof current === "undefined" )
+    if( typeof current === 'undefined' )
     {
       return null;
     }
@@ -1555,14 +1553,14 @@ export function _getParent( obj, arrPath )
         {
           throw new Error(
             `Cannot get property [${display_array_path(arrPath, j)}]` +
-            "from data node of type [Array]");
+            'from data node of type [Array]');
         }
       }
     }
     else {
       throw new Error(
         `Cannot get property [${display_array_path(arrPath, j)}]` +
-        "from a data node that is not an object or an array");
+        'from a data node that is not an object or an array');
     }
 
   } // end for

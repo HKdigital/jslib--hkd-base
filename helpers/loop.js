@@ -3,17 +3,17 @@
 
 import { expectPositiveNumber,
          expectFunction }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { delay }
-  from "@hkd-base/helpers/time.js";
+  from '@hkd-base/helpers/time.js';
 
 // -- Logging
 
 import { getModuleLogger }
-  from "@hkd-base/helpers/log.js";
+  from '@hkd-base/helpers/log.js';
 
-const log = getModuleLogger( "loop.js" );
+const log = getModuleLogger( 'loop.js' );
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -33,13 +33,13 @@ const log = getModuleLogger( "loop.js" );
 export function loop( { loopFn, intervalMs=1000, errorDelayMs=5000 }={} )
 {
   expectFunction( loopFn,
-    "Missing or invalid parameter [loopFn]" );
+    'Missing or invalid parameter [loopFn]' );
 
   expectPositiveNumber( intervalMs,
-    "Missing or invalid parameter [intervalMs]" );
+    'Missing or invalid parameter [intervalMs]' );
 
   expectPositiveNumber( errorDelayMs,
-    "Missing or invalid parameter [errorDelayMs]" );
+    'Missing or invalid parameter [errorDelayMs]' );
 
   let timer;
 
@@ -61,7 +61,7 @@ export function loop( { loopFn, intervalMs=1000, errorDelayMs=5000 }={} )
     catch( e )
     {
       const error =
-        new Error( "Exception in loop function", { cause: e } );
+        new Error( 'Exception in loop function', { cause: e } );
 
       log.error( error );
 

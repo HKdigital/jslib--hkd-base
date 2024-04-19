@@ -24,26 +24,26 @@
 import {
     expectString,
     expectNumber }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { noop }
-  from "@hkd-base/helpers/function.js";
+  from '@hkd-base/helpers/function.js';
 
 /* ---------------------------------------------------------------- Internals */
 
-const resolved$ = Symbol("resolved");
-const rejected$ = Symbol("rejected");
-const pending$ = Symbol("pending");
+const resolved$ = Symbol('resolved');
+const rejected$ = Symbol('rejected');
+const pending$ = Symbol('pending');
 
-const timeout$ = Symbol("timeout");
-const cancelled$ = Symbol("cancelled");
+const timeout$ = Symbol('timeout');
+const cancelled$ = Symbol('cancelled');
 
-const resolveFn$ = Symbol("resolveFn");
-const rejectFn$ = Symbol("rejectFn");
+const resolveFn$ = Symbol('resolveFn');
+const rejectFn$ = Symbol('rejectFn');
 
-const timeoutTimer$ = Symbol("timeoutTimer");
+const timeoutTimer$ = Symbol('timeoutTimer');
 
-const hasThen$ = Symbol("hasThen");
+const hasThen$ = Symbol('hasThen');
 
 /* ------------------------------------------------------------------- Export */
 
@@ -167,11 +167,11 @@ export default class HkPromise extends Promise
       if( this[ resolved$ ] )
       {
         throw new Error(
-          "Cannot resolve Promise. Promise has already resolved");
+          'Cannot resolve Promise. Promise has already resolved');
       }
       else {
         throw new Error(
-          "Cannot resolve Promise. Promise has already been rejected");
+          'Cannot resolve Promise. Promise has already been rejected');
       }
     }
 
@@ -241,11 +241,11 @@ export default class HkPromise extends Promise
       if( this[ resolved$ ] )
       {
         throw new Error(
-          "Cannot reject Promise. Promise has already resolved");
+          'Cannot reject Promise. Promise has already resolved');
       }
       else {
         throw new Error(
-          "Cannot reject Promise. Promise has already been rejected");
+          'Cannot reject Promise. Promise has already been rejected');
       }
     }
 
@@ -305,11 +305,11 @@ export default class HkPromise extends Promise
       if( !(errorOrInfo instanceof Object) )
       {
         throw new Error(
-          "Invalid parameter [errorOrInfo] (expected (error) object");
+          'Invalid parameter [errorOrInfo] (expected (error) object');
       }
     }
     else {
-      errorOrInfo = new Error("Cancelled");
+      errorOrInfo = new Error('Cancelled');
     }
 
     errorOrInfo.cancelled = true;
@@ -356,10 +356,10 @@ export default class HkPromise extends Promise
    * @param {string} [message="Timeout"]
    *   Message of the error that will be thrown when the timeout occurs
    */
-  setTimeout( ms, message="Timeout" )
+  setTimeout( ms, message='Timeout' )
   {
-    expectNumber( ms, "Missing or invalid parameter [ms]" );
-    expectString( message, "Missing or invalid parameter [message]" );
+    expectNumber( ms, 'Missing or invalid parameter [ms]' );
+    expectString( message, 'Missing or invalid parameter [message]' );
 
     // -- Check current Promise state
 
@@ -368,11 +368,11 @@ export default class HkPromise extends Promise
       if( this[ resolved$ ] )
       {
         throw new Error(
-          "Cannot set timeout. Promise has already resolved");
+          'Cannot set timeout. Promise has already resolved');
       }
       else {
         throw new Error(
-          "Cannot set timeout. Promise has already been rejected");
+          'Cannot set timeout. Promise has already been rejected');
       }
     }
 

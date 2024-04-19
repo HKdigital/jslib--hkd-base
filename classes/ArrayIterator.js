@@ -2,7 +2,7 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectArray }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -50,7 +50,7 @@ export default class ArrayIterator
   {
     //super( ...arguments );
 
-    expectArray("Invalid parameter [arr]");
+    expectArray('Invalid parameter [arr]');
 
     options = Object.assign( { reversed: false, callback: null }, options );
 

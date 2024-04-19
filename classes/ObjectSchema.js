@@ -5,10 +5,10 @@ import { expectBoolean,
          expectObject,
          expectFunction,
          expectError }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { registeredParsers }
-  from "@hkd-base/helpers/parse.js";
+  from '@hkd-base/helpers/parse.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -61,9 +61,9 @@ export default class ObjectSchema
     // == Process properties
 
     expectObject( properties,
-      "Missing or invalid parameter [properties]" );
+      'Missing or invalid parameter [properties]' );
 
-    for( let key in properties )
+    for( const key in properties )
     {
       let property = properties[ key ];
 
@@ -74,7 +74,7 @@ export default class ObjectSchema
 
       if( !parser )
       {
-        if( typeof property.type === "string" )
+        if( typeof property.type === 'string' )
         {
           throw new Error(
             `Invalid property [${key}]. ` +
@@ -103,14 +103,14 @@ export default class ObjectSchema
 
     if( options )
     {
-      expectObject( options, "Invalid parameter [options]" );
+      expectObject( options, 'Invalid parameter [options]' );
 
-      if( "allowUnknown" in options )
+      if( 'allowUnknown' in options )
       {
         this.allowUnknown( options.allowUnknown );
       }
 
-      if( "stripUnknown" in options )
+      if( 'stripUnknown' in options )
       {
         this.stripUnknown( options.stripUnknown );
       }
@@ -126,7 +126,7 @@ export default class ObjectSchema
    */
   allowUnknown( allow=true )
   {
-    expectBoolean( allow, "Invalid parameter [allow]" );
+    expectBoolean( allow, 'Invalid parameter [allow]' );
 
     this._allowUnknown = allow;
   }
@@ -140,7 +140,7 @@ export default class ObjectSchema
    */
   stripUnknown( strip=true )
   {
-    expectBoolean( strip, "Invalid parameter [strip]" );
+    expectBoolean( strip, 'Invalid parameter [strip]' );
 
     this._stripUnknown = strip;
   }
@@ -179,13 +179,13 @@ export default class ObjectSchema
    */
   validate( obj, { abortEarly=true, useFinalValue=false }={} )
   {
-    expectObject( obj, "Missing or invalid parameter [obj]" );
+    expectObject( obj, 'Missing or invalid parameter [obj]' );
 
     const properties = this._schemaProperties;
 
     let details = null;
 
-    let missing = new Set( this._required );
+    const missing = new Set( this._required );
 
     for( const key in obj )
     {
@@ -193,7 +193,7 @@ export default class ObjectSchema
             value,
             finalValue } = this.validateProperty( obj, key );
 
-      let property = properties[ key ];
+      const property = properties[ key ];
 
       if( error )
       {
@@ -264,7 +264,7 @@ export default class ObjectSchema
       const existingValue = obj[ key ];
 
       if( existingValue instanceof Object &&
-          typeof existingValue.get === "function" )
+          typeof existingValue.get === 'function' )
       {
         obj[ key ].set( value );
       }
@@ -289,7 +289,7 @@ export default class ObjectSchema
         };
       }
       else {
-        const str = Array.from( missing.values() ).join(", ");
+        const str = Array.from( missing.values() ).join(', ');
 
         return {
           error: new Error(`Missing properties [${str}]`),
@@ -327,7 +327,7 @@ export default class ObjectSchema
       const value = obj[ key ];
 
       if( value instanceof Object &&
-          typeof value.get === "function" )
+          typeof value.get === 'function' )
       {
         output[ key ] = value.get();
       }
@@ -351,14 +351,14 @@ export default class ObjectSchema
    */
   validateProperty( obj, key )
   {
-    expectObject( obj, "Missing or invalid parameter [obj]" );
+    expectObject( obj, 'Missing or invalid parameter [obj]' );
 
     const properties = this._schemaProperties;
 
     let originalValue = obj[ key ];
 
     if( (originalValue instanceof Object) &&
-        typeof originalValue.get === "function" )
+        typeof originalValue.get === 'function' )
     {
       //
       // If the value is a `store` (or has a get method), use it to get the
@@ -413,7 +413,7 @@ export default class ObjectSchema
   {
     const description =
       {
-        type: "object",
+        type: 'object',
         keys: this._keys
 
         //
@@ -451,7 +451,7 @@ export default class ObjectSchema
    */
   _toJoiProperty( property )
   {
-    expectObject( property, "Missin gor invalid parameter [property]" );
+    expectObject( property, 'Missin gor invalid parameter [property]' );
 
     if( !property.flags )
     {
@@ -465,7 +465,7 @@ export default class ObjectSchema
 
     const flags = property.flags;
 
-    if( "default" in property )
+    if( 'default' in property )
     {
       flags.default = property.default;
       delete property.default;
@@ -473,7 +473,7 @@ export default class ObjectSchema
 
     if( property.optional )
     {
-      flags.presence = "optional";
+      flags.presence = 'optional';
       delete property.optional;
     }
 

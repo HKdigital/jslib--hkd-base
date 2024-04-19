@@ -14,29 +14,29 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectObject } from "@hkd-base/helpers/expect.js";
+import { expectObject } from '@hkd-base/helpers/expect.js';
 
-import { errorCauseToArray } from "@hkd-base/helpers/exceptions.js";
+import { errorCauseToArray } from '@hkd-base/helpers/exceptions.js';
 
-import { DEBUG, INFO, WARNING,ERROR } from "@hkd-base/types/log-types.js";
+import { DEBUG, INFO, WARNING,ERROR } from '@hkd-base/types/log-types.js';
 
 import { getOutputStream,
-         OUTPUT_LABEL_CONSOLE } from "@hkd-base/helpers/log.js";
+         OUTPUT_LABEL_CONSOLE } from '@hkd-base/helpers/log.js';
 
-import { ArgumentsArray } from "@hkd-base/types/array-types.js";
+import { ArgumentsArray } from '@hkd-base/types/array-types.js';
 
-import { isIterable } from "@hkd-base/helpers/is.js";
+import { isIterable } from '@hkd-base/helpers/is.js';
 
 /* ---------------------------------------------------------------- Internals */
 
 const MAX_HEADER_CONTENT_LENGTH = 47;
 
-const CONSOLE_METHOD_LOG = "log";
+const CONSOLE_METHOD_LOG = 'log';
 
-const CONSOLE_METHOD_DEBUG = "debug";
-const CONSOLE_METHOD_INFO = "info";
-const CONSOLE_METHOD_ERROR = "error";
-const CONSOLE_METHOD_WARNING = "warn";
+const CONSOLE_METHOD_DEBUG = 'debug';
+const CONSOLE_METHOD_INFO = 'info';
+const CONSOLE_METHOD_ERROR = 'error';
+const CONSOLE_METHOD_WARNING = 'warn';
 
 const CONSOLE_METHODS =
   {
@@ -70,41 +70,41 @@ let unsubscribeConsoleLogging;
  */
 const MARKUP =
   {
-    reset: "\x1b[0m",
+    reset: '\x1b[0m',
 
 
-    cyan: "\x1b[36m",
-    magenta: "\x1b[35m",
-    yellow: "\x1b[33m",
-    red: "\x1b[31m",
+    cyan: '\x1b[36m',
+    magenta: '\x1b[35m',
+    yellow: '\x1b[33m',
+    red: '\x1b[31m',
 
-    green: "\x1b[32m",
+    green: '\x1b[32m',
 
-    white: "\x1b[37m",
-    black: "\x1b[30m",
+    white: '\x1b[37m',
+    black: '\x1b[30m',
 
-    brightWhite: "\x1b[97m",
-    brightBlack: "\x1b[90m",
+    brightWhite: '\x1b[97m',
+    brightBlack: '\x1b[90m',
 
-    bgWhite: "\x1b[47m",
+    bgWhite: '\x1b[47m',
 
-    bgBrightBlack: "\x1b[100m",
-    bgBlack: "\x1b[40m",
-    bgRed: "\x1b[41m",
-    bgGreen: "\x1b[42m",
+    bgBrightBlack: '\x1b[100m',
+    bgBlack: '\x1b[40m',
+    bgRed: '\x1b[41m',
+    bgGreen: '\x1b[42m',
     //bgYellow: "\x1b[43m",
-    bgBrightYellow: "\x1b[103m",
-    bgCyan: "\x1b[46m",
-    bgBrightCyan: "\x1b[106m",
-    bgMagenta: "\x1b[45m",
-    bgBlue: "\x1b[44m",
+    bgBrightYellow: '\x1b[103m',
+    bgCyan: '\x1b[46m',
+    bgBrightCyan: '\x1b[106m',
+    bgMagenta: '\x1b[45m',
+    bgBlue: '\x1b[44m',
 
-    bold: "\x1b[1m",
-    dim: "\x1b[2m",
-    italic: "\x1b[3m",
-    underline: "\x1b[4m",
+    bold: '\x1b[1m',
+    dim: '\x1b[2m',
+    italic: '\x1b[3m',
+    underline: '\x1b[4m',
 
-    newline: "\n"
+    newline: '\n'
   };
 
 // -----------------------------------------------------------------------------
@@ -131,7 +131,7 @@ export function disableConsoleLogging()
 export function enableConsoleLogging( eventLogPrinter=defaultEventLogPrinter )
 {
   expectObject( eventLogPrinter,
-    "Invalid parameter for property [eventLogPrinter]");
+    'Invalid parameter for property [eventLogPrinter]');
 
   if( unsubscribeConsoleLogging )
   {
@@ -199,7 +199,7 @@ function tryOutputConsoleTrace( logEvent )
       console.groupCollapsed(`trace (${logEvent.type})`);
     }
     else {
-      console.groupCollapsed(`trace`);
+      console.groupCollapsed('trace');
     }
 
     console.trace();
@@ -216,7 +216,7 @@ function tryOutputConsoleTrace( logEvent )
  */
 export function defaultEventLogPrinter( logEvent )
 {
-  expectObject( logEvent, "Missing or invalid parameter [logEvent]" );
+  expectObject( logEvent, 'Missing or invalid parameter [logEvent]' );
 
   // if( logEvent.type === DEBUG )
   // {
@@ -233,20 +233,20 @@ export function defaultEventLogPrinter( logEvent )
 
     const context = logEvent.context;
 
-    let errorHeader = createHeader( logEvent );
+    const errorHeader = createHeader( logEvent );
 
     if( !(error instanceof Error) )
     {
       const messageOrAttributes = error;
 
-      if( typeof messageOrAttributes === "string" )
+      if( typeof messageOrAttributes === 'string' )
       {
         error = new Error( messageOrAttributes );
       }
 
       if( messageOrAttributes instanceof ArgumentsArray )
       {
-        if( typeof messageOrAttributes[0] === "string" )
+        if( typeof messageOrAttributes[0] === 'string' )
         {
           const message = messageOrAttributes.shift();
 
@@ -257,7 +257,7 @@ export function defaultEventLogPrinter( logEvent )
 
       if( !(error instanceof Error) )
       {
-        error = new Error("Unknown error");
+        error = new Error('Unknown error');
         error.attributes = messageOrAttributes;
       }
     }
@@ -268,7 +268,7 @@ export function defaultEventLogPrinter( logEvent )
     //
     // logEvent does *not* contain an Error
     //
-    let { header,
+    const { header,
           parts } = getHeaderAndParts( logEvent );
 
     // const methodName = typeToConsoleMethod( logEvent.type );
@@ -369,7 +369,7 @@ export function defaultEventLogPrinter( logEvent )
  */
 function printError( { errorHeader, context, error }  )
 {
-  expectObject( error, "Missing or invalid parameter [error]");
+  expectObject( error, 'Missing or invalid parameter [error]');
 
   if( error.cause )
   {
@@ -397,7 +397,7 @@ function printError( { errorHeader, context, error }  )
     if( error.attributes )
     {
       console.log();
-      console.log("Attributes:");
+      console.log('Attributes:');
       console.log( error.attributes );
     }
 
@@ -413,7 +413,7 @@ function printError( { errorHeader, context, error }  )
 
       const cause = causes[j];
 
-      console.log( "Cause:" );
+      console.log( 'Cause:' );
       console.log( cause.message );
       console.log( cause.stack );
 
@@ -434,7 +434,7 @@ function printError( { errorHeader, context, error }  )
     if( context )
     {
       console.log();
-      console.log( "Context:" );
+      console.log( 'Context:' );
       console.log( context );
     }
 
@@ -456,7 +456,7 @@ function printError( { errorHeader, context, error }  )
 
     if( error.attributes )
     {
-      console.log("Attributes:");
+      console.log('Attributes:');
 
       const attributes = error.attributes;
 
@@ -489,7 +489,7 @@ function printError( { errorHeader, context, error }  )
       }
     }
 
-    console.log("Stack:");
+    console.log('Stack:');
     console.log( error.stack );
   }
 }
@@ -497,11 +497,11 @@ function printError( { errorHeader, context, error }  )
 
 // -----------------------------------------------------------------------------
 
-// eslint-disable-next-line no-undef
-const isNodeJs = (typeof process !== "undefined" && process.env);
+ 
+const isNodeJs = (typeof process !== 'undefined' && process.env);
 
-// eslint-disable-next-line no-undef
-const enableMarkup = isNodeJs && ("development" === process.env.NODE_ENV);
+ 
+const enableMarkup = isNodeJs && ('development' === process.env.NODE_ENV);
 
 // -----------------------------------------------------------------------------
 
@@ -518,7 +518,7 @@ function createHeader( logEvent, message )
 {
   const { sequenceId, type, at, context } = logEvent;
 
-  let header = "";
+  let header = '';
 
   let functionName;
 
@@ -652,7 +652,7 @@ function createHeader( logEvent, message )
 
   if( enableMarkup )
   {
-    let headerStyle = "";
+    let headerStyle = '';
 
     switch( logEvent.type )
     {
@@ -711,24 +711,24 @@ function getHeaderAndParts( logEvent )
 {
   const type = logEvent.type;
 
-  let data = logEvent.data;
+  const data = logEvent.data;
 
   if( data instanceof Error )
   {
     throw new Error(
-      "Invalid parameter [logEvent] " +
-      "(eventLog.data should not be an Error object)");
+      'Invalid parameter [logEvent] ' +
+      '(eventLog.data should not be an Error object)');
   }
 
   let header = null;
-  let parts = [];
+  const parts = [];
 
   switch( typeof data )
   {
-    case "string":
+    case 'string':
       if( !data.length )
       {
-        const message = "(empty string)";
+        const message = '(empty string)';
 
         header = createHeader( logEvent, message );
 
@@ -769,9 +769,9 @@ function getHeaderAndParts( logEvent )
       }
       break;
 
-    case "symbol":
+    case 'symbol':
       {
-        const message = `Symbol(${ data.description || "" })`;
+        const message = `Symbol(${ data.description || '' })`;
 
         header = createHeader( logEvent, message );
 
@@ -782,9 +782,9 @@ function getHeaderAndParts( logEvent )
       }
       break;
 
-    case "undefined":
+    case 'undefined':
       {
-        const message = "(undefined)";
+        const message = '(undefined)';
 
         header = createHeader( logEvent, message );
 
@@ -795,9 +795,9 @@ function getHeaderAndParts( logEvent )
       }
       break;
 
-    case "boolean":
-    case "number":
-    case "bigint":
+    case 'boolean':
+    case 'number':
+    case 'bigint':
       {
         const message = `(${typeof data}) ${data}`;
 
@@ -810,7 +810,7 @@ function getHeaderAndParts( logEvent )
       }
       break;
 
-    case "function":
+    case 'function':
       if( data.name )
       {
         const message = `(function ${data.name})`;
@@ -823,7 +823,7 @@ function getHeaderAndParts( logEvent )
         }
       }
       else {
-        const message = `(function)`;
+        const message = '(function)';
 
         header = createHeader( logEvent, message );
 
@@ -834,10 +834,10 @@ function getHeaderAndParts( logEvent )
       }
       break;
 
-    case "object":
+    case 'object':
       if( data === null )
       {
-        const message = `(null)`;
+        const message = '(null)';
 
         header = createHeader( logEvent, message );
 

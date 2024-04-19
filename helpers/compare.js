@@ -1,7 +1,7 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { objectGet } from "./object.js";
+import { objectGet } from './object.js';
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -133,9 +133,9 @@ import { objectGet } from "./object.js";
  */
 export function isGreaterThan( x, y )
 {
-  if( typeof x === "undefined" )
+  if( typeof x === 'undefined' )
   {
-    if( typeof y === "undefined" )
+    if( typeof y === 'undefined' )
     {
       return false;
     }
@@ -143,7 +143,7 @@ export function isGreaterThan( x, y )
     return true;
   }
 
-  if( typeof y === "undefined" )
+  if( typeof y === 'undefined' )
   {
     return false;
   }
@@ -161,9 +161,9 @@ export function isGreaterThan( x, y )
  */
 export function isLessThan( x, y )
 {
-  if( typeof x === "undefined" )
+  if( typeof x === 'undefined' )
   {
-    if( typeof y === "undefined" )
+    if( typeof y === 'undefined' )
     {
       return false;
     }
@@ -171,7 +171,7 @@ export function isLessThan( x, y )
     return false;
   }
 
-  if( typeof y === "undefined" )
+  if( typeof y === 'undefined' )
   {
     return true;
   }

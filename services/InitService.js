@@ -28,7 +28,7 @@ import {
     expectBoolean,
     expectObject,
     expectArray }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import {
     STOPPED,
@@ -38,20 +38,20 @@ import {
     UNAVAILABLE,
     ERROR,
     /*displayState,*/ }
-  from "@hkd-base/helpers/services.js";
+  from '@hkd-base/helpers/services.js';
 
 import ServiceBase,
        { setInitService }
-  from "../classes/ServiceBase.js";
+  from '../classes/ServiceBase.js';
 
 /* ---------------------------------------------------------------- Internals */
 
-const registrations$ = Symbol("registrations");
-const servicesByName$ = Symbol("servicesByName");
+const registrations$ = Symbol('registrations');
+const servicesByName$ = Symbol('servicesByName');
 
-const targetStates$ = Symbol("targetStates");
+const targetStates$ = Symbol('targetStates');
 
-const serviceStateUnsubscribers$ = Symbol("serviceStateUnsubscribers");
+const serviceStateUnsubscribers$ = Symbol('serviceStateUnsubscribers');
 
 /* ------------------------------------------------------------ Service class */
 
@@ -99,7 +99,7 @@ class InitService extends ServiceBase
    */
   async register( params )
   {
-    expectObject( params, "Missing or invalid parameter [params]" );
+    expectObject( params, 'Missing or invalid parameter [params]' );
 
     let { serviceName,
           service,
@@ -107,13 +107,13 @@ class InitService extends ServiceBase
           startOnBoot=true,
           dependencies } = params;
 
-    expectStringOrUndefined( serviceName, "Invalid parameter [serviceName]" );
+    expectStringOrUndefined( serviceName, 'Invalid parameter [serviceName]' );
 
     if( !(service instanceof Object ) || !service.isService )
     {
       throw new Error(
-        "Invalid value return by service loader [params.loader]" +
-        "(expected service instance)" );
+        'Invalid value return by service loader [params.loader]' +
+        '(expected service instance)' );
     }
 
     if( !serviceName )
@@ -131,12 +131,12 @@ class InitService extends ServiceBase
     }
 
     expectObject( config,
-      "Missing or invalid parameter [config]" );
+      'Missing or invalid parameter [config]' );
 
     await service.configure( config );
 
     expectBoolean( startOnBoot,
-      "Missing or invalid parameter [startOnBoot]" );
+      'Missing or invalid parameter [startOnBoot]' );
 
     this[ registrations$ ].push( params );
     this[ servicesByName$ ].set( serviceName, service );
@@ -146,13 +146,13 @@ class InitService extends ServiceBase
     if( dependencies )
     {
       expectArray( dependencies,
-        "Missing or invalid parameter [dependencies]" );
+        'Missing or invalid parameter [dependencies]' );
 
-      for( let dependencyService of dependencies )
+      for( const dependencyService of dependencies )
       {
         expectObject( dependencyService,
-          "Invalid parameter [dependencies] " +
-          "(expected list of service instances)" );
+          'Invalid parameter [dependencies] ' +
+          '(expected list of service instances)' );
 
         service.setDependency( dependencyService );
       }
@@ -209,7 +209,7 @@ class InitService extends ServiceBase
     }
     catch( e )
     {
-      throw new Error( "Initservice.boot() failed", { cause: e } );
+      throw new Error( 'Initservice.boot() failed', { cause: e } );
     }
   }
 
@@ -223,13 +223,13 @@ class InitService extends ServiceBase
   async shutdown()
   {
     try {
-      this.log.info( "InitService: shutdown" );
+      this.log.info( 'InitService: shutdown' );
 
       await this.setTargetState( STOPPED );
     }
     catch( e )
     {
-      console.log( "InitService: shutdown failed", e );
+      console.log( 'InitService: shutdown failed', e );
     }
   }
 
@@ -246,7 +246,7 @@ class InitService extends ServiceBase
   service( serviceName, expectStateRunning=false )
   {
     expectString( serviceName,
-      "Missing or invalid parameter [serviceName]" );
+      'Missing or invalid parameter [serviceName]' );
 
     const servicesByName = this[ servicesByName$ ];
 
@@ -261,7 +261,7 @@ class InitService extends ServiceBase
         else {
           throw new Error(
             `Service [${serviceName}] is in state [${service.getState(true)}]` +
-            `(expected state running)`);
+            '(expected state running)');
         }
       }
     } // end for
@@ -281,7 +281,7 @@ class InitService extends ServiceBase
     this.expectConfigured();
 
     expectString( serviceName,
-      "Missing or invalid parameter [serviceName]" );
+      'Missing or invalid parameter [serviceName]' );
 
     const service = this.service( serviceName );
 
@@ -300,7 +300,7 @@ class InitService extends ServiceBase
     this.expectConfigured();
 
     expectString( serviceName,
-      "Missing or invalid parameter [serviceName]" );
+      'Missing or invalid parameter [serviceName]' );
 
     const service = this.service( serviceName );
 

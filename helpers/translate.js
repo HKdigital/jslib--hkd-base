@@ -2,12 +2,12 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectNotEmptyString,
-         expectObject } from "@hkd-base/helpers/expect.js";
+         expectObject } from '@hkd-base/helpers/expect.js';
 
 import { currentLanguage,
-         LANG_DEFAULT } from "@hkd-base/stores/language.js";
+         LANG_DEFAULT } from '@hkd-base/stores/language.js';
 
-import { systemLog } from "@hkd-base/helpers/log.js";
+import { systemLog } from '@hkd-base/helpers/log.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -24,7 +24,7 @@ const translations_ = {};
 export function setTranslations( translations )
 {
   expectObject( translations,
-    "Missing or invalid parameter [translations]" );
+    'Missing or invalid parameter [translations]' );
 
   for( const textLabel in translations )
   {
@@ -54,9 +54,9 @@ export function setTranslations( translations )
  */
 export function setTranslation( label, translation )
 {
-  expectNotEmptyString( label, "Missing or invalid parameter [label]" );
+  expectNotEmptyString( label, 'Missing or invalid parameter [label]' );
 
-  if( (typeof item === "string" && translation.length > 0) ||
+  if( (typeof item === 'string' && translation.length > 0) ||
       (translation instanceof Object) )
   {
     translations_[ label ] = translation;
@@ -83,7 +83,7 @@ export function text( label, lang )
 {
   if( lang )
   {
-    expectNotEmptyString( lang, "Invalid parameter [lang]" );
+    expectNotEmptyString( lang, 'Invalid parameter [lang]' );
   }
   else {
     lang = currentLanguage.get();
@@ -93,7 +93,7 @@ export function text( label, lang )
 
   let text;
 
-  if( typeof item === "string" )
+  if( typeof item === 'string' )
   {
     text = item; // just a string -> use for all languages
   }

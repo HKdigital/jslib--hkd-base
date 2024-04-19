@@ -14,7 +14,7 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectString }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -57,9 +57,9 @@ export const ALPHABET_BASE_58_MAP =
  */
 export function base58fromNumber( num )
 {
-  let str = "";
+  let str = '';
 
-  if( typeof num !== "bigint" )
+  if( typeof num !== 'bigint' )
   {
     if( Number.isNaN( num ) ||
         num < 0 ||
@@ -67,7 +67,7 @@ export function base58fromNumber( num )
         Math.floor( num ) !== num )
     {
       throw new Error(
-        "Invalid parameter [num], expected not negative safe integer");
+        'Invalid parameter [num], expected not negative safe integer');
     }
 
     num = BigInt(num);
@@ -75,7 +75,7 @@ export function base58fromNumber( num )
 
   while( num >= BASE_SIZE )
   {
-    let mod = num % BASE_SIZE;
+    const mod = num % BASE_SIZE;
     str = ALPHABET_BASE_58[ mod ] + str;
 
     // num = Math.floor( num / BASE_SIZE );
@@ -98,7 +98,7 @@ export function base58fromNumber( num )
  */
 export function isBase58( str )
 {
-  expectString( str, "Missing or invalid parameter [str]" );
+  expectString( str, 'Missing or invalid parameter [str]' );
 
   for( let j = 0, n = str.length; j < n; j = j + 1 )
   {
@@ -127,12 +127,12 @@ export function isBase58( str )
  */
 export function base58toNumber( str, exceptionValue )
 {
-  expectString( str, "Missing or invalid parameter [str]" );
+  expectString( str, 'Missing or invalid parameter [str]' );
 
   let num = BigInt(0);
 
-  let n = str.length;
-  let n_1 = n - 1;
+  const n = str.length;
+  const n_1 = n - 1;
 
   for( let j = 0; j < n; j = j + 1 )
   {
@@ -184,7 +184,7 @@ export function base58toBytes( str )
     //
     // String contains inpair number of characters -> prefix a "0"
     //
-    numBase16 = "0" + numBase16;
+    numBase16 = '0' + numBase16;
   }
 
   const n = numBase16.length;

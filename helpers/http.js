@@ -6,24 +6,24 @@ import { expectNotEmptyString,
          expectObject,
          expectObjectNoArray,
          expectFunction }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { ResponseError,
          AbortError,
          TimeoutError,
          TypeOrValueError }
-  from "@hkd-base/types/error-types.js";
+  from '@hkd-base/types/error-types.js';
 
 import { CONTENT_TYPE }
-  from "@hkd-base/constants/http-headers.js";
+  from '@hkd-base/constants/http-headers.js';
 
 import { APPLICATION_JSON }
-  from "@hkd-base/constants/mime-types.js";
+  from '@hkd-base/constants/mime-types.js';
 
 /* ---------------------------------------------------------------- Internals */
 
-const METHOD_GET = "GET";
-const METHOD_POST = "POST";
+const METHOD_GET = 'GET';
+const METHOD_POST = 'POST';
 
 /**
  * Ensure to return an URL instance
@@ -34,13 +34,13 @@ const METHOD_POST = "POST";
  */
 function toURL( url )
 {
-  if( typeof url === "string" )
+  if( typeof url === 'string' )
   {
     return new URL( url );
   }
   else if( !(url instanceof URL) )
   {
-    throw new TypeOrValueError("Missing or invalid parameter [url]");
+    throw new TypeOrValueError('Missing or invalid parameter [url]');
   }
 
   // already an URL instance
@@ -86,27 +86,27 @@ function toURL( url )
  */
 function setRequestHeaders( target, nameValuePairs )
 {
-  // eslint-disable-next-line no-undef
+   
   if( !(target instanceof Headers) )
   {
     throw new Error(
-      "Invalid parameter [target] (expected Headers object)" );
+      'Invalid parameter [target] (expected Headers object)' );
   }
 
   expectObjectNoArray( nameValuePairs,
-      "Missing or invalid parameter [options.headers]" );
+      'Missing or invalid parameter [options.headers]' );
 
-  // eslint-disable-next-line no-undef
+   
   if( nameValuePairs instanceof Headers )
   {
     throw new Error(
-      "Invalid parameter [nameValuePairs] (should not be a Headers object)");
+      'Invalid parameter [nameValuePairs] (should not be a Headers object)');
   }
 
   for( const name in nameValuePairs )
   {
     expectNotEmptyString( name,
-      "Invalid parameter [nameValuePairs] (missing header name)" );
+      'Invalid parameter [nameValuePairs] (missing header name)' );
 
     const value = nameValuePairs[ name ];
 
@@ -116,7 +116,7 @@ function setRequestHeaders( target, nameValuePairs )
     //
     // Headers should be encoded lowercase in HTTP2
     //
-    let nameLower = name.toLowerCase();
+    const nameLower = name.toLowerCase();
 
     target.set( nameLower, value ); /* overwrites existing value */
   }
@@ -153,13 +153,13 @@ async function getErrorFromResponse( response )
   {
     content = await response.json();
 
-    if( typeof content === "object" )
+    if( typeof content === 'object' )
     {
-      if( typeof content.message === "string" )
+      if( typeof content.message === 'string' )
       {
         message = content.message;
       }
-      else if( typeof content.error === "string" )
+      else if( typeof content.error === 'string' )
       {
         message = content.error;
       }
@@ -175,15 +175,15 @@ async function getErrorFromResponse( response )
 
         if( details )
         {
-          let tmp = [];
+          const tmp = [];
 
           for( const current of details )
           {
-            if( typeof current === "object" && current.message )
+            if( typeof current === 'object' && current.message )
             {
               tmp.push( current.message );
             }
-            else if( typeof tmp.message === "string" )
+            else if( typeof tmp.message === 'string' )
             {
               tmp.push( current );
             }
@@ -192,7 +192,7 @@ async function getErrorFromResponse( response )
             }
           } // end for
 
-          message = tmp.join(", ");
+          message = tmp.join(', ');
         }
       }
     }
@@ -223,7 +223,7 @@ async function getErrorFromResponse( response )
  */
 async function expectResponseOk( response, url )
 {
-  expectObject( response, "Missing or invalid parameter [response]" );
+  expectObject( response, 'Missing or invalid parameter [response]' );
 
   url = toURL( url );
 
@@ -247,17 +247,17 @@ async function expectResponseOk( response, url )
 
   if( 401 === response.status )
   {
-    let errorMessage = "Server returned [401] Unauthorized";
+    let errorMessage = 'Server returned [401] Unauthorized';
 
-    const authValue = response.headers.get("www-authenticate");
+    const authValue = response.headers.get('www-authenticate');
 
     if( authValue )
     {
-      const from = authValue.indexOf("error=");
+      const from = authValue.indexOf('error=');
 
       if( from !== -1 )
       {
-        let to = authValue.indexOf(",", from);
+        let to = authValue.indexOf(',', from);
 
         if( -1 === to )
         {
@@ -273,7 +273,7 @@ async function expectResponseOk( response, url )
 
   // -- Gather additional info for all other responses
 
-  let error = await getErrorFromResponse( response );
+  const error = await getErrorFromResponse( response );
 
   throw new ResponseError(
     `Server returned - ${response.status} ${response.statusText}, ` +
@@ -312,7 +312,7 @@ export async function waitForAndCheckResponse( responsePromise, url )
   if( !(responsePromise instanceof Promise) )
   {
     throw new TypeOrValueError(
-      "Missing or invalid parameter [responsePromise]");
+      'Missing or invalid parameter [responsePromise]');
   }
 
   url = toURL( url );
@@ -373,7 +373,7 @@ export async function jsonGet( { url, urlSearchParams, headers } )
     headers = {};
   }
 
-  headers[ "accept" ] = "application/json";
+  headers[ 'accept' ] = 'application/json';
 
   const responsePromise =
     httpRequest(
@@ -462,11 +462,11 @@ export async function jsonPost(
   }
   else {
     expectObject( headers,
-      "Invalid value for parameter [headers]" );
+      'Invalid value for parameter [headers]' );
   }
 
-  headers[ "accept" ] = "application/json";
-  headers[ "content-type" ] = "application/json";
+  headers[ 'accept' ] = 'application/json';
+  headers[ 'content-type' ] = 'application/json';
 
   const responsePromise =
     httpRequest( { METHOD_POST, url, body, urlSearchParams, headers } );
@@ -647,7 +647,7 @@ export async function httpRequest(
 
   // @see https://developer.mozilla.org/en-US/docs/Web/API/Headers
 
-  // eslint-disable-next-line no-undef
+   
   const requestHeaders = new Headers();
 
   if( headers )
@@ -655,11 +655,11 @@ export async function httpRequest(
     setRequestHeaders( requestHeaders, headers );
 
     if( headers[ CONTENT_TYPE ] === APPLICATION_JSON &&
-        typeof body !== "string" )
+        typeof body !== 'string' )
     {
       throw new Error(
         `Trying to send request with [content-type:${APPLICATION_JSON}], ` +
-        `but body is not a (JSON encoded) string.`);
+        'but body is not a (JSON encoded) string.');
     }
     // IDEA: try to decode the body to catch errors on client side
   }
@@ -680,8 +680,8 @@ export async function httpRequest(
     if( !(urlSearchParams instanceof URLSearchParams) )
     {
       throw new Error(
-        `Invalid parameter [urlSearchParams] ` +
-        `(expected instanceof URLSearchParams)`);
+        'Invalid parameter [urlSearchParams] ' +
+        '(expected instanceof URLSearchParams)');
     }
 
     const existingParams = url.searchParams;
@@ -718,7 +718,7 @@ export async function httpRequest(
   // console.log( "init", init );
   // console.log( "headers", init.headers );
 
-  // eslint-disable-next-line no-undef
+   
   const request = new Request( url, init );
 
   // @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
@@ -766,7 +766,7 @@ export async function httpRequest(
      */
     const timeout = ( delayMs=10000 ) =>
       {
-        expectPositiveNumber( delayMs, "Invalid value for [delayMs]" );
+        expectPositiveNumber( delayMs, 'Invalid value for [delayMs]' );
 
         const timerId =
           setTimeout( () =>
@@ -790,7 +790,7 @@ export async function httpRequest(
     if( requestHandler )
     {
       expectFunction( requestHandler,
-        "Invalid parameter [requestHandler]" );
+        'Invalid parameter [requestHandler]' );
 
       requestHandler( { controller, abort, timeout } );
     }

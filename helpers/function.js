@@ -17,7 +17,7 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectFunction }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -37,7 +37,7 @@ export const noop = () => {};
  */
 export function once( callback )
 {
-  expectFunction( callback, "Missing or invalid parameter [callback]" );
+  expectFunction( callback, 'Missing or invalid parameter [callback]' );
 
   let ignore = false;
 

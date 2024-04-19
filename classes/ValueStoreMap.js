@@ -19,10 +19,10 @@
 
 import { expectFunction,
          expectDefined }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import ValueStore
-  from "@hkd-base/classes/ValueStore.js";
+  from '@hkd-base/classes/ValueStore.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -81,8 +81,8 @@ export default class ValueStoreMap extends Map
    */
   subscribe( key, callback, callOnRegistration=true )
   {
-    expectDefined( key, "Missing or invalid parameter [key]" );
-    expectFunction( callback, "Missing or invalid parameter [callback]" );
+    expectDefined( key, 'Missing or invalid parameter [key]' );
+    expectFunction( callback, 'Missing or invalid parameter [callback]' );
 
     const store = super.get( key );
 
@@ -114,17 +114,17 @@ export default class ValueStoreMap extends Map
    */
   set( key, value )
   {
-    expectDefined( key, "Missing parameter [key]" );
+    expectDefined( key, 'Missing parameter [key]' );
     // expectDefined( value, "Missing parameter [value]" );
 
     if( arguments.length < 2 )
     {
-      throw new Error( "Missing parameter [value]" );
+      throw new Error( 'Missing parameter [value]' );
     }
 
     if( value instanceof ValueStore )
     {
-      throw new Error("Invalid parameter [value] (should not be a store)");
+      throw new Error('Invalid parameter [value] (should not be a store)');
     }
 
     const store = super.get( key );
@@ -156,7 +156,7 @@ export default class ValueStoreMap extends Map
    */
   setObject( item )
   {
-    expectDefined( item, "Missing parameter [item]" );
+    expectDefined( item, 'Missing parameter [item]' );
 
     for( const key in item )
     {
@@ -176,7 +176,7 @@ export default class ValueStoreMap extends Map
    */
   delete( key )
   {
-    expectDefined( key, "Missing or invalid parameter [key]" );
+    expectDefined( key, 'Missing or invalid parameter [key]' );
 
     const store = super.get( key );
 
@@ -199,7 +199,7 @@ export default class ValueStoreMap extends Map
    */
   has( key )
   {
-    expectDefined( key, "Missing or invalid parameter [key]" );
+    expectDefined( key, 'Missing or invalid parameter [key]' );
 
     return super.has( key );
   }
@@ -219,7 +219,7 @@ export default class ValueStoreMap extends Map
    */
   get( key, defaultValue=undefined )
   {
-    expectDefined( key, "Missing or invalid parameter [key]" );
+    expectDefined( key, 'Missing or invalid parameter [key]' );
 
     let store = super.get( key );
 
@@ -296,14 +296,14 @@ export default class ValueStoreMap extends Map
    */
   update( key, updateFn )
   {
-    expectDefined( key, "Missing or invalid parameter [key]" );
-    expectFunction( updateFn, "Missing or invalid parameter [updateFn]" );
+    expectDefined( key, 'Missing or invalid parameter [key]' );
+    expectFunction( updateFn, 'Missing or invalid parameter [updateFn]' );
 
-    let store = super.get( key );
+    const store = super.get( key );
 
     if( !(store instanceof ValueStore) )
     {
-      store = new ValueStore();
+      const newStore = new ValueStore();
       super.set( key, newStore );
     }
 

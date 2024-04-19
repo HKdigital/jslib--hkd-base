@@ -1,11 +1,11 @@
 
-import { generateLocalId } from "@hkd-base/helpers/unique.js";
+import { generateLocalId } from '@hkd-base/helpers/unique.js';
 
-import ValueStore from "@hkd-base/classes/ValueStore.js";
+import ValueStore from '@hkd-base/classes/ValueStore.js';
 
 /* ------------------------------------------------------------------ Exports */
 
-export let caseId = new ValueStore( generateLocalId() );
+export const caseId = new ValueStore( generateLocalId() );
 
 // -----------------------------------------------------------------------------
 

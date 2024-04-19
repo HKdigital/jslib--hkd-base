@@ -5,7 +5,7 @@
 // @see https://developer.mozilla.org/
 //    en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction
 //
-const AsyncFunction = Object.getPrototypeOf( async function(){} ).constructor;
+const AsyncFunction = Object.getPrototypeOf( async () =>{} ).constructor;
 const objectToString = Object.prototype.toString;
 
 /* ------------------------------------------------------------------ Exports */
@@ -26,7 +26,7 @@ export function isArrayLike( item )
     return false;
   }
 
-  if( "length" in item )
+  if( 'length' in item )
   {
     return true;
   }
@@ -90,7 +90,7 @@ export function isArrayOfPrimitives( arr )
 export function isAsyncIterator( value )
 {
   if( !(value instanceof Object) ||
-        typeof value[ Symbol.asyncIterator ] !== "function" )
+        typeof value[ Symbol.asyncIterator ] !== 'function' )
   {
     return false;
   }
@@ -136,7 +136,7 @@ export function isAsyncFunction( value )
 export function isIterable( value )
 {
   if( !(value instanceof Object) ||
-        typeof value[ Symbol.iterator ] !== "function" )
+        typeof value[ Symbol.iterator ] !== 'function' )
   {
     return false;
   }
@@ -159,7 +159,7 @@ export function isObject( value )
 {
   if( !(value instanceof Object) )
   {
-    if( value && typeof value === "object" )
+    if( value && typeof value === 'object' )
     {
       // e.g. obj = Object.create(null);
       return true;

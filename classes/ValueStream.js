@@ -32,9 +32,9 @@
 
 import { expectString,
          expectObject,
-         expectFunction } from "@hkd-base/helpers/expect.js";
+         expectFunction } from '@hkd-base/helpers/expect.js';
 
-import ValueStore from "@hkd-base/classes/ValueStore.js";
+import ValueStore from '@hkd-base/classes/ValueStore.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -100,31 +100,31 @@ export default class ValueStream extends ValueStore
       target,
       eventName,
       callbackFn,
-      registerFunctionName = "addEventListener",
-      unregisterFunctionName = "removeEventListener"
+      registerFunctionName = 'addEventListener',
+      unregisterFunctionName = 'removeEventListener'
     } )
   {
     expectObject( target,
-      "Missing or invalid parameter [target]" );
+      'Missing or invalid parameter [target]' );
 
     expectString( eventName,
-      "Missing or invalid parameter [eventName]" );
+      'Missing or invalid parameter [eventName]' );
 
     expectFunction( callbackFn,
-      "Missing or invalid parameter [callbackFn]" );
+      'Missing or invalid parameter [callbackFn]' );
 
     expectString( registerFunctionName,
-      "Invalid parameter [registerFunctionName]" );
+      'Invalid parameter [registerFunctionName]' );
 
-    if( typeof target[ registerFunctionName ] !== "function" )
+    if( typeof target[ registerFunctionName ] !== 'function' )
     {
       throw new Error(
         `Invalid registerFunctionName [${registerFunctionName}]`);
     }
 
-    expectString( unregisterFunctionName, "Invalid parameter [unregisterFn]" );
+    expectString( unregisterFunctionName, 'Invalid parameter [unregisterFn]' );
 
-    if( typeof target[ unregisterFunctionName ] !== "function" )
+    if( typeof target[ unregisterFunctionName ] !== 'function' )
     {
       throw new Error(
         `Invalid unregisterFunctionName [${unregisterFunctionName}]`);
@@ -196,12 +196,12 @@ export default class ValueStream extends ValueStore
     } )
   {
     expectObject( store,
-      "Missing or invalid parameter [store]" );
+      'Missing or invalid parameter [store]' );
 
     if( callbackFn )
     {
       expectFunction( callbackFn,
-        "Missing or invalid parameter [callbackFn]" );
+        'Missing or invalid parameter [callbackFn]' );
     }
 
     let unsubscibeFn;
@@ -218,7 +218,7 @@ export default class ValueStream extends ValueStore
               if( undefined !== unexpectedValue )
               {
                 throw new Error(
-                  `A store subscriber should not return any value`);
+                  'A store subscriber should not return any value');
               }
 
             }  );

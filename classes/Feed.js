@@ -3,27 +3,27 @@
 
 import { expectNumber,
          expectFunction }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import ValueStore
-  from "@hkd-base/classes/ValueStore.js";
+  from '@hkd-base/classes/ValueStore.js';
 
 /* ---------------------------------------------------------------- Internals */
 
-const processor$ = Symbol("processor");
+const processor$ = Symbol('processor');
 
-const url$ = Symbol("url");
+const url$ = Symbol('url');
 
-const data$ = Symbol("data");
+const data$ = Symbol('data');
 
-const eventSource$ = Symbol("eventSource");
+const eventSource$ = Symbol('eventSource');
 
-const connect$ = Symbol("connect");
-const disconnect$ = Symbol("disconnect");
+const connect$ = Symbol('connect');
+const disconnect$ = Symbol('disconnect');
 
-const autoReconnect$ = Symbol("autoReconnect");
+const autoReconnect$ = Symbol('autoReconnect');
 
-const destroyed$ = Symbol("destroyed");
+const destroyed$ = Symbol('destroyed');
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -50,12 +50,12 @@ export default class Feed
   constructor( processor, EventSourceClass )
   {
     expectFunction( processor,
-      "Missing or invalid parameter [processor]" );
+      'Missing or invalid parameter [processor]' );
 
     this[ processor$ ] = ( eventOrError ) => {
 
       if( !(eventOrError instanceof Error) &&
-           "error" === eventOrError.type)
+           'error' === eventOrError.type)
       {
         // console.log( eventOrError );
 
@@ -67,7 +67,7 @@ export default class Feed
 
       if( value === undefined )
       {
-        throw new Error("Processor function should not return [undefined]");
+        throw new Error('Processor function should not return [undefined]');
       }
 
       this[ data$ ].set( value );
@@ -77,16 +77,16 @@ export default class Feed
     {
       this.EventSourceClass = EventSourceClass;
     }
-    // eslint-disable-next-line no-undef
+     
     else if( EventSource !== undefined )
     {
-      // eslint-disable-next-line no-undef
+       
       this.EventSourceClass = EventSource;
     }
     else {
       throw new Error(
-        "Missing parameter [EventSourceClass] and " +
-        "global [EventSOurce] is not available");
+        'Missing parameter [EventSourceClass] and ' +
+        'global [EventSOurce] is not available');
     }
 
     // --
@@ -134,7 +134,7 @@ export default class Feed
   {
     if( this[ destroyed$ ] )
     {
-      throw new Error("Feed has been destroyed");
+      throw new Error('Feed has been destroyed');
     }
 
     return this[ data$ ].get();
@@ -154,7 +154,7 @@ export default class Feed
   {
     if( this[ destroyed$ ] )
     {
-      throw new Error("Feed has been destroyed");
+      throw new Error('Feed has been destroyed');
     }
 
     return this[ data$ ].subscribe( ...arguments );
@@ -172,7 +172,7 @@ export default class Feed
   {
     if( this[ destroyed$ ] )
     {
-      throw new Error("Feed has been destroyed");
+      throw new Error('Feed has been destroyed');
     }
 
     //console.log( `Feed: configure [${url}]` );
@@ -181,9 +181,9 @@ export default class Feed
 
     if( url )
     {
-      if( typeof url !== "string" && !(url instanceof URL) )
+      if( typeof url !== 'string' && !(url instanceof URL) )
       {
-        throw new Error( "Missing or invalid parameter [url]" );
+        throw new Error( 'Missing or invalid parameter [url]' );
       }
     }
 
@@ -213,7 +213,7 @@ export default class Feed
     if( this[ eventSource$ ] )
     {
       throw new Error(
-        "Property [eventSource] already defined (this should not happen)");
+        'Property [eventSource] already defined (this should not happen)');
     }
 
     this[ url$ ] = url;
@@ -254,7 +254,7 @@ export default class Feed
   {
     if( this[ destroyed$ ] )
     {
-      throw new Error("Feed has already been destroyed");
+      throw new Error('Feed has already been destroyed');
     }
 
     this.disconnectAndSetNull();
@@ -297,12 +297,12 @@ export default class Feed
   {
     if( this[ destroyed$ ] )
     {
-      throw new Error("Feed has been destroyed");
+      throw new Error('Feed has been destroyed');
     }
 
     console.log(`reconnect [${delay}]`);
 
-    expectNumber( delay, "Invalid parameter [delay]" );
+    expectNumber( delay, 'Invalid parameter [delay]' );
 
     this[ disconnect$ ]();
     setTimeout( () => {
@@ -320,7 +320,7 @@ export default class Feed
   {
     if( this[ destroyed$ ] )
     {
-      throw new Error("Feed has been destroyed");
+      throw new Error('Feed has been destroyed');
     }
 
     // console.log( `Feed: disconnect and set null` );
@@ -367,7 +367,7 @@ export default class Feed
 
     if( this[ eventSource$ ] )
     {
-      throw new Error("Property [eventSource$] should be null");
+      throw new Error('Property [eventSource$] should be null');
     }
 
     let url = this[ url$ ];
@@ -380,9 +380,9 @@ export default class Feed
 
     this[ eventSource$ ] = new this.EventSourceClass( url );
 
-    this[ eventSource$ ].addEventListener( "message", this[ processor$ ] );
+    this[ eventSource$ ].addEventListener( 'message', this[ processor$ ] );
 
-    this[ eventSource$ ].addEventListener( "error", ( e ) => {
+    this[ eventSource$ ].addEventListener( 'error', ( e ) => {
       this[ processor$ ]( e );
 
       if( this[ autoReconnect$ ] )

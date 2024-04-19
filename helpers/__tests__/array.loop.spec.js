@@ -1,7 +1,7 @@
 
-import { jest } from "@jest/globals";
+import { jest } from '@jest/globals';
 
-import { loop } from "@rootDir/helpers/array.js";
+import { loop } from '@rootDir/helpers/array.js';
 
 /* -------------------------------------------------------------------- Tests */
 
@@ -36,15 +36,15 @@ describe('loop( <Array>, <callback> )', () =>
 {
   test('should call <callback> for each Array value', () => {
 
-    const arr = [ "a", "b", "c" ];
+    const arr = [ 'a', 'b', 'c' ];
 
     const callback = jest.fn();
 
     loop( arr, callback );
 
-    expect( callback ).toHaveBeenNthCalledWith( 1, "a" );
-    expect( callback ).toHaveBeenNthCalledWith( 2, "b" );
-    expect( callback ).toHaveBeenNthCalledWith( 3, "c" );
+    expect( callback ).toHaveBeenNthCalledWith( 1, 'a' );
+    expect( callback ).toHaveBeenNthCalledWith( 2, 'b' );
+    expect( callback ).toHaveBeenNthCalledWith( 3, 'c' );
 
   } );
 } );
@@ -55,15 +55,15 @@ describe('loop( <Array>, <callback>, <additionalArguments> )', () =>
 {
   test('should pass addition arguments to callback', () => {
 
-    const arr = [ "a", "b", "c" ];
+    const arr = [ 'a', 'b', 'c' ];
 
     const callback = jest.fn();
 
-    loop( arr, callback, [ "abc", "xyz" ] );
+    loop( arr, callback, [ 'abc', 'xyz' ] );
 
-    expect( callback ).toHaveBeenNthCalledWith( 1, "a", "abc", "xyz" );
-    expect( callback ).toHaveBeenNthCalledWith( 2, "b", "abc", "xyz" );
-    expect( callback ).toHaveBeenNthCalledWith( 3, "c", "abc", "xyz" );
+    expect( callback ).toHaveBeenNthCalledWith( 1, 'a', 'abc', 'xyz' );
+    expect( callback ).toHaveBeenNthCalledWith( 2, 'b', 'abc', 'xyz' );
+    expect( callback ).toHaveBeenNthCalledWith( 3, 'c', 'abc', 'xyz' );
 
   } );
 } );

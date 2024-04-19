@@ -32,24 +32,24 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectFunction }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import ValueStore
-  from "@hkd-base/classes/ValueStore.js";
+  from '@hkd-base/classes/ValueStore.js';
 
 /* ---------------------------------------------------------------- Internals */
 
-const subscribers$ = Symbol("subscribers$");
+const subscribers$ = Symbol('subscribers$');
 
-const deriveFn$ = Symbol("deriveFn");
-const stores$ = Symbol("stores");
+const deriveFn$ = Symbol('deriveFn');
+const stores$ = Symbol('stores');
 
-const inputUnsubscribers$ = Symbol("inputUnsubscribers");
-const destroyed$ = Symbol("destroyed");
+const inputUnsubscribers$ = Symbol('inputUnsubscribers');
+const destroyed$ = Symbol('destroyed');
 
-const unsubscribeFromHasSubscribers$ = Symbol("unsubscribeFromHasSubscribers");
+const unsubscribeFromHasSubscribers$ = Symbol('unsubscribeFromHasSubscribers');
 
-const currentValue$ = Symbol("currentValue");
+const currentValue$ = Symbol('currentValue');
 
 /* ------------------------------------------------------------------- Export */
 
@@ -116,7 +116,7 @@ export default class DerivedStore
       this[ stores$ ] = map;
     }
     else {
-      throw new Error("Invalid parameter [stores] (expected Map or Array)");
+      throw new Error('Invalid parameter [stores] (expected Map or Array)');
     }
 
     // -- Ensure `storesMap` only contains store instances
@@ -124,10 +124,10 @@ export default class DerivedStore
     for( const [ label, store ] of this[ stores$ ].entries() )
     {
       if( !(store instanceof Object) ||
-          typeof store.subscribe !== "function" )
+          typeof store.subscribe !== 'function' )
       {
         throw new Error(
-          `Invalid parameter [stores]. ` +
+          'Invalid parameter [stores]. ' +
           `Store[${label}] has no method subscribe` );
       }
     }
@@ -154,7 +154,7 @@ export default class DerivedStore
       };
 
     expectFunction( deriveFn,
-      "Missing or invalid parameter [deriveFn]" );
+      'Missing or invalid parameter [deriveFn]' );
 
     // Pass property `enableHasSubscribers`,
     // value is not used, so leave it `undefined`
@@ -186,7 +186,7 @@ export default class DerivedStore
             {
               if( inputUnsubscribers.has( store ) )
               {
-                throw new Error(`Duplicate input store instance`);
+                throw new Error('Duplicate input store instance');
               }
 
               const unsubscribe = store.subscribe( callSubscribersBound );
@@ -217,7 +217,7 @@ export default class DerivedStore
   {
     if( this[ destroyed$ ] )
     {
-      throw new Error("The derived store has already been destroyed");
+      throw new Error('The derived store has already been destroyed');
     }
 
     this[ destroyed$ ] = true;
@@ -254,14 +254,14 @@ export default class DerivedStore
   {
     if( this[ destroyed$ ] )
     {
-      throw new Error("Cannot subscribe. The derived store has been destroyed");
+      throw new Error('Cannot subscribe. The derived store has been destroyed');
     }
 
-    expectFunction( callback, "Missing or invalid parameter [callback]" );
+    expectFunction( callback, 'Missing or invalid parameter [callback]' );
 
     if( this[ subscribers$ ].has( callback ) )
     {
-      throw new Error("Callback has already been registered");
+      throw new Error('Callback has already been registered');
     }
 
     this[ subscribers$ ].add( callback );
@@ -317,7 +317,7 @@ export default class DerivedStore
   {
     if( this[ destroyed$ ] )
     {
-      throw new Error("Cannot get value. The derived store has been destroyed");
+      throw new Error('Cannot get value. The derived store has been destroyed');
     }
 
     return this[ deriveFn$ ]( this[ stores$ ] );
@@ -332,7 +332,7 @@ export default class DerivedStore
    */
   set()
   {
-    throw new Error("Cannot set a value on a derived store");
+    throw new Error('Cannot set a value on a derived store');
   }
 
   // -------------------------------------------------------------------- Method
@@ -342,7 +342,7 @@ export default class DerivedStore
    */
   update()
   {
-    throw new Error("Cannot update a value of a derived store");
+    throw new Error('Cannot update a value of a derived store');
   }
 
   /* ------------------------------------------------------- Internal methods */

@@ -1,6 +1,6 @@
 
 import { sortByPathValue,
-         PATH_SEPARATOR } from "@rootDir/helpers/array.js";
+         PATH_SEPARATOR } from '@rootDir/helpers/array.js';
 
 /* -------------------------------------------------------------------- Tests */
 
@@ -21,12 +21,12 @@ describe('sortByPathValue( <items>, <path> )', () =>
 
     const items =
       [
-        { value: 2, nested: { value: "c" } },
-        { value: 1, nested: { value: "b" } },
-        { value: 3, nested: { value: "a" } }
+        { value: 2, nested: { value: 'c' } },
+        { value: 1, nested: { value: 'b' } },
+        { value: 3, nested: { value: 'a' } }
       ];
 
-    sortByPathValue( items, "value" ) ;
+    sortByPathValue( items, 'value' ) ;
 
     expect( items[0].value ).toEqual( 1 );
     expect( items[1].value ).toEqual( 2 );

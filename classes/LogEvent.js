@@ -2,11 +2,11 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectObjectOrNull,
-         expectDefined } from "@hkd-base/helpers/expect.js";
+         expectDefined } from '@hkd-base/helpers/expect.js';
 
-import { DEBUG, INFO, WARNING, ERROR } from "@hkd-base/types/log-types.js";
+import { DEBUG, INFO, WARNING, ERROR } from '@hkd-base/types/log-types.js';
 
-import { BOOT_STAMP } from "@hkd-base/helpers/unique.js";
+import { BOOT_STAMP } from '@hkd-base/helpers/unique.js';
 
 let sequenceCounter = 1;
 
@@ -35,11 +35,11 @@ export default class LogEvent
         break;
 
       default:
-       throw new Error("Missing or invalid parameter [type]");
+       throw new Error('Missing or invalid parameter [type]');
     }
 
-    expectObjectOrNull( context, "Missing or invalid parameter [context]" );
-    expectDefined( data, "Missing or invalid parameter [data]" );
+    expectObjectOrNull( context, 'Missing or invalid parameter [context]' );
+    expectDefined( data, 'Missing or invalid parameter [data]' );
 
     this.type = type;
     this.systemId = BOOT_STAMP;

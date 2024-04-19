@@ -7,18 +7,18 @@ import {
   expectArray,
   expectFunction,
   expectArrayLike,
-  expectArrayOfStrings} from "./expect.js";
+  expectArrayOfStrings} from './expect.js';
 
 import {
   smallestFirst,
   largestFirst,
   /*compareUsingKey,
-  compareUsingPath*/ } from "./compare.js";
+  compareUsingPath*/ } from './compare.js';
 
 import { objectGet,
-         PATH_SEPARATOR } from "./object.js";
+         PATH_SEPARATOR } from './object.js';
 
-import Selector from "../classes/Selector.js";
+import Selector from '../classes/Selector.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -27,7 +27,7 @@ const arrayConcat = Array.prototype.concat;
 
 /* ------------------------------------------------------------------ Exports */
 
-export { PATH_SEPARATOR } from "./object.js";
+export { PATH_SEPARATOR } from './object.js';
 
 export { smallestFirst, largestFirst };
 
@@ -121,7 +121,7 @@ export function toArray( value, start, end )
 export async function toArrayAsync( value )
 {
   if( (value instanceof Object) &&
-      typeof value[ Symbol.asyncIterator ] === "function" )
+      typeof value[ Symbol.asyncIterator ] === 'function' )
   {
     // value is an async iterator
 
@@ -159,7 +159,7 @@ export async function toArrayAsync( value )
  */
 export function toArrayPath( path, pathSeparator=PATH_SEPARATOR )
 {
-  if( typeof path === "string" )
+  if( typeof path === 'string' )
   {
     return path.split( pathSeparator );
   }
@@ -170,7 +170,7 @@ export function toArrayPath( path, pathSeparator=PATH_SEPARATOR )
   }
   else {
     throw new Error(
-      "Missing or invalid parameter [path] (expected string or array)");
+      'Missing or invalid parameter [path] (expected string or array)');
   }
 }
 
@@ -189,14 +189,14 @@ export function toArrayPath( path, pathSeparator=PATH_SEPARATOR )
  */
 export function loop( arr, callback, additionalArguments )
 {
-  expectFunction( callback, "Missing or invalid parameter [callback]" );
+  expectFunction( callback, 'Missing or invalid parameter [callback]' );
 
   if( !arr )
   {
     return;
   }
 
-  expectArray( arr, "Missing or invalid parameter [arr]" );
+  expectArray( arr, 'Missing or invalid parameter [arr]' );
 
   if( !arr.length )
   {
@@ -219,7 +219,7 @@ export function loop( arr, callback, additionalArguments )
   // >> CASE B: additional arguments
 
   expectArrayLike( additionalArguments,
-    "Invalid value for parameter [additionalArguments]" );
+    'Invalid value for parameter [additionalArguments]' );
 
   const args = [ null, ...additionalArguments ];
 
@@ -255,16 +255,16 @@ export function pathValues( items, path, options={} )
   // == Process parameters
 
   expectArray( items,
-    "Missing or invalid parameter [items]" );
+    'Missing or invalid parameter [items]' );
 
   const { outputAsSet=false, pathSeparator=PATH_SEPARATOR } = options;
 
-  if( typeof path === "string" )
+  if( typeof path === 'string' )
   {
     path = toArrayPath( path, pathSeparator );
   }
   else {
-    expectArrayOfStrings( path, "Missing or invalid parameter [path]" );
+    expectArrayOfStrings( path, 'Missing or invalid parameter [path]' );
   }
 
   // >> CASE A: Output as plain Array
@@ -321,11 +321,11 @@ export function pathValues( items, path, options={} )
 export function sortByKeyValue( items, key, compareFn=smallestFirst )
 {
   expectFunction( compareFn,
-    "Missing or invalid parameter [compareFn]" );
+    'Missing or invalid parameter [compareFn]' );
 
-  expectArray( items, "Invalid or missing parameter [items]" );
+  expectArray( items, 'Invalid or missing parameter [items]' );
 
-  expectString( key, "Invalid parameter [key]");
+  expectString( key, 'Invalid parameter [key]');
 
   items.sort( ( itemA, itemB ) => {
 
@@ -353,11 +353,11 @@ export function sortByKeyValue( items, key, compareFn=smallestFirst )
 export function sortByKeyValueReversed( items, key, compareFn=largestFirst )
 {
   expectFunction( compareFn,
-    "Missing or invalid parameter [compareFn]" );
+    'Missing or invalid parameter [compareFn]' );
 
-  expectArray( items, "Invalid or missing parameter [items]" );
+  expectArray( items, 'Invalid or missing parameter [items]' );
 
-  expectString( key, "Invalid parameter [key]");
+  expectString( key, 'Invalid parameter [key]');
 
   items.sort( ( itemA, itemB ) => {
 
@@ -386,16 +386,16 @@ export function sortByKeyValueReversed( items, key, compareFn=largestFirst )
 export function sortByPathValue( items, path, compareFn=smallestFirst )
 {
   expectFunction( compareFn,
-    "Missing or invalid parameter [compareFn]" );
+    'Missing or invalid parameter [compareFn]' );
 
-  expectArray( items, "Invalid or missing parameter [items]" );
+  expectArray( items, 'Invalid or missing parameter [items]' );
 
-  if( typeof path === "string" )
+  if( typeof path === 'string' )
   {
     path = toArrayPath( path );
   }
   else {
-    expectArrayOfStrings( path, "Invalid parameter [path]");
+    expectArrayOfStrings( path, 'Invalid parameter [path]');
   }
 
   const cache = new Map();
@@ -480,8 +480,8 @@ export function findAll( arr, selector )
  */
 export function arrayToObject( arr, keys )
 {
-  expectArray( arr, "Invalid or missing parameter [arr]" );
-  expectArray( keys, "Invalid or missing parameter [keys]" );
+  expectArray( arr, 'Invalid or missing parameter [arr]' );
+  expectArray( keys, 'Invalid or missing parameter [keys]' );
 
   const obj = {};
 

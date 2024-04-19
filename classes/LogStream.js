@@ -2,25 +2,25 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectObject,
-         expectObjectOrNull } from "@hkd-base/helpers/expect.js";
+         expectObjectOrNull } from '@hkd-base/helpers/expect.js';
 
-import { InternalEventOrLogError } from "@hkd-base/types/error-types.js";
+import { InternalEventOrLogError } from '@hkd-base/types/error-types.js';
 
-import ValueStore from "@hkd-base/classes/ValueStore.js";
+import ValueStore from '@hkd-base/classes/ValueStore.js';
 
-import { ArgumentsArray } from "@hkd-base/types/array-types.js";
+import { ArgumentsArray } from '@hkd-base/types/array-types.js';
 
 // import { getTwoChar10ms } from "@hkd-base/helpers/unique.js";
 
-import { DEBUG, INFO, WARNING, ERROR } from "@hkd-base/types/log-types.js";
+import { DEBUG, INFO, WARNING, ERROR } from '@hkd-base/types/log-types.js';
 
-import LogEvent from "@hkd-base/classes/LogEvent.js";
+import LogEvent from '@hkd-base/classes/LogEvent.js';
 
 /* ---------------------------------------------------------------- Internals */
 
 // const isNodeJs = (typeof process !== "undefined" && process.env);
 
-const INTERNAL_LOG_OR_EVENT_ERROR = "internal-log-or-event-error";
+const INTERNAL_LOG_OR_EVENT_ERROR = 'internal-log-or-event-error';
 
 /* ------------------------------------------------------------- Export class */
 
@@ -43,10 +43,10 @@ export default class LogStream extends ValueStore
     super();
 
     expectObjectOrNull( context,
-      "Invalid value for parameter [context]" );
+      'Invalid value for parameter [context]' );
 
     Object.defineProperty(
-      this, "context",
+      this, 'context',
       {
         value: context ? { ...context } : null,
         enumerable: false
@@ -73,7 +73,7 @@ export default class LogStream extends ValueStore
   {
     if( !(logStream instanceof LogStream) )
     {
-      throw new Error("Missing or invalid parameter [logStream]");
+      throw new Error('Missing or invalid parameter [logStream]');
     }
 
     return this.subscribe( ( logEvent ) =>
@@ -84,7 +84,7 @@ export default class LogStream extends ValueStore
           return;
         }
 
-        expectObject( logEvent, "Invalid parameter [logEvent]" );
+        expectObject( logEvent, 'Invalid parameter [logEvent]' );
 
         // console.log( "sendTo", logEvent );
 
@@ -151,7 +151,7 @@ export default class LogStream extends ValueStore
   {
     if( arguments.length !== 1 )
     {
-      throw new Error("Method [error] expects a single argument");
+      throw new Error('Method [error] expects a single argument');
     }
 
     const logEvent = this._toLogEvent( ERROR, arguments );
@@ -185,7 +185,7 @@ export default class LogStream extends ValueStore
         break;
 
       case 0:
-        data = "(empty)";
+        data = '(empty)';
         // throw new Error("Expected at least one argument");
         break;
 
@@ -201,14 +201,14 @@ export default class LogStream extends ValueStore
 
     let logEvent;
 
-    let context = this.context;
+    const context = this.context;
 
     // console.log( "####_toLogEvent", args, context );
 
     try {
       if( undefined === data )
       {
-        throw new Error("The data to log should not be undefined");
+        throw new Error('The data to log should not be undefined');
       }
 
       logEvent = new LogEvent( { type, context, data } );
@@ -217,7 +217,7 @@ export default class LogStream extends ValueStore
     {
       const error =
         new InternalEventOrLogError(
-          "Failed to construct LogEvent instance", { cause: e } );
+          'Failed to construct LogEvent instance', { cause: e } );
 
       const logEvent =
         new LogEvent( { type: ERROR, context, data: error } );

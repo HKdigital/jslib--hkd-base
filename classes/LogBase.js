@@ -22,9 +22,9 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { systemLog } from "@hkd-base/helpers/log.js";
+import { systemLog } from '@hkd-base/helpers/log.js';
 
-import LogStream from "@hkd-base/classes/LogStream.js";
+import LogStream from '@hkd-base/classes/LogStream.js';
 
 /* ---------------------------------------------------------------- Internals */
 

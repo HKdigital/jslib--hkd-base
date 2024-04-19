@@ -19,10 +19,10 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { TypeOrValueError }
-  from "../types/error-types.js";
+  from '../types/error-types.js';
 
 import { RE_URI_COMPONENT }
-  from "../constants/regexp.js";
+  from '../constants/regexp.js';
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -42,22 +42,22 @@ export function type( value )
 
   switch( typeofValue )
   {
-    case "object":
+    case 'object':
       if( value === null )
       {
-        return "null";
+        return 'null';
       }
       else if( value instanceof Promise )
       {
-        return "Promise";
+        return 'Promise';
       }
       else if( value instanceof Map )
       {
-        return "Map";
+        return 'Map';
       }
       else if( value instanceof Set )
       {
-        return "Set";
+        return 'Set';
       }
       // else if( typeof value.next === "function" )
       // {
@@ -68,7 +68,7 @@ export function type( value )
       //   return "ArrayBuffer";
       // }
 
-      return "object";
+      return 'object';
 
     default:
       return typeofValue;
@@ -93,7 +93,7 @@ export function expected( errorText, expectedText, value )
 {
   if( !errorText && !expectedText )
   {
-    throw new Error("Missing parameter [errorText] or [expectedText]");
+    throw new Error('Missing parameter [errorText] or [expectedText]');
   }
 
   if( 3 === arguments.length )
@@ -116,7 +116,7 @@ export function expected( errorText, expectedText, value )
     throw new TypeOrValueError( expectedText );
   }
 
-  if( !errorText.includes("(expected") )
+  if( !errorText.includes('(expected') )
   {
     // Combine error text and expected text into a single error message
     throw new TypeOrValueError( `${errorText} (${expectedText})` );
@@ -137,10 +137,10 @@ export function expected( errorText, expectedText, value )
  */
 export function expectDefined( value, errorText )
 {
-  if( typeof value === "undefined" )
+  if( typeof value === 'undefined' )
   {
     expected( errorText,
-      "expected a definined value" );
+      'expected a definined value' );
   }
 }
 
@@ -159,7 +159,7 @@ export function expectNotNull( value, errorText )
     return;
   }
 
-  expected( errorText, "expected null", value );
+  expected( errorText, 'expected null', value );
 }
 
 // -----------------------------------------------------------------------------
@@ -174,7 +174,7 @@ export function expectArray( value, errorText )
 {
   if( !(value instanceof Array) )
   {
-    expected( errorText, "expected array", value );
+    expected( errorText, 'expected array', value );
   }
 }
 
@@ -190,7 +190,7 @@ export function expectNotEmptyArray( value, errorText )
 {
   if( !(value instanceof Array) || !value.length )
   {
-    expected( errorText, "expected not empty array", value );
+    expected( errorText, 'expected not empty array', value );
   }
 }
 
@@ -206,7 +206,7 @@ export function expectArrayLike( value, errorText )
 {
   if( !(value instanceof Object) || undefined === value.length )
   {
-    expected( errorText, "expected array-like object", value );
+    expected( errorText, 'expected array-like object', value );
   }
 }
 
@@ -220,15 +220,15 @@ export function expectArrayLike( value, errorText )
  */
 export function expectArrayBuffer( value, errorText )
 {
-  if( typeof value === "function" )
+  if( typeof value === 'function' )
   {
     expected( errorText,
-      "expected Object, not a function" );
+      'expected Object, not a function' );
   }
 
   if( !(value instanceof ArrayBuffer) )
   {
-    expected( errorText, "expected ArrayBuffer", value );
+    expected( errorText, 'expected ArrayBuffer', value );
   }
 }
 
@@ -244,14 +244,14 @@ export function expectArrayOfStrings( value, errorText )
 {
   if( !(value instanceof Array) )
   {
-    expected( errorText, "expected array of strings", value );
+    expected( errorText, 'expected array of strings', value );
   }
 
   // -- Check if all array items are strings
 
   for( let j = 0, n = value.length; j < n; j = j + 1 )
   {
-    if( typeof value[ j ] !== "string" )
+    if( typeof value[ j ] !== 'string' )
     {
       expected( errorText,
         `expected array value [${j}] to be a string`, value[ j ] );
@@ -271,7 +271,7 @@ export function expectArrayOrUndefined( value, errorText )
 {
   if( undefined !== value && !(value instanceof Array) )
   {
-    expected( errorText, "expected array or undefined", value );
+    expected( errorText, 'expected array or undefined', value );
   }
 }
 
@@ -294,9 +294,9 @@ export function expectArrayOrUndefined( value, errorText )
 export function expectAsyncIterator( value, errorText )
 {
   if( !(value instanceof Object) ||
-      typeof value[ Symbol.asyncIterator ] !== "function" )
+      typeof value[ Symbol.asyncIterator ] !== 'function' )
   {
-    expected( errorText, "expected async iterator", value );
+    expected( errorText, 'expected async iterator', value );
   }
 }
 
@@ -310,9 +310,9 @@ export function expectAsyncIterator( value, errorText )
  */
 export function expectBoolean( value, errorText )
 {
-  if( typeof value !== "boolean" )
+  if( typeof value !== 'boolean' )
   {
-    expected( errorText, "expected boolean", value );
+    expected( errorText, 'expected boolean', value );
   }
 }
 
@@ -326,9 +326,9 @@ export function expectBoolean( value, errorText )
  */
 export function expectFunction( value, errorText )
 {
-  if( typeof value !== "function" )
+  if( typeof value !== 'function' )
   {
-    expected( errorText, "expected function", value );
+    expected( errorText, 'expected function', value );
   }
 }
 
@@ -343,9 +343,9 @@ export function expectFunction( value, errorText )
  */
 export function expectClass( value, errorText )
 {
-  if( typeof value !== "function" )
+  if( typeof value !== 'function' )
   {
-    expected( errorText, "expected function or class", value );
+    expected( errorText, 'expected function or class', value );
   }
 }
 
@@ -368,9 +368,9 @@ export function expectClass( value, errorText )
 export function expectIterable( value, errorText )
 {
   if( !(value instanceof Object) ||
-      typeof value[ Symbol.iterator ] !== "function" )
+      typeof value[ Symbol.iterator ] !== 'function' )
   {
-    expected( errorText, "expected Iterable", value );
+    expected( errorText, 'expected Iterable', value );
   }
 }
 
@@ -393,9 +393,9 @@ export function expectIterable( value, errorText )
 export function expectIterator( value, errorText )
 {
   if( !(value instanceof Object) ||
-       typeof value.next !== "function" )
+       typeof value.next !== 'function' )
   {
-    expected( errorText, "expected iterator", value );
+    expected( errorText, 'expected iterator', value );
   }
 }
 
@@ -409,14 +409,14 @@ export function expectIterator( value, errorText )
  */
 export function expectNotEmptyString( value, errorText )
 {
-  if( typeof value !== "string" )
+  if( typeof value !== 'string' )
   {
-    expected( errorText, "expected not empty string", value );
+    expected( errorText, 'expected not empty string', value );
   }
 
   if( !value.length )
   {
-    expected( errorText, "expected not empty string, got empty string");
+    expected( errorText, 'expected not empty string, got empty string');
   }
 }
 
@@ -430,10 +430,10 @@ export function expectNotEmptyString( value, errorText )
  */
 export function expectStore( value, errorText )
 {
-  if( !(value instanceof Object || (value && typeof value === "object") ) ||
-      typeof value.subscribe !== "function" )
+  if( !(value instanceof Object || (value && typeof value === 'object') ) ||
+      typeof value.subscribe !== 'function' )
   {
-    expected( errorText, "expected store", value );
+    expected( errorText, 'expected store', value );
   }
 }
 
@@ -448,16 +448,16 @@ export function expectStore( value, errorText )
  */
 export function expectArangoCollectionId( value, errorText )
 {
-  if( typeof value !== "string" )
+  if( typeof value !== 'string' )
   {
-    expected( errorText, "expected not empty string", value );
+    expected( errorText, 'expected not empty string', value );
   }
 
-  const x = value.indexOf("/");
+  const x = value.indexOf('/');
 
   if( -1 === x || x === value.length - 1 )
   {
-    expected( errorText, "expected collection id (invalid string)");
+    expected( errorText, 'expected collection id (invalid string)');
   }
 }
 
@@ -471,16 +471,16 @@ export function expectArangoCollectionId( value, errorText )
  */
 export function expectUriComponent( value, errorText )
 {
-  if( typeof value !== "string" )
+  if( typeof value !== 'string' )
   {
     expected( errorText,
-      "expected URI component", value );
+      'expected URI component', value );
   }
 
   if( !RE_URI_COMPONENT.test( value ) )
   {
     expected( errorText,
-      "expected URI component (invalid character found)");
+      'expected URI component (invalid character found)');
   }
 }
 
@@ -494,16 +494,16 @@ export function expectUriComponent( value, errorText )
  */
 export function expectNotEmptyStringOrNull( value, errorText )
 {
-  if( typeof value !== "string" && null !== value )
+  if( typeof value !== 'string' && null !== value )
   {
     expected( errorText,
-      "expected not empty string or null", value );
+      'expected not empty string or null', value );
   }
 
   if( value !== null && !value.length )
   {
     expected( errorText,
-      "expected not empty string or null, got empty string");
+      'expected not empty string or null, got empty string');
   }
 }
 
@@ -519,16 +519,16 @@ export function expectNotEmptyStringOrNull( value, errorText )
  */
 export function expectNumber( value, errorText )
 {
-  if( typeof value !== "number" )
+  if( typeof value !== 'number' )
   {
     expected( errorText,
-      "expected number", value );
+      'expected number', value );
   }
 
   if( Number.isNaN(value) )
   {
     expected( errorText,
-      "(expected number, got [NaN]" );
+      '(expected number, got [NaN]' );
   }
 
   // TODO: What to do with Infinity and -Infinity?
@@ -544,12 +544,12 @@ export function expectNumber( value, errorText )
  */
 export function expectPositiveNumber( value, errorText )
 {
-  if( typeof value !== "number" ||
+  if( typeof value !== 'number' ||
       value <= 0 ||
       Number.isNaN( value ) )
   {
     expected( errorText,
-      "expected positive number", value );
+      'expected positive number', value );
   }
 }
 
@@ -563,11 +563,11 @@ export function expectPositiveNumber( value, errorText )
  */
 export function expectNotNegativeNumber( value, errorText )
 {
-  if( typeof value !== "number" ||
+  if( typeof value !== 'number' ||
       value < 0 ||
       Number.isNaN( value ) )
   {
-    expected( errorText, "expected not negative number", value );
+    expected( errorText, 'expected not negative number', value );
   }
 }
 
@@ -581,12 +581,12 @@ export function expectNotNegativeNumber( value, errorText )
  */
 export function expectPositiveInteger( value, errorText )
 {
-  if( typeof value !== "number" ||
+  if( typeof value !== 'number' ||
       value < 0 ||
       !Number.isInteger( value ) ||
       Number.isNaN( value ) )
   {
-    expected( errorText, "expected positive integer", value );
+    expected( errorText, 'expected positive integer', value );
   }
 }
 
@@ -600,12 +600,12 @@ export function expectPositiveInteger( value, errorText )
  */
 export function expectNotNegativeInteger( value, errorText )
 {
-  if( typeof value !== "number" ||
+  if( typeof value !== 'number' ||
       value < 0 ||
       !Number.isInteger( value ) ||
       Number.isNaN( value ) )
   {
-    expected( errorText, "expected not negative integer", value );
+    expected( errorText, 'expected not negative integer', value );
   }
 }
 
@@ -621,10 +621,10 @@ export function expectNotNegativeInteger( value, errorText )
  */
 export function expectObject( value, errorText )
 {
-  if( !(value instanceof Object || (value && typeof value === "object") ) ||
+  if( !(value instanceof Object || (value && typeof value === 'object') ) ||
       value instanceof Promise )
   {
-    expected( errorText, "expected object", value );
+    expected( errorText, 'expected object', value );
   }
 }
 
@@ -639,12 +639,12 @@ export function expectObject( value, errorText )
  */
 export function expectObjectNoArray( value, errorText )
 {
-  if( !(value instanceof Object || (value && typeof value === "object") ) ||
+  if( !(value instanceof Object || (value && typeof value === 'object') ) ||
        (value instanceof Promise) ||
        Array.isArray(value) )
   {
     expected( errorText,
-      "expected object but not an array", value );
+      'expected object but not an array', value );
   }
 }
 
@@ -659,12 +659,12 @@ export function expectObjectNoArray( value, errorText )
  */
 export function expectObjectNoFunction( value, errorText )
 {
-  if( !(value instanceof Object || (value && typeof value === "object") ) ||
+  if( !(value instanceof Object || (value && typeof value === 'object') ) ||
        (value instanceof Promise) ||
-       typeof value === "function" )
+       typeof value === 'function' )
   {
     expected( errorText,
-      "expected object but not a function", value );
+      'expected object but not a function', value );
   }
 }
 
@@ -684,10 +684,10 @@ export function expectObjectOrNull( value, errorText )
     return;
   }
 
-  if( !(value instanceof Object || typeof value === "object") ||
+  if( !(value instanceof Object || typeof value === 'object') ||
        (value instanceof Promise) )
   {
-    expected( errorText, "expected object or null", value );
+    expected( errorText, 'expected object or null', value );
   }
 }
 
@@ -707,11 +707,11 @@ export function expectObjectOrUndefined( value, errorText )
     return;
   }
 
-  if( !(value instanceof Object || (value && typeof value === "object") ) ||
+  if( !(value instanceof Object || (value && typeof value === 'object') ) ||
        (value instanceof Promise) )
   {
     expected( errorText,
-      "expected object or undefined", value );
+      'expected object or undefined', value );
   }
 }
 
@@ -732,13 +732,13 @@ export function expectObjectOrString( value, errorText )
   }
 
   const notAnObject =
-    !(value instanceof Object || (value && typeof value === "object") ) ||
+    !(value instanceof Object || (value && typeof value === 'object') ) ||
      (value instanceof Promise);
 
-  if( notAnObject && typeof value !== "string" )
+  if( notAnObject && typeof value !== 'string' )
   {
     expected( errorText,
-      "expected object or string", value );
+      'expected object or string', value );
   }
 }
 
@@ -752,7 +752,7 @@ export function expectObjectOrString( value, errorText )
  */
 export function expectObjectPath( value, errorText )
 {
-  if( typeof value === "string" )
+  if( typeof value === 'string' )
   {
     return;
   }
@@ -761,7 +761,7 @@ export function expectObjectPath( value, errorText )
   {
     expected(
       errorText,
-      "expected object path (string or array of strings)",
+      'expected object path (string or array of strings)',
       value );
   }
 
@@ -769,7 +769,7 @@ export function expectObjectPath( value, errorText )
 
   for( let j = 0, n = value.length; j < n; j = j + 1 )
   {
-    if( typeof value[ j ] !== "string" )
+    if( typeof value[ j ] !== 'string' )
     {
       expected(
         errorText,
@@ -791,7 +791,7 @@ export function expectPromise( value, errorText )
 {
   if( !(value instanceof Promise) )
   {
-    expected( errorText, "expected Promise", value );
+    expected( errorText, 'expected Promise', value );
   }
 }
 
@@ -807,7 +807,7 @@ export function expectMap( value, errorText )
 {
   if( !(value instanceof Map) )
   {
-    expected( errorText, "expected Map", value );
+    expected( errorText, 'expected Map', value );
   }
 }
 
@@ -823,7 +823,7 @@ export function expectSet( value, errorText )
 {
   if( !(value instanceof Set) )
   {
-    expected( errorText, "expected Set", value );
+    expected( errorText, 'expected Set', value );
   }
 }
 
@@ -840,7 +840,7 @@ export function expectArrayOrSet( value, errorText )
 {
   if( !(value instanceof Array) && !(value instanceof Set) )
   {
-    expected( errorText, "expected Array or Set", value );
+    expected( errorText, 'expected Array or Set', value );
   }
 }
 
@@ -856,17 +856,17 @@ export function expectSetOfStrings( value, errorText )
 {
   if( !(value instanceof Set) )
   {
-    expected( errorText, "expected Set of strings", value );
+    expected( errorText, 'expected Set of strings', value );
   }
 
   // -- Check all values in Set
 
-  for( let current of value.values() )
+  for( const current of value.values() )
   {
-    if( typeof current !== "string" )
+    if( typeof current !== 'string' )
     {
       expected( errorText,
-        "expected all Set values to be strings", current );
+        'expected all Set values to be strings', current );
     }
   }
 }
@@ -881,9 +881,9 @@ export function expectSetOfStrings( value, errorText )
  */
 export function expectString( value, errorText )
 {
-  if( typeof value !== "string" )
+  if( typeof value !== 'string' )
   {
-    expected( errorText, "expected string", value );
+    expected( errorText, 'expected string', value );
   }
 }
 
@@ -899,20 +899,20 @@ export function expectStringOrArrayOfStrings( value, errorText )
 {
   if( !(value instanceof Array) )
   {
-    if( typeof value === "string" )
+    if( typeof value === 'string' )
     {
       // A string is ok -> done
       return;
     }
 
-    expected( errorText, "expected string or array of strings", value );
+    expected( errorText, 'expected string or array of strings', value );
   }
 
   // -- Check if all array items are strings
 
   for( let j = 0, n = value.length; j < n; j = j + 1 )
   {
-    if( typeof value[ j ] !== "string" )
+    if( typeof value[ j ] !== 'string' )
     {
       expected( errorText,
         `expected array value [${j}] to be a string`, value[ j ] );
@@ -930,9 +930,9 @@ export function expectStringOrArrayOfStrings( value, errorText )
  */
 export function expectStringOrNull( value, errorText )
 {
-  if( typeof value !== "string" && null !== value )
+  if( typeof value !== 'string' && null !== value )
   {
-    expected( errorText, "expected string or null", value );
+    expected( errorText, 'expected string or null', value );
   }
 }
 
@@ -946,9 +946,9 @@ export function expectStringOrNull( value, errorText )
  */
 export function expectStringOrUndefined( value, errorText )
 {
-  if( typeof value !== "string" && undefined !== value )
+  if( typeof value !== 'string' && undefined !== value )
   {
-    expected( errorText, "expected string or undefined", value );
+    expected( errorText, 'expected string or undefined', value );
   }
 }
 
@@ -963,9 +963,9 @@ export function expectStringOrUndefined( value, errorText )
  */
 export function expectSymbol( value, errorText )
 {
-  if( typeof value !== "symbol" )
+  if( typeof value !== 'symbol' )
   {
-    expected( errorText, "expected symbol", value );
+    expected( errorText, 'expected symbol', value );
   }
 }
 
@@ -980,9 +980,9 @@ export function expectSymbol( value, errorText )
  */
 export function expectNotEmptyStringOrSymbol( value, errorText )
 {
-  if( typeof value !== "symbol" && typeof value !== "string" )
+  if( typeof value !== 'symbol' && typeof value !== 'string' )
   {
-    expected( errorText, "expected symbol or string", value );
+    expected( errorText, 'expected symbol or string', value );
   }
 }
 
@@ -998,7 +998,7 @@ export function expectError( value, errorText )
 {
   if( !(value instanceof Error) )
   {
-    expected( errorText, "expected an Error instance", value );
+    expected( errorText, 'expected an Error instance', value );
   }
 }
 

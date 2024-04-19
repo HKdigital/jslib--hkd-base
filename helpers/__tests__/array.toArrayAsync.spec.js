@@ -1,5 +1,5 @@
 
-import { toArrayAsync } from "@rootDir/helpers/array.js";
+import { toArrayAsync } from '@rootDir/helpers/array.js';
 
 /* -------------------------------------------------------------------- Tests */
 

@@ -2,12 +2,12 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectFunction }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { delay }
-  from "@hkd-base/helpers/time.js";
+  from '@hkd-base/helpers/time.js';
 
-import "@hkd-base/typedef/StateMachineTransition.type.js";
+import '@hkd-base/typedef/StateMachineTransition.type.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -78,12 +78,12 @@ export default class StateTransition
    */
   constructor( nextStepFnOrDelayMs )
   {
-    if( typeof nextStepFnOrDelayMs === "number" )
+    if( typeof nextStepFnOrDelayMs === 'number' )
     {
       this.addStep( async () => { await delay( nextStepFnOrDelayMs ); }  );
     }
 
-    if( typeof nextStepFnOrDelayMs === "function" )
+    if( typeof nextStepFnOrDelayMs === 'function' )
     {
       this.addStep( nextStepFnOrDelayMs );
     }
@@ -169,7 +169,7 @@ export default class StateTransition
       catch( e )
       {
         throw new Error(
-          `Exception in transition onStart function`,
+          'Exception in transition onStart function',
           { cause: e });
       }
     }
@@ -205,7 +205,7 @@ export default class StateTransition
       catch( e )
       {
         throw new Error(
-          `Exception in transition onEnded function`,
+          'Exception in transition onEnded function',
           { cause: e });
       }
 

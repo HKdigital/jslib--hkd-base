@@ -2,12 +2,12 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectString,
-         expectObject } from "./expect.js";
+         expectObject } from './expect.js';
 
 import { objectGet,
-         PATH_SEPARATOR } from "./object.js";
+         PATH_SEPARATOR } from './object.js';
 
-import { toArrayPath } from "./array.js";
+import { toArrayPath } from './array.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -62,28 +62,26 @@ export function interpolate(
   expressionRegexp=RE_MUSTACHE )
 {
   expectString( template,
-    "Missing or invalid variable [template]" );
+    'Missing or invalid variable [template]' );
 
   expectObject( templateData,
-    "Missing or invalid variable [templateData]" );
+    'Missing or invalid variable [templateData]' );
 
   return template.replace( expressionRegexp,
 
-    // eslint-disable-next-line no-unused-vars
-    function( match, expression )
+
+    ( match, expression ) =>
     {
-      let replacement;
+      const path = toArrayPath( expression );
 
-      let path = toArrayPath( expression );
+      const replacement = objectGet( templateData, path, undefined);
 
-      replacement = objectGet( templateData, path, undefined);
-
-      if( typeof replacement !== "string" &&
-          typeof replacement !== "number" &&
-          typeof replacement !== "boolean" )
+      if( typeof replacement !== 'string' &&
+          typeof replacement !== 'number' &&
+          typeof replacement !== 'boolean' )
       {
         throw new Error(
-          `Failed to interpolate template: Missing or invalid value for ` +
+          'Failed to interpolate template: Missing or invalid value for ' +
           `expression [${expression}] (expected string, number or boolean)`);
       }
 
@@ -102,9 +100,9 @@ export function interpolate(
 export function toUriName( str )
 {
   expectString( str,
-    "Missing or invalid variable [str]" );
+    'Missing or invalid variable [str]' );
 
-  str = str.toLowerCase().replace(/[^a-z0-9]+/ig, "-");
+  str = str.toLowerCase().replace(/[^a-z0-9]+/ig, '-');
 
   // TODO: remove duplicate dashes
 
@@ -133,14 +131,14 @@ export function toStringPath( path, pathSeparator=PATH_SEPARATOR )
   {
     return path.join( pathSeparator );
   }
-  else if( typeof path === "string" )
+  else if( typeof path === 'string' )
   {
     // path is already a string
     return path;
   }
   else {
     throw new Error(
-      "Missing or invalid parameter [path] (expected string or array)");
+      'Missing or invalid parameter [path] (expected string or array)');
   }
 }
 
@@ -153,9 +151,9 @@ export function toStringPath( path, pathSeparator=PATH_SEPARATOR )
  *
  * @returns {string}
  */
-export function padDigits( input, targetLength=2, padString="0" )
+export function padDigits( input, targetLength=2, padString='0' )
 {
-  return ("" + input).padStart( targetLength, padString);
+  return ('' + input).padStart( targetLength, padString);
 }
 
 // -----------------------------------------------------------------------------

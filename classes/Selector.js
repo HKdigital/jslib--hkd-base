@@ -29,7 +29,7 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectObjectOrNull }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -126,7 +126,7 @@ export default class Selector
     // == Validate selector
 
     expectObjectOrNull( selector,
-      "Invalid value for parameter [selector]" );
+      'Invalid value for parameter [selector]' );
 
     const keys = Object.keys( selector );
     const n = keys.length;

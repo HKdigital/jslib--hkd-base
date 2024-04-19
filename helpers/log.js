@@ -5,25 +5,25 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import LogStream from "@hkd-base/classes/LogStream.js";
+import LogStream from '@hkd-base/classes/LogStream.js';
 
-import ValueStore from "@hkd-base/classes/ValueStore.js";
+import ValueStore from '@hkd-base/classes/ValueStore.js';
 
-import { expectNotEmptyString } from "@hkd-base/helpers/expect.js";
+import { expectNotEmptyString } from '@hkd-base/helpers/expect.js';
 
-import { isIterable } from "@hkd-base/helpers/is.js";
+import { isIterable } from '@hkd-base/helpers/is.js';
 
 // import { DEBUG, INFO, WARNING, ERROR } from "@hkd-base/types/log-types.js";
 
 // import { defer } from "@hkd-base/helpers/process.js";
 
-import { enableConsoleLogging } from "@hkd-base/helpers/console.js";
+import { enableConsoleLogging } from '@hkd-base/helpers/console.js';
 
-import { catchUncaughtExceptions } from "@hkd-base/helpers/exceptions.js";
+import { catchUncaughtExceptions } from '@hkd-base/helpers/exceptions.js';
 
 /* ---------------------------------------------------------------- Internals */
 
-const OUTPUT_LABEL_CONSOLE = "console";
+const OUTPUT_LABEL_CONSOLE = 'console';
 
 const systemLog = new LogStream( /* { source: "system-log" } */ );
 
@@ -57,7 +57,7 @@ export const debug = systemLog.debug.bind( systemLog );
 export function getModuleLogger( moduleName )
 {
   expectNotEmptyString( moduleName,
-    "Missing or invalid parameter [moduleName]" );
+    'Missing or invalid parameter [moduleName]' );
 
   const log = new LogStream( { className: moduleName } );
 
@@ -130,7 +130,7 @@ export function consoleLogProcessor( logEvent )
 
   context.e = new Error();
 
-  Object.defineProperty( context, "e",
+  Object.defineProperty( context, 'e',
     {
       enumerable: false
     } );
@@ -190,7 +190,7 @@ export function consoleLogProcessor( logEvent )
  */
 export function setProcessor( processorFn, outputLabel=OUTPUT_LABEL_CONSOLE )
 {
-  expectNotEmptyString( outputLabel, "Invalid parameter [outputLabel]" );
+  expectNotEmptyString( outputLabel, 'Invalid parameter [outputLabel]' );
 
   // -- Get or create output
 
@@ -201,7 +201,7 @@ export function setProcessor( processorFn, outputLabel=OUTPUT_LABEL_CONSOLE )
     const stream = new ValueStore();
 
     stream.get = () => {
-      throw new Error("Method not supported (use subscribe)");
+      throw new Error('Method not supported (use subscribe)');
     };
 
     output =
@@ -279,7 +279,7 @@ export function setProcessor( processorFn, outputLabel=OUTPUT_LABEL_CONSOLE )
  */
 export function getOutputStream( outputLabel=OUTPUT_LABEL_CONSOLE )
 {
-  expectNotEmptyString( outputLabel, "Invalid parameter [outputLabel]" );
+  expectNotEmptyString( outputLabel, 'Invalid parameter [outputLabel]' );
 
   let output = outputs[ outputLabel ];
 
@@ -315,7 +315,7 @@ export function getOutputStream( outputLabel=OUTPUT_LABEL_CONSOLE )
  */
 export function deleteOutputStream( outputLabel=OUTPUT_LABEL_CONSOLE )
 {
-  expectNotEmptyString( outputLabel, "Invalid parameter [outputLabel]" );
+  expectNotEmptyString( outputLabel, 'Invalid parameter [outputLabel]' );
 
   const output = outputs[ outputLabel ];
 

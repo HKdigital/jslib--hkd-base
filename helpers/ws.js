@@ -49,16 +49,16 @@ import {
   expectPositiveNumber,
   expectDefined,
   expectObject }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { getGlobalConfig }
-  from "@hkd-base/helpers/global-config.js";
+  from '@hkd-base/helpers/global-config.js';
 
 const stores = new Map();
 
 /* ------------------------------------------------------------------ Exports */
 
-export const KEY_DEFAULT_WS_SERVER = "default-ws-server";
+export const KEY_DEFAULT_WS_SERVER = 'default-ws-server';
 
 // -----------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ export const KEY_DEFAULT_WS_SERVER = "default-ws-server";
  */
 export function getWebsocketStore( label=KEY_DEFAULT_WS_SERVER )
 {
-  expectNotEmptyString( label, "Missing or invalid parameter [label]" );
+  expectNotEmptyString( label, 'Missing or invalid parameter [label]' );
 
   const store = stores.get( label );
 
@@ -122,13 +122,13 @@ export function createWebsocketStore( label=KEY_DEFAULT_WS_SERVER )
     maxReconnectDelay=20000 } = config;
 
   expectNotEmptyString( url,
-    "Missing or invalid parameter [url]" );
+    'Missing or invalid parameter [url]' );
 
   expectPositiveNumber( minReconnectDelay,
-    "Missing or invalid parameter [minReconnectDelay]" );
+    'Missing or invalid parameter [minReconnectDelay]' );
 
   expectPositiveNumber( maxReconnectDelay,
-    "Missing or invalid parameter [maxReconnectDelay]" );
+    'Missing or invalid parameter [maxReconnectDelay]' );
 
   let socket, openPromise, reopenTimeoutHandler;
 
@@ -221,7 +221,7 @@ export function createWebsocketStore( label=KEY_DEFAULT_WS_SERVER )
             openPromise = undefined;
           };
 
-          socket.onopen = event => {
+          socket.onopen = ( /*event*/ ) => {
             resolve();
             openPromise = undefined;
           };
@@ -301,7 +301,7 @@ export function createWebsocketStore( label=KEY_DEFAULT_WS_SERVER )
       {
         // No more subscribers -> close websocket
 
-        console.log("No more subscribers -> close websocket");
+        console.log('No more subscribers -> close websocket');
 
         //
         // Closing websocket after a delay
@@ -332,15 +332,13 @@ export function createWebsocketStore( label=KEY_DEFAULT_WS_SERVER )
   function setRepeated( valueOrFunction, intervalMs=2000 )
   {
     expectPositiveNumber( intervalMs,
-      "Invalid value for parameter [intervalMs]" );
+      'Invalid value for parameter [intervalMs]' );
 
-    let timer;
-
-    function getAndSetValue( force=false )
+    function getAndSetValue( /*force=false*/ )
     {
       let value;
 
-      if( typeof valueOrFunction === "function" )
+      if( typeof valueOrFunction === 'function' )
       {
         value = valueOrFunction();
       }
@@ -348,7 +346,7 @@ export function createWebsocketStore( label=KEY_DEFAULT_WS_SERVER )
         value = valueOrFunction;
       }
 
-      expectDefined( value, "setRepeated: [value] should be defined" );
+      expectDefined( value, 'setRepeated: [value] should be defined' );
 
       setStoreValue( value );
     }
@@ -357,7 +355,7 @@ export function createWebsocketStore( label=KEY_DEFAULT_WS_SERVER )
     getAndSetValue();
 
     // Set value at regular intervals
-    timer = setInterval( getAndSetValue, intervalMs );
+    const timer = setInterval( getAndSetValue, intervalMs );
 
     return function cancelSetRepeated() {
       clearInterval( timer );
@@ -373,7 +371,7 @@ export function createWebsocketStore( label=KEY_DEFAULT_WS_SERVER )
 
   if( label )
   {
-    expectNotEmptyString( label, "Invalid value for parameter [label]" );
+    expectNotEmptyString( label, 'Invalid value for parameter [label]' );
 
     stores.set( label, store );
   }

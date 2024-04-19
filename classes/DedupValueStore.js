@@ -21,13 +21,13 @@
 
 import { value$,
          default as ValueStore }
-  from "./ValueStore.js";
+  from './ValueStore.js';
 
 import { defer }
-  from "@hkd-base/helpers/process.js";
+  from '@hkd-base/helpers/process.js';
 
 import { equals }
-  from "@hkd-base/helpers/compare.js";
+  from '@hkd-base/helpers/compare.js';
 
 
 /* ------------------------------------------------------------------- Export */
@@ -54,7 +54,7 @@ export default class DedupValueStore extends ValueStore
    */
   constructor( initialValue, enableHasSubscribers=true )
   {
-    super( ...arguments );
+    super( initialValue, enableHasSubscribers );
   }
 
   // -------------------------------------------------------------------- Method
@@ -72,7 +72,7 @@ export default class DedupValueStore extends ValueStore
 
     if( arguments.length < 1 )
     {
-      throw new Error( "Missing parameter [value]" );
+      throw new Error( 'Missing parameter [value]' );
     }
 
     if( equals( this[ value$ ], value ) )

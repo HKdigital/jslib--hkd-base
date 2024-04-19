@@ -2,15 +2,15 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { base58fromNumber,
-         ALPHABET_BASE_58 } from "./base-58.js";
+         ALPHABET_BASE_58 } from './base-58.js';
 
-import { ALPHABET_BASE_HUMAN } from "./base-human.js";
+import { ALPHABET_BASE_HUMAN } from './base-human.js';
 
-import { sinceMs } from "./time.js";
+import { sinceMs } from './time.js';
 
 function vars() {} /* use function as object for hoisting */
 
-import { TIME_2020_01_01 } from "@hkd-base/helpers/time.js";
+import { TIME_2020_01_01 } from '@hkd-base/helpers/time.js';
 
 export const BOOT_STAMP = ( Date.now() - TIME_2020_01_01 ).toString(36);
 
@@ -25,7 +25,7 @@ export function bootTimePrefix()
 {
   if( !vars.bootTimePrefix )
   {
-    vars.bootTimePrefix = "3" + getTwoChar10ms();
+    vars.bootTimePrefix = '3' + getTwoChar10ms();
   }
 
   return vars.bootTimePrefix;
@@ -66,17 +66,17 @@ export function randomStringBaseHuman( length=48 )
  */
 export function randomString( length=48, ALPHABET=ALPHABET_BASE_58 )
 {
-  if( typeof length !== "number" || length < 1 )
+  if( typeof length !== 'number' || length < 1 )
   {
-    throw new Error("Invalid parameter [length]");
+    throw new Error('Invalid parameter [length]');
   }
 
-  if( typeof ALPHABET !== "string" || !ALPHABET.length )
+  if( typeof ALPHABET !== 'string' || !ALPHABET.length )
   {
-    throw new Error("Invalid parameter [ALPHABET]");
+    throw new Error('Invalid parameter [ALPHABET]');
   }
 
-  let str = "";
+  let str = '';
 
   const n = ALPHABET.length;
 
@@ -183,16 +183,10 @@ export function generateLocalId( timeMs )
 /**
  * Returns a time based number that changes every 30 seconds
  *
- * @param {number} [timeMs]
- *   Custom time value to be used instead of Date.now()
- *
  * @returns {number} time based numerical that changes every 30 seconds
  */
-export function getTimeBasedNumber30s( timeMs )
+export function getTimeBasedNumber30s()
 {
-  // const now = timeMs || Date.now();
-  // const jan2017 = 1483228800000;
-
   // @note
   // do not use bitwise shift since it only works on 32 bit numbers
   return Math.floor( sinceMs() / 30000 );
@@ -227,7 +221,7 @@ export function getTwoChar10ms( timeMs )
     return base58fromNumber( num );
   }
   else {
-    return "1" + base58fromNumber( num );
+    return '1' + base58fromNumber( num );
   }
 }
 

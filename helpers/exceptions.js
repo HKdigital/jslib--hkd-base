@@ -13,14 +13,14 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { isObject }
-  from "@hkd-base/helpers/is.js";
+// import { isObject }
+//   from '@hkd-base/helpers/is.js';
 
 import { arrayConcat }
-  from "@hkd-base/helpers/array.js";
+  from '@hkd-base/helpers/array.js';
 
 import { systemLog }
-  from "@hkd-base/helpers/log.js";
+  from '@hkd-base/helpers/log.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -59,9 +59,9 @@ export function raise( message, /* attributes, cause */ )
 {
   let exception;
 
-  if( typeof message !== "string" || !message )
+  if( typeof message !== 'string' || !message )
   {
-    throw new Error("Missing or invalid parameter [message]");
+    throw new Error('Missing or invalid parameter [message]');
   }
 
   switch( arguments.length )
@@ -112,14 +112,14 @@ export function raise( message, /* attributes, cause */ )
       if( !(attributes instanceof Object) )
       {
         throw new Error(
-          "Invalid value for parameter [attributes] (expected object)",
+          'Invalid value for parameter [attributes] (expected object)',
           { cause: new Error( message ) } );
       }
 
       if( !(exception instanceof Error) )
       {
         throw new Error(
-          "Invalid value for parameter [exception] (expected Error)",
+          'Invalid value for parameter [exception] (expected Error)',
           { cause: new Error( message ) } );
       }
 
@@ -132,7 +132,7 @@ export function raise( message, /* attributes, cause */ )
   } // end switch
 
   throw new Error(
-    "Too many parameters supplied", { cause: new Error( message ) } );
+    'Too many parameters supplied', { cause: new Error( message ) } );
 }
 
 // -----------------------------------------------------------------------------
@@ -151,7 +151,7 @@ export function rethrow( message, error )
 {
   if( !(error instanceof Error) )
   {
-    throw new Error(`Invalid parameter [error] (expected Error)`);
+    throw new Error('Invalid parameter [error] (expected Error)');
   }
 
   throw new Error( message, { cause: error } );
@@ -180,7 +180,7 @@ export function catchUncaughtExceptions( exitProcess=true )
   // TODO: return unsubscribe function (removeEventListener)
   // TODO: prevent subscribing more than once
 
-  if( typeof process !== "undefined" )
+  if( typeof process !== 'undefined' )
   {
     /**
      * Register listeners to catch uncaught errors and unhandled exceptions in
@@ -189,11 +189,11 @@ export function catchUncaughtExceptions( exitProcess=true )
 
     /* eslint-disable no-undef */
 
-    if( typeof process.on === "function" )
+    if( typeof process.on === 'function' )
     {
       process.on('uncaughtException',
-        // eslint-disable-next-line no-unused-vars
-        function handleUnCaughtException(error, origin)
+
+        (error /*, origin */ ) =>
           {
             //
             // @note origin = 'uncaughtException' or 'unhandledRejection'
@@ -201,14 +201,14 @@ export function catchUncaughtExceptions( exitProcess=true )
 
             try {
               systemLog
-                .error( new Error( "Uncaught exception", { cause: error } ) );
+                .error( new Error( 'Uncaught exception', { cause: error } ) );
             }
             catch( e )
             {
-              console.log( "Failed to log uncaught exception" );
+              console.log( 'Failed to log uncaught exception' );
               console.log( e );
 
-              console.log( "Original error" );
+              console.log( 'Original error' );
               console.log( err );
             }
 
@@ -225,17 +225,17 @@ export function catchUncaughtExceptions( exitProcess=true )
     }
   }
 
-  if( typeof window !== "undefined" )
+  if( typeof window !== 'undefined' )
   {
     /**
      * Register listeners to catch uncaught errors and unhandled exceptions in
      * a browser environment
      */
 
-    /* eslint-disable no-undef */
-    if( typeof window.addEventListener === "function" )
+
+    if( typeof window.addEventListener === 'function' )
     {
-      window.addEventListener("error", ( errorEvent ) =>
+      window.addEventListener('error', ( errorEvent ) =>
         {
           try {
             // console.log( {bootReady} );
@@ -264,8 +264,8 @@ export function catchUncaughtExceptions( exitProcess=true )
           return false;
         } );
 
-      window.addEventListener("unhandledrejection",
-        function( promiseRejectionEvent )
+      window.addEventListener('unhandledrejection',
+        ( promiseRejectionEvent ) =>
         {
 
           // FIXME: send to systemLog!!!
@@ -504,7 +504,7 @@ export function errorCauseToArray( error )
 {
   if( !(error instanceof Error) )
   {
-    throw new Error(`Invalid parameter [cause] (expected Error)`);
+    throw new Error('Invalid parameter [cause] (expected Error)');
   }
 
   const cause = error.cause;
@@ -559,20 +559,20 @@ export function getStack( skipFirst=3, skipLast=0 )
 {
   // let orig = Error.prepareStackTrace;
 
-  // eslint-disable-next-line no-unused-vars
+
   Error.prepareStackTrace = function( _, stack )
     {
       return stack;
     };
 
-  let err = new Error();
+  const err = new Error();
 
   // Error.captureStackTrace( err );
 
-  let stack = err.stack;
+  const stack = err.stack;
 
   let j = skipFirst;
-  let n = stack.length - skipLast;
+  const n = stack.length - skipLast;
 
   const result = [];
 

@@ -1,33 +1,33 @@
 
 // -----------------------------------------------------------------------------
 
-export const STOPPED = Symbol("stopped");
-export const STARTING = Symbol("starting");
-export const RUNNING = Symbol("running");
-export const STOPPING = Symbol("stopping");
-export const UNAVAILABLE = Symbol("unavailable");
-export const ERROR = Symbol("error");
+export const STOPPED = Symbol('stopped');
+export const STARTING = Symbol('starting');
+export const RUNNING = Symbol('running');
+export const STOPPING = Symbol('stopping');
+export const UNAVAILABLE = Symbol('unavailable');
+export const ERROR = Symbol('error');
 
 // -----------------------------------------------------------------------------
 
 const STATE_LABELS =
   {
-    [STOPPED]: "stopped",
-    [STARTING]: "starting",
-    [RUNNING]: "running",
-    [STOPPING]: "stopping",
-    [UNAVAILABLE]: "unavailable",
-    [ERROR]: "error"
+    [STOPPED]: 'stopped',
+    [STARTING]: 'starting',
+    [RUNNING]: 'running',
+    [STOPPING]: 'stopping',
+    [UNAVAILABLE]: 'unavailable',
+    [ERROR]: 'error'
   };
 
 const DISPLAY_STATE_LABELS =
   {
-    "stopped": STOPPED,
-    "starting": STARTING,
-    "running": RUNNING,
-    "stopping": STOPPING,
-    "unavailable": UNAVAILABLE,
-    "error": ERROR
+    stopped: STOPPED,
+    starting: STARTING,
+    running: RUNNING,
+    stopping: STOPPING,
+    unavailable: UNAVAILABLE,
+    error: ERROR
   };
 
 // -----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ const DISPLAY_STATE_LABELS =
  */
 export function stateLabel( state_label_or_string )
 {
-  if( typeof state_label_or_string === "symbol" )
+  if( typeof state_label_or_string === 'symbol' )
   {
     if( STATE_LABELS[ state_label_or_string ] )
     {
@@ -51,7 +51,7 @@ export function stateLabel( state_label_or_string )
     }
 
     throw new Error(
-      `Invalid parameter ` +
+      'Invalid parameter ' +
       `[state_label_or_string=${state_label_or_string.toString()}]`);
   }
 
@@ -77,5 +77,5 @@ export function stateLabel( state_label_or_string )
  */
 export function displayState( state )
 {
-  return STATE_LABELS[ state ] || "UNKNOWN";
+  return STATE_LABELS[ state ] || 'UNKNOWN';
 }

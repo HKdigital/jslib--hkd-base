@@ -2,7 +2,7 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectNotEmptyString,
-         expectObject } from "@hkd-base/helpers/expect.js";
+         expectObject } from '@hkd-base/helpers/expect.js';
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -20,22 +20,22 @@ import { expectNotEmptyString,
  */
 export function decodePayload( token )
 {
-  expectNotEmptyString( token, "Missing or invalid parameter [token]" );
+  expectNotEmptyString( token, 'Missing or invalid parameter [token]' );
 
-  const from = token.indexOf(".");
+  const from = token.indexOf('.');
 
   if( -1 === from )
   {
     throw new Error(
-      "Invalid token, missing [.] token as payload start indicator");
+      'Invalid token, missing [.] token as payload start indicator');
   }
 
-  const to = token.lastIndexOf(".");
+  const to = token.lastIndexOf('.');
 
   if( to === from )
   {
     throw new Error(
-      "Invalid token, missing second [.] token as payload end indicator");
+      'Invalid token, missing second [.] token as payload end indicator');
   }
 
   const payload = token.slice( from + 1, to );
@@ -56,9 +56,9 @@ export function decodePayload( token )
  */
 export function expiresAtUTC( token )
 {
-  expectObject( token, "Missing or invalid parameter [token]");
+  expectObject( token, 'Missing or invalid parameter [token]');
 
-  if( "exp" in token )
+  if( 'exp' in token )
   {
     return (new Date( 1000 * token.exp ).toUTCString() );
   }

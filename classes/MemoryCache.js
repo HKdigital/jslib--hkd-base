@@ -21,7 +21,7 @@
 import { expectArrayOfStrings,
          expectPositiveNumber,
          expectDefined }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -52,7 +52,7 @@ export default class MemoryCache
     // == Process input parameters
 
     expectPositiveNumber( defaultTTL,
-      "Missing or invalid parameter [defaultTTL]" );
+      'Missing or invalid parameter [defaultTTL]' );
 
     this._defaultTTL = defaultTTL;
 
@@ -73,7 +73,7 @@ export default class MemoryCache
   {
     if( this._cleanupTimer )
     {
-      throw new Error("Automatic cleanup has already been enabled");
+      throw new Error('Automatic cleanup has already been enabled');
     }
 
     // == Enable cleanup loop
@@ -117,12 +117,12 @@ export default class MemoryCache
    */
   set( key, value, { ttl=undefined, tags=null}={} )
   {
-    expectDefined( key, "Missing or invalid parameter [key]");
-    expectDefined( value, "Missing or invalid parameter [value]");
+    expectDefined( key, 'Missing or invalid parameter [key]');
+    expectDefined( value, 'Missing or invalid parameter [value]');
 
     if( tags )
     {
-      expectArrayOfStrings( tags, "Invalid parameter [tags]");
+      expectArrayOfStrings( tags, 'Invalid parameter [tags]');
 
       tags = new Set( tags );
     }
@@ -132,7 +132,7 @@ export default class MemoryCache
       ttl = this._defaultTTL;
     }
     else {
-      expectPositiveNumber( ttl, "Invalid parameter [options.ttl]");
+      expectPositiveNumber( ttl, 'Invalid parameter [options.ttl]');
     }
 
     let expiresAt;
@@ -184,7 +184,7 @@ export default class MemoryCache
    */
   get( key, defaultValue, { updateTTL=false }={} )
   {
-    expectDefined( key, "Missing or invalid parameter [key]");
+    expectDefined( key, 'Missing or invalid parameter [key]');
 
     const node = this.getNode( key, { updateTTL } );
 
@@ -218,7 +218,7 @@ export default class MemoryCache
    */
   getNode( key, { updateTTL=false }={} )
   {
-    expectDefined( key, "Missing or invalid parameter [key]");
+    expectDefined( key, 'Missing or invalid parameter [key]');
 
     const node = this.storage.get( key );
 
@@ -266,7 +266,7 @@ export default class MemoryCache
    */
   exists( key )
   {
-    expectDefined( key, "Missing or invalid parameter [key]");
+    expectDefined( key, 'Missing or invalid parameter [key]');
 
     const item = this.storage.get( key );
 
@@ -305,7 +305,7 @@ export default class MemoryCache
    */
   remove( key )
   {
-    expectDefined( key, "Missing or invalid parameter [key]" );
+    expectDefined( key, 'Missing or invalid parameter [key]' );
 
     const storage = this.storage;
 
@@ -367,7 +367,7 @@ export default class MemoryCache
 
     const now = Date.now();
 
-    for( let [ key, item ] of storage.entries() )
+    for( const [ key, item ] of storage.entries() )
     {
       // hk.debug("TRY CLEANUP", key, item );
 

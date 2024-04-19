@@ -6,7 +6,7 @@ import { expectString,
          expectNumber,
          expectPositiveNumber,
          expectObject }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import {
   TYPE_STRING,
@@ -18,12 +18,12 @@ import {
   TYPE_FANTASY_NAME,
   TYPE_EMAIL,
   TYPE_PHONE }
-  from "@hkd-base/types/schema-types.js";
+  from '@hkd-base/types/schema-types.js';
 
 import {
   TYPE_COLLECTION_NAME,
   TYPE_LABEL }
-  from "@hkd-base/types/schema-types-data.js";
+  from '@hkd-base/types/schema-types-data.js';
 
 import { RE_NAME,
          RE_FANTASY_NAME,
@@ -32,10 +32,10 @@ import { RE_NAME,
          RE_MULTIPLE_SPACES,
          RE_LABEL,
          RE_COLLECTION_NAME }
-  from "@hkd-base/constants/regexp.js";
+  from '@hkd-base/constants/regexp.js';
 
 import { registerParsers }
-  from "@hkd-base/helpers/parse.js";
+  from '@hkd-base/helpers/parse.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -68,7 +68,7 @@ export const rulesByName =
      */
     trim: ( value ) =>
       {
-        expectString( value, "Missing or invalid parameter [value]" );
+        expectString( value, 'Missing or invalid parameter [value]' );
 
         return { value: value.trim() };
       },
@@ -82,7 +82,7 @@ export const rulesByName =
      */
     lowercase: ( value ) =>
       {
-        expectString( value, "Missing or invalid parameter [value]" );
+        expectString( value, 'Missing or invalid parameter [value]' );
 
         return { value: value.toLowerCase() };
       },
@@ -96,7 +96,7 @@ export const rulesByName =
      */
     uppercase: ( value ) =>
       {
-        expectString( value, "Missing or invalid parameter [value]" );
+        expectString( value, 'Missing or invalid parameter [value]' );
 
         return { value: value.toUpperCase() };
       },
@@ -110,7 +110,7 @@ export const rulesByName =
      */
     singleSpaces: ( value ) =>
       {
-        expectString( value, "Missing or invalid parameter [value]" );
+        expectString( value, 'Missing or invalid parameter [value]' );
 
         value.replace( RE_MULTIPLE_SPACES, ' ' );
 
@@ -130,13 +130,13 @@ export const rulesByName =
       {
         if( value === undefined || value.length === undefined )
         {
-          throw new Error("Missing or invalid parameter [value]");
+          throw new Error('Missing or invalid parameter [value]');
         }
 
         if( min !== undefined )
         {
           expectPositiveNumber( min,
-            "Missing or invalid parameter [min]" );
+            'Missing or invalid parameter [min]' );
 
           if( value.length < min )
           {
@@ -150,7 +150,7 @@ export const rulesByName =
         if( max !== undefined )
         {
           expectPositiveNumber( max,
-            "Missing or invalid parameter [max]" );
+            'Missing or invalid parameter [max]' );
 
           if( value.length > max )
           {
@@ -176,14 +176,14 @@ export const rulesByName =
     range: ( value, { min, max }={} ) =>
       {
         expectNumber( value,
-          "Missing or invalid parameter [value]" );
+          'Missing or invalid parameter [value]' );
 
         // console.log("check range", { value, min, max } );
 
         if( min !== undefined )
         {
           expectPositiveNumber( min,
-            "Missing or invalid parameter [min]" );
+            'Missing or invalid parameter [min]' );
 
           if( value < min )
           {
@@ -197,7 +197,7 @@ export const rulesByName =
         if( max !== undefined )
         {
           expectPositiveNumber( max,
-            "Missing or invalid parameter [max]" );
+            'Missing or invalid parameter [max]' );
 
           if( value > max )
           {
@@ -225,7 +225,7 @@ export const rulesByName =
     hasKeys: ( value, { truthyValues=false } ) =>
     {
       expectObject( value,
-        "Missing or invalid parameter [value]" );
+        'Missing or invalid parameter [value]' );
 
       for( const key in value )
       {
@@ -241,7 +241,7 @@ export const rulesByName =
       // No keys found
 
       return {
-        error: new Error( `Value (object) should have at least one key`)
+        error: new Error( 'Value (object) should have at least one key')
       };
     }
 
@@ -266,7 +266,7 @@ export function applyRules( { value, rules } )
     const name = rule.name;
 
     expectNotEmptyString( name,
-      "Invalid rule, invalid property [name]" );
+      'Invalid rule, invalid property [name]' );
 
     const ruleFn = rulesByName[ name ];
 
@@ -297,7 +297,7 @@ export function applyRules( { value, rules } )
  */
 export const parsers =
   {
-    [ TYPE_STRING ]: function( value, { flags={}, rules=[] }={} )
+    [ TYPE_STRING ]( value, { flags={}, rules=[] }={} )
       {
         //
         // TODO parse options (to check if options are valid)
@@ -308,25 +308,25 @@ export const parsers =
 
         if( undefined === value )
         {
-          if( "default" in flags )
+          if( 'default' in flags )
           {
             return flags.default;
           }
         }
 
-        if( typeof value !== "string" )
+        if( typeof value !== 'string' )
         {
-          return { error: new Error("Value should be a string") };
+          return { error: new Error('Value should be a string') };
         }
 
         return applyRules( { value, rules } );
       },
 
-    [ TYPE_COLLECTION_NAME ]: function( value /* , { flags={}, rules=[] }={} */ )
+    [ TYPE_COLLECTION_NAME ]( value /* , { flags={}, rules=[] }={} */ )
     {
-      if( typeof value !== "string" )
+      if( typeof value !== 'string' )
       {
-        return { error: new Error("Value should be a string") };
+        return { error: new Error('Value should be a string') };
       }
 
       const finalValue = value.trim(); // trim value before test
@@ -345,11 +345,11 @@ export const parsers =
       return { value, finalValue };
     },
 
-    [ TYPE_LABEL ]: function( value /* , { flags={}, rules=[] }={} */ )
+    [ TYPE_LABEL ]( value /* , { flags={}, rules=[] }={} */ )
     {
-      if( typeof value !== "string" )
+      if( typeof value !== 'string' )
       {
-        return { error: new Error("Value should be a string") };
+        return { error: new Error('Value should be a string') };
       }
 
       const finalValue = value.trim(); // trim value before test
@@ -368,11 +368,11 @@ export const parsers =
       return { value, finalValue };
     },
 
-    [ TYPE_NAME ]: function( value /* , { flags={}, rules=[] }={} */ )
+    [ TYPE_NAME ]( value /* , { flags={}, rules=[] }={} */ )
     {
-      if( typeof value !== "string" )
+      if( typeof value !== 'string' )
       {
-        return { error: new Error("Value should be a string") };
+        return { error: new Error('Value should be a string') };
       }
 
       const finalValue = value.trim(); // trim value before test
@@ -391,11 +391,11 @@ export const parsers =
       return { value, finalValue };
     },
 
-    [ TYPE_FANTASY_NAME ]: function( value /* , { flags={}, rules=[] }={} */ )
+    [ TYPE_FANTASY_NAME ]( value /* , { flags={}, rules=[] }={} */ )
     {
-      if( typeof value !== "string" )
+      if( typeof value !== 'string' )
       {
-        return { error: new Error("Value should be a string") };
+        return { error: new Error('Value should be a string') };
       }
 
       const finalValue = value.trim(); // trim value before test
@@ -414,88 +414,88 @@ export const parsers =
       return { value, finalValue };
     },
 
-    [ TYPE_EMAIL ]: function( value /* , { flags={}, rules=[] }={} */ )
+    [ TYPE_EMAIL ]( value /* , { flags={}, rules=[] }={} */ )
     {
       // return { error: new Error("Test failure") };
 
-      if( typeof value !== "string" )
+      if( typeof value !== 'string' )
       {
-        return { error: new Error("Value should be a string") };
+        return { error: new Error('Value should be a string') };
       }
 
       value = value.trim().toLowerCase();
 
       if( !RE_EMAIL.test( value ) )
       {
-        return { error: new Error("Value should be a valid email address") };
+        return { error: new Error('Value should be a valid email address') };
       }
 
       return { value };
     },
 
-    [ TYPE_PHONE ]: function( value, { flags={} /*, rules=[]*/ }={} )
+    [ TYPE_PHONE ]( value, { flags={} /*, rules=[]*/ }={} )
     {
-      if( !value && flags.presence === "optional" )
+      if( !value && flags.presence === 'optional' )
       {
         // Phone number is optional
         return { value: null };
       }
 
-      if( typeof value !== "string" )
+      if( typeof value !== 'string' )
       {
-        return { error: new Error("Value should be a string") };
+        return { error: new Error('Value should be a string') };
       }
 
       // value = value.trim().toLowerCase();
 
       if( !RE_PHONE.test( value ) )
       {
-        return { error: new Error("Value should be a valid phone number") };
+        return { error: new Error('Value should be a valid phone number') };
       }
 
       return { value };
     },
 
-    [ TYPE_NUMBER ]: function( value, { flags={}, rules=[] }={} )
+    [ TYPE_NUMBER ]( value, { flags={}, rules=[] }={} )
       {
         if( undefined === value )
         {
-          if( "default" in flags )
+          if( 'default' in flags )
           {
             return flags.default;
           }
         }
 
-        if( typeof value !== "number" ) {
-          return { error: new Error("Value should be a number") };
+        if( typeof value !== 'number' ) {
+          return { error: new Error('Value should be a number') };
         }
 
         return applyRules( { value, rules } );
       },
 
-    [ TYPE_BOOLEAN ]: function( value /* , { flags={}, rules=[] }={} */ )
+    [ TYPE_BOOLEAN ]( value /* , { flags={}, rules=[] }={} */ )
       {
-        if( typeof value !== "boolean" ) {
-          return { error: new Error("Value should be a boolean") };
+        if( typeof value !== 'boolean' ) {
+          return { error: new Error('Value should be a boolean') };
         }
 
         return { value };
       },
 
-    [ TYPE_OBJECT ]: function( value, { flags={}, rules=[] }={} )
+    [ TYPE_OBJECT ]( value, { /*flags={},*/ rules=[] }={} )
       {
-        if( typeof value !== "object" || value === null )
+        if( typeof value !== 'object' || value === null )
         {
-          return { error: new Error("Value should be an object") };
+          return { error: new Error('Value should be an object') };
         }
 
         return applyRules( { value, rules } );
       },
 
-    [ TYPE_ARRAY ]: function( value /* , { flags={}, rules=[] }={} */ )
+    [ TYPE_ARRAY ]( value /* , { flags={}, rules=[] }={} */ )
       {
         if( !Array.isArray(value) ) {
-          return { error: new Error("Value should be an array") };
+          return { error: new Error('Value should be an array') };
         }
 
         return { value };

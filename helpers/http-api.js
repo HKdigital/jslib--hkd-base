@@ -3,34 +3,34 @@
 import { expectString,
          expectNotEmptyString,
          expectObject }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { ResponseError,
          TokenExpiredError }
-  from "@hkd-base/types/error-types.js";
+  from '@hkd-base/types/error-types.js';
 
 import { ACCEPT,
          CONTENT_TYPE }
-  from "@hkd-base/constants/http-headers.js";
+  from '@hkd-base/constants/http-headers.js';
 
 import { TEXT_HTML,
          APPLICATION_JSON }
-  from "@hkd-base/constants/mime-types.js";
+  from '@hkd-base/constants/mime-types.js';
 
 import { isObject }
-  from "@hkd-base/helpers/is.js";
+  from '@hkd-base/helpers/is.js';
 
 import { getGlobalConfig }
-  from "@hkd-base/helpers/global-config.js";
+  from '@hkd-base/helpers/global-config.js';
 
 import { waitForAndCheckResponse,
          httpRequest,
          METHOD_GET,
          METHOD_POST }
-  from "@hkd-base/helpers/http.js";
+  from '@hkd-base/helpers/http.js';
 
 import { decodePayload }
-  from "@hkd-base/helpers/jwt-info.js";
+  from '@hkd-base/helpers/jwt-info.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -38,9 +38,9 @@ import { decodePayload }
 
 export { METHOD_GET,
          METHOD_POST }
-  from "@hkd-base/helpers/http.js";
+  from '@hkd-base/helpers/http.js';
 
-export const KEY_DEFAULT_HTTP_API = "default-http-api";
+export const KEY_DEFAULT_HTTP_API = 'default-http-api';
 
 // -----------------------------------------------------------------------------
 
@@ -57,34 +57,34 @@ export const KEY_DEFAULT_HTTP_API = "default-http-api";
 export function buildApiUrl( uri, config )
 {
   expectNotEmptyString( uri,
-    "Missing or invalid parameter [uri]");
+    'Missing or invalid parameter [uri]');
 
   expectObject( config,
-    "Missing or invalid parameter [config]");
+    'Missing or invalid parameter [config]');
 
-  const { origin, apiPrefix="" } = config;
+  const { origin, apiPrefix='' } = config;
 
   expectNotEmptyString( origin,
-    `Missing or invalid parameter [config.origin]` );
+    'Missing or invalid parameter [config.origin]' );
 
   expectString( apiPrefix,
-    `Invalid parameter [config.apiPrefix]` );
+    'Invalid parameter [config.apiPrefix]' );
 
   // console.log( { apiPrefix, uri, origin } );
 
   if( origin )
   {
-    const x = origin.indexOf("://");
+    const x = origin.indexOf('://');
 
     if( x !== -1 )
     {
-      const y = origin.indexOf( "/", x + 3 );
+      const y = origin.indexOf( '/', x + 3 );
 
       if( y !== -1 && origin.length !== y + 1 )
       {
         throw new Error(
           `Invalid parameter [config.origin=${origin}] ` +
-          `(should not contain a path)` );
+          '(should not contain a path)' );
       }
     }
   }
@@ -211,6 +211,7 @@ export async function httpApiPost(
       body: JSON.stringify( body ),
       method: METHOD_POST,
       requestHandler,
+      timeoutMs,
       config
     } );
 }
@@ -297,11 +298,11 @@ export async function httpApiRequest(
     config=KEY_DEFAULT_HTTP_API
   } )
 {
-  expectNotEmptyString( uri, "Missing or invalid parameter [uri]" );
+  expectNotEmptyString( uri, 'Missing or invalid parameter [uri]' );
 
   if( !isObject( config ) )
   {
-    expectNotEmptyString( config, "Invalid parameter [config]" );
+    expectNotEmptyString( config, 'Invalid parameter [config]' );
 
     config = getGlobalConfig( config );
   }
@@ -332,7 +333,7 @@ export async function httpApiRequest(
   }
   else {
     expectObject( headers,
-      "Missing or invalid parameter [headers]" );
+      'Missing or invalid parameter [headers]' );
   }
 
   if( token )
@@ -346,7 +347,7 @@ export async function httpApiRequest(
     //
     const decodedToken = decodePayload(token);
 
-    if( "exp" in decodedToken )
+    if( 'exp' in decodedToken )
     {
       const expiredMs = Date.now() - decodedToken.exp * 1000;
 
@@ -360,12 +361,12 @@ export async function httpApiRequest(
     //
     // Add token as HTTP header
     //
-    headers["authorization"] = `Bearer ${token}`;
+    headers['authorization'] = `Bearer ${token}`;
   }
   else if( basicAuth )
   {
     expectObject( basicAuth,
-      "Invalid property [config.basicAuth]" );
+      'Invalid property [config.basicAuth]' );
 
     const {
         username,
@@ -373,12 +374,12 @@ export async function httpApiRequest(
       } = basicAuth;
 
     expectString( username,
-      "Invalid property [config.basicAuth.username]" );
+      'Invalid property [config.basicAuth.username]' );
 
     expectString( password,
-      "Invalid property [config.basicAuth.password]" );
+      'Invalid property [config.basicAuth.password]' );
 
-    headers["authorization"] = `Basic ${btoa( username+":"+password)}`;
+    headers['authorization'] = `Basic ${btoa( username+':'+password)}`;
   }
 
   // console.log( "json-api", { method, url, body, urlSearchParams, headers } );
@@ -400,11 +401,11 @@ export async function httpApiRequest(
 
   let contentType;
 
-  for( let [ key, value ] of response.headers )
+  for( const [ key, value ] of response.headers )
   {
     if( key === CONTENT_TYPE )
     {
-      const x = value.indexOf(";");
+      const x = value.indexOf(';');
 
       if( x === -1 )
       {
@@ -428,11 +429,11 @@ export async function httpApiRequest(
 
     switch( contentType )
     {
-      case "application/json":
+      case 'application/json':
         parsedResponse = await response.json();
         break;
 
-      case "text/plain":
+      case 'text/plain':
         parsedResponse = await response.text();
         break;
 

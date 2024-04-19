@@ -7,32 +7,30 @@ import { expectNotEmptyString,
          expectArray,
          expectDefined,
          expectFunction }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { objectGet,
-         objectSet }
-  from "@hkd-base/helpers/object.js";
+         objectSet,
+         clone }
+  from '@hkd-base/helpers/object.js';
 
 import { toStringPath }
-  from "@hkd-base/helpers/string.js";
+  from '@hkd-base/helpers/string.js';
 
 import { equals }
-  from "@hkd-base/helpers/compare.js";
-
-import { clone }
-  from "@hkd-base/helpers/object.js";
+  from '@hkd-base/helpers/compare.js';
 
 import { toArrayPath }
-  from "@hkd-base/helpers/array.js";
+  from '@hkd-base/helpers/array.js';
 
 import ValueStore
-  from "@hkd-base/classes/ValueStore.js";
+  from '@hkd-base/classes/ValueStore.js';
 
 import LogBase
-  from "@hkd-base/classes/LogBase.js";
+  from '@hkd-base/classes/LogBase.js';
 
 import ObjectSchema
-  from "@hkd-base/classes/ObjectSchema.js";
+  from '@hkd-base/classes/ObjectSchema.js';
 
 /* ------------------------------------------------------------- Export class */
 
@@ -60,7 +58,7 @@ export default class Config extends LogBase
     if( schemaOrSchemaProperties )
     {
       expectObject( schemaOrSchemaProperties,
-        "Missing or invalid parameter [schemaOrSchemaProperties]" );
+        'Missing or invalid parameter [schemaOrSchemaProperties]' );
 
       if( !(schemaOrSchemaProperties instanceof ObjectSchema) )
       {
@@ -116,15 +114,15 @@ export default class Config extends LogBase
     // this.log.debug( objectPath );
 
     expectObjectPath( objectPath,
-      "Missing or invalid parameter [objectPath]" );
+      'Missing or invalid parameter [objectPath]' );
 
-    expectDefined( newValue, "Missing or invalid parameter [newValue]" );
+    expectDefined( newValue, 'Missing or invalid parameter [newValue]' );
 
     objectPath = toArrayPath( objectPath );
 
     if( !objectPath.length )
     {
-      throw new Error("Invalid parameter [objectPath] (path is empty)");
+      throw new Error('Invalid parameter [objectPath] (path is empty)');
     }
 
     const data = this.data;
@@ -281,13 +279,13 @@ export default class Config extends LogBase
   getTopLevelPath( objectPath )
   {
     expectObjectPath( objectPath,
-      "Missing or invalid parameter [objectPath]" );
+      'Missing or invalid parameter [objectPath]' );
 
     objectPath = toArrayPath( objectPath );
 
     if( !objectPath.length )
     {
-      throw new Error("Invalid parameter [objectPath] (path is empty)");
+      throw new Error('Invalid parameter [objectPath] (path is empty)');
     }
 
     return objectPath[0];
@@ -305,13 +303,13 @@ export default class Config extends LogBase
   getValueAtTopLevelPath( objectPath )
   {
     expectObjectPath( objectPath,
-      "Missing or invalid parameter [objectPath]" );
+      'Missing or invalid parameter [objectPath]' );
 
     objectPath = toArrayPath( objectPath );
 
     if( !objectPath.length )
     {
-      throw new Error("Invalid parameter [objectPath] (path is empty)");
+      throw new Error('Invalid parameter [objectPath] (path is empty)');
     }
 
     const topLevelPath = objectPath[0];
@@ -382,7 +380,7 @@ export default class Config extends LogBase
   setParser( topLevelPath, callbackOrNull )
   {
     expectNotEmptyString( topLevelPath,
-      "Missing or invalid parameter [topLevelPath]" );
+      'Missing or invalid parameter [topLevelPath]' );
 
     if( null === callbackOrNull )
     {
@@ -390,7 +388,7 @@ export default class Config extends LogBase
     }
 
     expectFunction( callbackOrNull,
-      "Missing or invalid parameter [callbackOrNull]" );
+      'Missing or invalid parameter [callbackOrNull]' );
 
     this._parsers[ topLevelPath ] = callbackOrNull;
   }
@@ -405,24 +403,24 @@ export default class Config extends LogBase
   expectNotEmptyArrayObjectPath( arrayObjectPath )
   {
     expectArray( arrayObjectPath,
-      "Invalid parameter [arrayObjectPath]" );
+      'Invalid parameter [arrayObjectPath]' );
 
     const n = arrayObjectPath.length;
 
     if( 0 === n )
     {
-      throw new Error("Invalid parameter [objectPath] (path is empty)");
+      throw new Error('Invalid parameter [objectPath] (path is empty)');
     }
 
     for( let j = 0; j < n; j = j + 1 )
     {
       const current = arrayObjectPath[j];
 
-      if( typeof current !== "string" || !current.length )
+      if( typeof current !== 'string' || !current.length )
       {
         throw new Error(
-          "Invalid [arrayObjectPath] " +
-          "(should only contain not-emtpy strings)");
+          'Invalid [arrayObjectPath] ' +
+          '(should only contain not-emtpy strings)');
       }
     }
   }

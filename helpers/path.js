@@ -2,7 +2,7 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectString }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -15,9 +15,9 @@ import { expectString }
  */
 function stripExtensionFn( path )
 {
-  expectString( path, "Missing or invalid parameter [path]" );
+  expectString( path, 'Missing or invalid parameter [path]' );
 
-  const x = path.lastIndexOf(".");
+  const x = path.lastIndexOf('.');
 
   if( x <= 0 )
   {
@@ -29,7 +29,7 @@ function stripExtensionFn( path )
 
 /* ------------------------------------------------------------------ Exports */
 
-export const DEFAULT_SEPARATOR = "/";
+export const DEFAULT_SEPARATOR = '/';
 
 export { stripExtensionFn as stripExtension };
 
@@ -57,7 +57,7 @@ export { stripExtensionFn as stripExtension };
  */
 export function basename( path, options )
 {
-  expectString( path, "Missing or invalid parameter [path]" );
+  expectString( path, 'Missing or invalid parameter [path]' );
 
   const x = path.lastIndexOf( options ? options.separator : DEFAULT_SEPARATOR );
 

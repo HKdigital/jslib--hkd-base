@@ -30,8 +30,8 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectPositiveNumber } from "./expect.js";
-import { HkPromise } from "./promises.js";
+import { expectPositiveNumber } from './expect.js';
+import { HkPromise } from './promises.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -48,18 +48,18 @@ export const WEEK_MS = 7 * DAY_MS;
 export const TIME_2020_01_01 = 1577836800000; // 2020-01-01T00:00:00.000Z
 export const TIME_2100_01_01 = 4102444800000; // 2100-01-01T00:00:00.000Z
 
-export const JANUARY = "January";
-export const FEBRUARY = "February";
-export const MARCH = "March";
-export const APRIL = "April";
-export const MAY = "May";
-export const JUNE = "June";
-export const JULY = "July";
-export const AUGUST = "August";
-export const SEPTEMBER = "September";
-export const OCTOBER = "October";
-export const NOVEMBER = "November";
-export const DECEMBER = "December";
+export const JANUARY = 'January';
+export const FEBRUARY = 'February';
+export const MARCH = 'March';
+export const APRIL = 'April';
+export const MAY = 'May';
+export const JUNE = 'June';
+export const JULY = 'July';
+export const AUGUST = 'August';
+export const SEPTEMBER = 'September';
+export const OCTOBER = 'October';
+export const NOVEMBER = 'November';
+export const DECEMBER = 'December';
 
 export const MONTH_NAME_LABELS_EN =
   [
@@ -67,13 +67,13 @@ export const MONTH_NAME_LABELS_EN =
     JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER
   ];
 
-export const MONDAY = "Monday";
-export const TUESDAY = "Tuesday";
-export const WEDNESDAY = "Wednesday";
-export const THURSDAY = "Thursday";
-export const FRIDAY = "Friday";
-export const SATURDAY = "Saturday";
-export const SUNDAY = "Sunday";
+export const MONDAY = 'Monday';
+export const TUESDAY = 'Tuesday';
+export const WEDNESDAY = 'Wednesday';
+export const THURSDAY = 'Thursday';
+export const FRIDAY = 'Friday';
+export const SATURDAY = 'Saturday';
+export const SUNDAY = 'Sunday';
 
 export const DAY_NAME_LABELS_EN =
   [
@@ -82,9 +82,9 @@ export const DAY_NAME_LABELS_EN =
 
 // -- Intervals
 
-export const HOURLY = "hourly";
-export const DAILY = "daily";
-export const WEEKLY = "weekly";
+export const HOURLY = 'hourly';
+export const DAILY = 'daily';
+export const WEEKLY = 'weekly';
 // export const TWO_WEEKLY = "two-weekly";
 // export const FOUR_WEEKLY = "four-weekly";
 
@@ -130,7 +130,7 @@ export function getSynchedTime()
 export function setReferenceTime( referenceTimeMs )
 {
   expectPositiveNumber( referenceTimeMs,
-    "Missing or invalid parameter [referenceTimeMs]" );
+    'Missing or invalid parameter [referenceTimeMs]' );
 
   _aheadOfReferenceTimeMs = Date.now() - referenceTimeMs;
 }
@@ -153,9 +153,9 @@ export function setReferenceTime( referenceTimeMs )
  */
 export function delay( delayOrMinDelayMs, maxDelayMs )
 {
-  if( typeof delayOrMinDelayMs !== "number" )
+  if( typeof delayOrMinDelayMs !== 'number' )
   {
-    throw new Error("Invalid or missing parameter [delayOrMinDelayMs]");
+    throw new Error('Invalid or missing parameter [delayOrMinDelayMs]');
   }
 
   if( maxDelayMs )
@@ -238,21 +238,21 @@ export function timeToString( timeMs )
 
   restMs = restMs - seconds * SECOND_MS;
 
-  let str = "";
+  let str = '';
 
   if( days )
   {
-    str += `${days.toString().padStart( 2, "0")}:`;
-    str += `${hours.toString().padStart( 2, "0")}:`;
+    str += `${days.toString().padStart( 2, '0')}:`;
+    str += `${hours.toString().padStart( 2, '0')}:`;
   }
   else if( hours )
   {
-    str += `${hours.toString().padStart( 2, "0")}:`;
+    str += `${hours.toString().padStart( 2, '0')}:`;
   }
 
-  str += `${minutes.toString().padStart( 2, "0")}:`;
-  str += `${seconds.toString().padStart( 2, "0")}.`;
-  str += `${restMs.toString().padEnd( 3, "0" )}`;
+  str += `${minutes.toString().padStart( 2, '0')}:`;
+  str += `${seconds.toString().padStart( 2, '0')}.`;
+  str += `${restMs.toString().padEnd( 3, '0' )}`;
 
   return str;
 }
@@ -274,12 +274,12 @@ export function toDate( dateOrTimestamp )
     return dateOrTimestamp;
   }
 
-  if( typeof dateOrTimestamp === "number" )
+  if( typeof dateOrTimestamp === 'number' )
   {
     return new Date( dateOrTimestamp );
   }
 
-  throw new Error("Missing or invalid parameter [dateOrTimestamp]");
+  throw new Error('Missing or invalid parameter [dateOrTimestamp]');
 }
 
 // -----------------------------------------------------------------------------
@@ -296,7 +296,7 @@ export function toDate( dateOrTimestamp )
  */
 export function getWeekNumber( dateOrTimestamp )
 {
-  let date = toDate( dateOrTimestamp );
+  const date = toDate( dateOrTimestamp );
 
   //
   // Create a copy of this date object
@@ -306,7 +306,7 @@ export function getWeekNumber( dateOrTimestamp )
   //
   // ISO week date weeks start on Monday, so correct the day number
   //
-  var dayNumber = ( date.getDay() + 6 ) % 7;
+  const dayNumber = ( date.getDay() + 6 ) % 7;
 
   //
   // ISO 8601 states that week 1 is the week with the first Thursday

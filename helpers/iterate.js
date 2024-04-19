@@ -1,10 +1,10 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectIterable, expectFunction } from "./expect.js";
-import { smallestFirst, largestFirst } from "./compare.js";
+import { expectIterable, expectFunction } from './expect.js';
+import { smallestFirst, largestFirst } from './compare.js';
 
-import IterableTree from "../classes/IterableTree.js"
+import IterableTree from '../classes/IterableTree.js'
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -18,8 +18,8 @@ import IterableTree from "../classes/IterableTree.js"
  */
 export function *filter( iterable, filterFn )
 {
-  expectIterable( iterable, "Missing or invalid parameter [iterable]" );
-  expectFunction( filterFn, "Missing or invalid parameter [filterFn]" );
+  expectIterable( iterable, 'Missing or invalid parameter [iterable]' );
+  expectFunction( filterFn, 'Missing or invalid parameter [filterFn]' );
 
   for( const value of iterable )
   {
@@ -44,10 +44,10 @@ export function *filter( iterable, filterFn )
 export function *map( iterable, transformFn )
 {
   expectIterable( iterable,
-    "Missing or invalid parameter [iterable]" );
+    'Missing or invalid parameter [iterable]' );
 
   expectFunction( transformFn,
-    "Missing or invalid parameter [transformFn]" );
+    'Missing or invalid parameter [transformFn]' );
 
   for( const value of iterable )
   {
@@ -97,7 +97,7 @@ export function iterateObjectEntries( obj, options={} )
     objectIterator = new IterableTree( obj, options );
   }
   else {
-    throw new Error("NOT IMPLEMENTED YET");
+    throw new Error('NOT IMPLEMENTED YET');
 
     // objectIterator
     //   = new hk.iterate._BreadthFirstIterableTree( obj, options );
@@ -148,7 +148,7 @@ export function iterateObjectPaths( obj, options={} )
     objectIterator = new IterableTree( obj, options );
   }
   else {
-    throw new Error("NOT IMPLEMENTED YET");
+    throw new Error('NOT IMPLEMENTED YET');
 
     // objectIterator
     //   = new hk.iterate._BreadthFirstIterableTree( obj, options );
@@ -221,10 +221,10 @@ export async function sortObjects(
   } )
 {
   expectIterable( it,
-    "Missing or invalid parameter [it]" );
+    'Missing or invalid parameter [it]' );
 
   expectFunction( getValueFn,
-    "missing or invalid parameter [getValueFn]" );
+    'missing or invalid parameter [getValueFn]' );
 
   const allItems = [];
   const valuesByItem = new WeakMap();

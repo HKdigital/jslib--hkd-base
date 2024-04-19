@@ -1,9 +1,9 @@
 
-import { toArrayPath } from "@hkd-base/helpers/array.js";
+import { toArrayPath } from '@hkd-base/helpers/array.js';
 
-import { smallestFirst, compareUsingKey } from "@hkd-base/helpers/compare.js";
+import { smallestFirst, compareUsingKey } from '@hkd-base/helpers/compare.js';
 
-import { objectGet, PATH_SEPARATOR } from "@hkd-base/helpers/object.js";
+import { objectGet, PATH_SEPARATOR } from '@hkd-base/helpers/object.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -54,7 +54,7 @@ class Logic {
    */
   _createPathsSet( listOfPaths )
   {
-    let tmp = [];
+    const tmp = [];
 
     for( let j = 0, n = listOfPaths.length; j < n; j = j + 1 )
     {
@@ -63,7 +63,7 @@ class Logic {
       tmp.push( path);
     }
 
-    tmp.sort( compareUsingKey.bind( null, smallestFirst, "length" ) );
+    tmp.sort( compareUsingKey.bind( null, smallestFirst, 'length' ) );
 
     return new Set( tmp );
   }
@@ -85,12 +85,12 @@ class TruthyOrSelector extends Logic
   {
     const paths = this.paths;
 
-    if( typeof obj !== "object" )
+    if( typeof obj !== 'object' )
     {
-      throw new Error("Invalid parameter [obj]");
+      throw new Error('Invalid parameter [obj]');
     }
 
-    for( let path of paths.values() )
+    for( const path of paths.values() )
     {
       if( /* truthy */ objectGet( obj, path ) )
       {
@@ -109,7 +109,7 @@ class TruthyOrSelector extends Logic
    */
   explain()
   {
-    let str = "";
+    let str = '';
 
     for( const path of this.paths.values() )
     {
@@ -137,12 +137,12 @@ class TruthyAndSelector extends Logic
   {
     const paths = this.paths;
 
-    if( typeof obj !== "object" )
+    if( typeof obj !== 'object' )
     {
-      throw new Error("Invalid parameter [obj]");
+      throw new Error('Invalid parameter [obj]');
     }
 
-    for( let path of paths.values() )
+    for( const path of paths.values() )
     {
       if( /* not truthy */ !objectGet( obj, path ) )
       {
@@ -163,7 +163,7 @@ class TruthyAndSelector extends Logic
    */
   explain()
   {
-    let str = "";
+    let str = '';
 
     for( const path of this.paths.values() )
     {

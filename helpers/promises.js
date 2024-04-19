@@ -18,10 +18,10 @@ import { expectString,
          expectArray,
          expectObject,
          expectFunction }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import HkPromise
-  from "@hkd-base/classes/HkPromise.js";
+  from '@hkd-base/classes/HkPromise.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -100,7 +100,7 @@ export function promisify( /* function OR object, methodName */ )
   {
     case 1:
       f = arguments[0];
-      expectFunction( f, "Invalid parameter [functionOrObject]" );
+      expectFunction( f, 'Invalid parameter [functionOrObject]' );
       break;
 
     case 2:
@@ -108,14 +108,14 @@ export function promisify( /* function OR object, methodName */ )
         const obj = arguments[0];
         methodName = arguments[1];
 
-        expectObject( obj, "Invalid parameter [functionOrObject]" );
-        expectString( methodName, "Invalid parameter [methodName]" );
+        expectObject( obj, 'Invalid parameter [functionOrObject]' );
+        expectString( methodName, 'Invalid parameter [methodName]' );
 
         f = obj[ methodName ].bind( obj );
       }
       break;
     default:
-      throw new Error("Invalid number of arguments (expected one of two)");
+      throw new Error('Invalid number of arguments (expected one of two)');
   }
 
   function promisified( ...args )
@@ -174,17 +174,17 @@ export function promisify( /* function OR object, methodName */ )
  */
 export async function async( fns, args )
 {
-  expectArray( fns, "Missing or invalid parameter [fns]" );
+  expectArray( fns, 'Missing or invalid parameter [fns]' );
 
   if( args )
   {
-    expectArray( args, "Missing or invalid parameter [args]" );
+    expectArray( args, 'Missing or invalid parameter [args]' );
   }
 
   for( const fn of fns )
   {
     expectFunction( fn,
-      "Invalid parameter [fns] (expected list of functions)" );
+      'Invalid parameter [fns] (expected list of functions)' );
 
     if( args )
     {

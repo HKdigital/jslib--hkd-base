@@ -1,6 +1,6 @@
 
 import { pathValues,
-         PATH_SEPARATOR } from "@rootDir/helpers/array.js";
+         PATH_SEPARATOR } from '@rootDir/helpers/array.js';
 
 /* -------------------------------------------------------------------- Tests */
 
@@ -20,7 +20,7 @@ describe('pathValues( <items[]>, <path> )', () =>
 {
   test('should return path values from the items', () => {
 
-    expect( typeof PATH_SEPARATOR ).toBe("string");
+    expect( typeof PATH_SEPARATOR ).toBe('string');
 
     const items =
       [
@@ -29,7 +29,7 @@ describe('pathValues( <items[]>, <path> )', () =>
         { value: 3, nested: { value: 6 } }
       ];
 
-    expect( pathValues( items, "value" ) ).toEqual( [ 1, 2, 3 ] );
+    expect( pathValues( items, 'value' ) ).toEqual( [ 1, 2, 3 ] );
 
     expect( pathValues( items, `nested${PATH_SEPARATOR}value` ) )
       .toEqual( [ 4, 5, 6 ] );

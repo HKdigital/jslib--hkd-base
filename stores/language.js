@@ -1,13 +1,13 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectNotEmptyString } from "@hkd-base/helpers/expect.js";
+import { expectNotEmptyString } from '@hkd-base/helpers/expect.js';
 
-import ValueStore from "@hkd-base/classes/ValueStore.js";
+import ValueStore from '@hkd-base/classes/ValueStore.js';
 
 /* ------------------------------------------------------------------ Exports */
 
-export const LANG_DEFAULT = "en";
+export const LANG_DEFAULT = 'en';
 
 export const currentLanguage = new ValueStore( LANG_DEFAULT );
 
@@ -20,7 +20,7 @@ export const currentLanguage = new ValueStore( LANG_DEFAULT );
 export function setLanguage( languageCode )
 {
   expectNotEmptyString( languageCode,
-    "Missing or invalid parameter [languageCode]" );
+    'Missing or invalid parameter [languageCode]' );
 
   currentLanguage.set( languageCode );
 }

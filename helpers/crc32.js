@@ -15,8 +15,8 @@
 
 /* ---------------------------------------------------------------- Internals */
 
-const CRC32 = "crc32";
-const CRC32C = "crc32c";
+const CRC32 = 'crc32';
+const CRC32C = 'crc32c';
 
 const START_POLYNOMIALS =
   {

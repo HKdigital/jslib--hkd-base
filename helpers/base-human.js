@@ -6,4 +6,4 @@
  * thereby can be distinguisted easily by humans.
  */
 
-export const ALPHABET_BASE_HUMAN = "3456789abcdefghjkmnpqrstuvwxy";
+export const ALPHABET_BASE_HUMAN = '3456789abcdefghjkmnpqrstuvwxy';

@@ -6,26 +6,26 @@ import { expectNotEmptyString,
          expectObject,
          expectFunction,
          expectError }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { delay }
-  from "@hkd-base/helpers/time.js";
+  from '@hkd-base/helpers/time.js';
 
 import { defer }
-  from "@hkd-base/helpers/process.js";
+  from '@hkd-base/helpers/process.js';
 
 import { setReadOnlyProperty,
          objectGet }
-  from "@hkd-base/helpers/object.js";
+  from '@hkd-base/helpers/object.js';
 
 import ValueStore
-  from "@hkd-base/classes/ValueStore.js";
+  from '@hkd-base/classes/ValueStore.js';
 
 import StateTransition
-  from "@hkd-base/classes/StateTransition.js";
+  from '@hkd-base/classes/StateTransition.js';
 
-import "@hkd-base/typedef/StateMachineMessage.type.js";
-import "@hkd-base/typedef/StateMachineState.type.js";
+import '@hkd-base/typedef/StateMachineMessage.type.js';
+import '@hkd-base/typedef/StateMachineState.type.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -34,9 +34,9 @@ const DEFAULT_MAX_MS = 60000;
 
 /* ------------------------------------------------------------------ Exports */
 
-export const IDLE = "idle";
+export const IDLE = 'idle';
 
-export const ERROR = "error";
+export const ERROR = 'error';
 
 /* ------------------------------------------------------------- Export class */
 
@@ -109,17 +109,17 @@ export default class StateMachine extends ValueStore
   addState( { label, context={}, overwrite=false }={} )
   {
     expectNotEmptyString( label,
-      "Missing or invalid parameter [label]" );
+      'Missing or invalid parameter [label]' );
 
     expectObject( context,
-      "Invalid parameter [context]" );
+      'Invalid parameter [context]' );
 
     if( !overwrite && label in this.statesByLabel )
     {
       throw new Error(`State [${label}] already exists`);
     }
 
-    setReadOnlyProperty( context, "label", label );
+    setReadOnlyProperty( context, 'label', label );
 
     this.statesByLabel[ label ] = context;
 
@@ -167,20 +167,20 @@ export default class StateMachine extends ValueStore
   addTransition( { from, to, transition, steps, delayMs, onStart, onEnded } )
   {
     expectNotEmptyString( from,
-      "Missing or invalid parameter [from]" );
+      'Missing or invalid parameter [from]' );
 
     expectNotEmptyString( to,
-      "Missing or invalid parameter [to]" );
+      'Missing or invalid parameter [to]' );
 
     if( delayMs !== undefined )
     {
       expectPositiveNumber( delayMs,
-        "Invalid value for parameter [delayMs]" );
+        'Invalid value for parameter [delayMs]' );
 
       if( transition )
       {
         throw new Error(
-          `Parameters [transition] and [delayMs] should not be used both`);
+          'Parameters [transition] and [delayMs] should not be used both');
       }
 
       transition = new StateTransition();
@@ -196,7 +196,7 @@ export default class StateMachine extends ValueStore
       if( transition )
       {
         throw new Error(
-          `Parameters [transition] and [steps] should not be used both`);
+          'Parameters [transition] and [steps] should not be used both');
       }
 
       transition = new StateTransition();
@@ -208,33 +208,33 @@ export default class StateMachine extends ValueStore
     }
 
     expectObject( transition,
-      "Missing or invalid parameter [transition]" );
+      'Missing or invalid parameter [transition]' );
 
     expectFunction( transition.step,
-      "Missing or invalid parameter [transition.step]" );
+      'Missing or invalid parameter [transition.step]' );
 
     if( transition.cancel )
     {
       expectFunction( transition.cancel,
-      "Invalid parameter [transition.cancel]" );
+      'Invalid parameter [transition.cancel]' );
     }
 
     if( !transition._maxSteps )
     {
       // Set max steps to prevent transitions of never ending
-      setReadOnlyProperty( transition, "_maxSteps", DEFAULT_MAX_STEPS );
+      setReadOnlyProperty( transition, '_maxSteps', DEFAULT_MAX_STEPS );
     }
 
     if( !transition._maxMs )
     {
       // Set max ms to prevent transitions of never ending
-      setReadOnlyProperty( transition, "_maxMs", DEFAULT_MAX_MS );
+      setReadOnlyProperty( transition, '_maxMs', DEFAULT_MAX_MS );
     }
 
     if( onStart )
     {
       expectFunction( onStart,
-        "Invalid value for parameter [onStart]" );
+        'Invalid value for parameter [onStart]' );
 
       transition.registerOnStartCallback( onStart );
     }
@@ -242,7 +242,7 @@ export default class StateMachine extends ValueStore
     if( onEnded )
     {
       expectFunction( onEnded,
-      "Invalid value for parameter [onEnded]" );
+      'Invalid value for parameter [onEnded]' );
 
       transition.registerOnEndedCallback( onEnded );
     }
@@ -270,7 +270,7 @@ export default class StateMachine extends ValueStore
   jumpTo( toLabel )
   {
     expectNotEmptyString( toLabel,
-      "Missing or invalid parameter [toLabel]" );
+      'Missing or invalid parameter [toLabel]' );
 
     const toState = this.statesByLabel[ toLabel ];
 
@@ -296,7 +296,7 @@ export default class StateMachine extends ValueStore
   async gotoState( toLabel )
   {
     expectNotEmptyString( toLabel,
-      "Missing or invalid parameter [toLabel]" );
+      'Missing or invalid parameter [toLabel]' );
 
     const toState = this.statesByLabel[ toLabel ];
 
@@ -319,7 +319,7 @@ export default class StateMachine extends ValueStore
 
     if( !fromState )
     {
-      throw new Error(`Current state has not been set`);
+      throw new Error('Current state has not been set');
     }
 
     const fromLabel = fromState.label;
@@ -384,7 +384,7 @@ export default class StateMachine extends ValueStore
 
     if( !fromState )
     {
-      throw new Error( `Current state has not been set` );
+      throw new Error( 'Current state has not been set' );
     }
 
     const transition = this._getCurrentTransition();
@@ -402,7 +402,7 @@ export default class StateMachine extends ValueStore
       catch( e )
       {
         throw new Error(
-          `Cancel current transition ` +
+          'Cancel current transition ' +
           `[${fromState.label}] => [${toState.label}] failed`,
           { cause: e } );
       }
@@ -426,7 +426,7 @@ export default class StateMachine extends ValueStore
 
     if( !fromState )
     {
-      throw new Error(`Current state has not been set`);
+      throw new Error('Current state has not been set');
     }
 
     const toState = this.get()?.next;
@@ -460,13 +460,13 @@ export default class StateMachine extends ValueStore
   async _transition( { toState, fromState, transition } )
   {
     expectObject( toState,
-      "Missing or invalid parameter [toState]" );
+      'Missing or invalid parameter [toState]' );
 
     expectObject( fromState,
-      "Missing or invalid parameter [fromState]" );
+      'Missing or invalid parameter [fromState]' );
 
     expectObject( transition,
-      "Missing or invalid parameter [transition]" );
+      'Missing or invalid parameter [transition]' );
 
     const maxSteps = transition._maxSteps;
     const maxMs = transition._maxMs;
@@ -524,7 +524,7 @@ export default class StateMachine extends ValueStore
       {
         throw new Error(
           `Transition failed [${fromState.label}] => [${toState.label}], ` +
-          `followed by cancelCurrentTransition() failure.`,
+          'followed by cancelCurrentTransition() failure.',
           { cause: [ cancelError, transitionError ] } );
       }
 
@@ -543,7 +543,7 @@ export default class StateMachine extends ValueStore
    */
   setError( error )
   {
-    expectError( error, "Missing or invalid parameter [error]" );
+    expectError( error, 'Missing or invalid parameter [error]' );
 
     this.lastErrorMessage.set( error.message );
 

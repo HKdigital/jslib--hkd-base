@@ -2,9 +2,9 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectString,
-         expectObject } from "./expect.js";
+         expectObject } from './expect.js';
 
-import ValueStoreMap from "../classes/ValueStoreMap.js";
+import ValueStoreMap from '../classes/ValueStoreMap.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -20,8 +20,8 @@ const configMap = new ValueStoreMap();
  */
 export function setGlobalConfig( label, config )
 {
-  expectString( label, "Missing or invalid parameter [label]");
-  expectObject( config, "Missing or invalid parameter [config]");
+  expectString( label, 'Missing or invalid parameter [label]');
+  expectObject( config, 'Missing or invalid parameter [config]');
 
   // console.log(`Set config [${label}]`);
 
@@ -40,7 +40,7 @@ export function setGlobalConfig( label, config )
  */
 export function getGlobalConfig( label, defaultValue )
 {
-  expectString( label, "Missing or invalid parameter [label]");
+  expectString( label, 'Missing or invalid parameter [label]');
 
   const config = configMap.get( label );
 

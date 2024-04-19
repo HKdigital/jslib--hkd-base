@@ -4,7 +4,7 @@
 import { expectNotEmptyString,
          expectNotEmptyStringOrSymbol,
          expectNumber,
-         expectFunction } from "@hkd-base/helpers/expect.js";
+         expectFunction } from '@hkd-base/helpers/expect.js';
 
 /* ------------------------------------------------------------- Export class */
 
@@ -43,20 +43,20 @@ export default class Offs
         break;
 
       default:
-        throw new Error("Invalid number of arguments");
+        throw new Error('Invalid number of arguments');
     }
 
-    if( label && typeof label !== "symbol" )
+    if( label && typeof label !== 'symbol' )
     {
       expectNotEmptyString( label,
-        "Missing or invalid parameter [label]" );
+        'Missing or invalid parameter [label]' );
     }
     else if( !label ) {
       label = Symbol();
     }
 
     expectFunction( unsubscribeFn,
-      "Missing or invalid parameter [unsubscribeFn]" );
+      'Missing or invalid parameter [unsubscribeFn]' );
 
     const offs = this._offs;
 
@@ -101,23 +101,23 @@ export default class Offs
         break;
 
       default:
-        throw new Error("Invalid number of arguments");
+        throw new Error('Invalid number of arguments');
     }
 
     if( label )
     {
       expectNotEmptyString( label,
-        "Missing or invalid parameter [label]" );
+        'Missing or invalid parameter [label]' );
     }
     else {
       label = Symbol();
     }
 
     expectFunction( callback,
-      "Missing or invalid parameter [callback]" );
+      'Missing or invalid parameter [callback]' );
 
     expectNumber( delayMs,
-      "Missing or invalid parameter [delayMs]" );
+      'Missing or invalid parameter [delayMs]' );
 
     const timer = setTimeout( callback, delayMs );
 
@@ -144,7 +144,7 @@ export default class Offs
   tryUnregister( label )
   {
     expectNotEmptyStringOrSymbol( label,
-      "Missing or invalid parameter [label]" );
+      'Missing or invalid parameter [label]' );
 
     const fn = this._offs[ label ];
 

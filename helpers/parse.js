@@ -3,10 +3,10 @@
 
 import { expectNotEmptyString,
          expectDefined,
-         expectObject } from "@hkd-base/helpers/expect.js";
+         expectObject } from '@hkd-base/helpers/expect.js';
 
 import { tryRegisterDefaultParsers }
-  from "@hkd-base/parsers/default-parsers.js";
+  from '@hkd-base/parsers/default-parsers.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -20,10 +20,15 @@ const registeredParsers = {};
  */
 function registerParsers( { parsers, overwrite=false } )
 {
-  expectObject( parsers, "Missing or invalid parameter [parsers]" );
+  expectObject( parsers, 'Missing or invalid parameter [parsers]' );
 
   for( const label in parsers )
   {
+    if( !overwrite && registeredParsers[ label ] )
+    {
+      throw new Error(`Parser [${label}] already registered (overwrite=false)`);
+    }
+
     registeredParsers[ label ] = parsers[ label ];
   }
 }
@@ -57,7 +62,7 @@ export { registerParsers };
 export function getParser( type, { flags, rules }={} )
 {
   expectNotEmptyString( type,
-    "Missing or invalid parameter [type]" );
+    'Missing or invalid parameter [type]' );
 
   const parser = registeredParsers[ type ];
 
@@ -130,8 +135,8 @@ export function getParser( type, { flags, rules }={} )
  */
 export function parse( schema, value )
 {
-  expectObject( schema, "Missing or invalid parameter [schema]" );
-  expectDefined( value, "Missing or invalid parameter [value]" );
+  expectObject( schema, 'Missing or invalid parameter [schema]' );
+  expectDefined( value, 'Missing or invalid parameter [value]' );
 
   const { error,
           value: parsedValue } = schema.validate( value );

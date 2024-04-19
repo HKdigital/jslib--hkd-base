@@ -3,11 +3,11 @@
 
 import {
   expectArray,
-  expectArrayOfStrings} from "./expect.js";
+  expectArrayOfStrings} from './expect.js';
 
-import { isObject } from "./is.js";
+import { isObject } from './is.js';
 
-import { objectSet } from "./object.js";
+import { objectSet } from './object.js';
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -33,17 +33,17 @@ import { objectSet } from "./object.js";
  */
 export function arrayToTree( items, pathKeyOrKeys )
 {
-  expectArray( items, "Missing or invalid parameter [items]" );
+  expectArray( items, 'Missing or invalid parameter [items]' );
 
   let pathKeys;
 
-  if( typeof pathKeyOrKeys === "string" )
+  if( typeof pathKeyOrKeys === 'string' )
   {
     pathKeys = [ pathKeyOrKeys ];
   }
   else {
     expectArrayOfStrings( pathKeyOrKeys,
-      "Missing or invalid parameter [pathKeyOrKeys]" );
+      'Missing or invalid parameter [pathKeyOrKeys]' );
 
     pathKeys = pathKeyOrKeys;
   }
@@ -64,18 +64,18 @@ export function arrayToTree( items, pathKeyOrKeys )
 
     // Create path
 
-    let path = [];
+    const path = [];
 
     for( let j = 0; j < pathLength; j = j + 1 )
     {
       const key = pathKeys[ j ];
       const keyValue = item[ key ];
 
-      if( typeof keyValue !== "string" )
+      if( typeof keyValue !== 'string' )
       {
         throw new Error(
           `Invalid parameter [items]. [ item[${j}][${key}] ] ` +
-          `should be a string`);
+          'should be a string');
       }
 
       path.push( keyValue );

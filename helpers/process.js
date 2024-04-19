@@ -14,7 +14,7 @@
  */
 
 import { expectFunction }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 /* ---------------------------------------------------------------- Internals */
 
@@ -24,20 +24,20 @@ import { expectFunction }
  */
 function set_immediate_implementation()
 {
-  if( typeof global !== "undefined" )
+  if( typeof global !== 'undefined' )
   {
     if( undefined !== global.setImmediate )
     {
       return global.setImmediate;
     }
   }
-  else if( typeof window !== "undefined" )
+  else if( typeof window !== 'undefined' )
   {
     if( window.postMessage && window.addEventListener )
     {
       const queue = [];
 
-      window.addEventListener('message', function( event )
+      window.addEventListener('message', ( event ) =>
       {
         const source = event.source;
 
@@ -64,7 +64,7 @@ function set_immediate_implementation()
     }
   }
 
-  throw new Error("No suitable [setImmediate] implementation available");
+  throw new Error('No suitable [setImmediate] implementation available');
 }
 
 /* ------------------------------------------------------------------ Exports */

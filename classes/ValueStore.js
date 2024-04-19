@@ -17,18 +17,18 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectFunction }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { defer }
-  from "@hkd-base/helpers/process.js";
+  from '@hkd-base/helpers/process.js';
 
 /* ---------------------------------------------------------------- Internals */
 
 // @note export internal property symbols for inheritance
 
-export const value$ = Symbol("value");
-export const callbacks$ = Symbol("callbacks");
-export const unsubscribers$ = Symbol("unsubscribers");
+export const value$ = Symbol('value');
+export const callbacks$ = Symbol('callbacks');
+export const unsubscribers$ = Symbol('unsubscribers');
 
 //
 // async iterator support
@@ -151,11 +151,11 @@ export default class ValueStore
    */
   subscribe( callback, callOnRegistration=true )
   {
-    expectFunction( callback, "Missing or invalid parameter [callback]" );
+    expectFunction( callback, 'Missing or invalid parameter [callback]' );
 
     if( this[ callbacks$ ].has( callback ) )
     {
-      throw new Error("Callback has already been registered");
+      throw new Error('Callback has already been registered');
     }
 
     this[ callbacks$ ].add( callback );
@@ -216,7 +216,7 @@ export default class ValueStore
    */
   once( callback, callOnRegistration=true )
   {
-    expectFunction( callback, "Missing or invalid parameter [callback]" );
+    expectFunction( callback, 'Missing or invalid parameter [callback]' );
 
     function once( value, unsubscribe )
     {
@@ -248,7 +248,7 @@ export default class ValueStore
 
     if( arguments.length < 1 )
     {
-      throw new Error( "Missing parameter [value]" );
+      throw new Error( 'Missing parameter [value]' );
     }
 
     // console.log( "set", value );
@@ -304,7 +304,7 @@ export default class ValueStore
    */
   update( updateFn )
   {
-    expectFunction( updateFn, "Missing or invalid parameter [updateFn]" );
+    expectFunction( updateFn, 'Missing or invalid parameter [updateFn]' );
 
     const newValue = updateFn( this[ value$ ] );
 

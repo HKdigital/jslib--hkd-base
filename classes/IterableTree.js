@@ -2,10 +2,10 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectObject }
-  from "@hkd-base/helpers/expect.js";
+  from '@hkd-base/helpers/expect.js';
 
 import { PATH_SEPARATOR }
-  from "@hkd-base/helpers/object.js";
+  from '@hkd-base/helpers/object.js';
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -32,7 +32,7 @@ export default class StdIterableTree
   {
     //super( ...arguments );
 
-    expectObject( obj, "Missing or invalid parameter [obj]");
+    expectObject( obj, 'Missing or invalid parameter [obj]');
 
     this.obj = obj;
 
@@ -249,7 +249,7 @@ export default class StdIterableTree
       return true;
     }
 
-    if( "[object Object]" !== value.toString() )
+    if( '[object Object]' !== value.toString() )
     {
       // Not a plain object -> no recursion
       return false;

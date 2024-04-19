@@ -2,7 +2,7 @@
 /* ------------------------------------------------------------------ Imports */
 
 import { expectNotEmptyString,
-         expectObject } from "./expect.js";
+         expectObject } from './expect.js';
 
 /* ------------------------------------------------------------------ Exports */
 
@@ -14,10 +14,10 @@ import { expectNotEmptyString,
  *
  * @returns {object} tree data
  */
-export function buildTree( flatTree, idKey="_id" )
+export function buildTree( flatTree, idKey='_id' )
 {
   expectObject( flatTree,
-    "Missing or invalid parameter [flatTree]" );
+    'Missing or invalid parameter [flatTree]' );
 
   let { root, branches } = flatTree;
 
@@ -26,8 +26,8 @@ export function buildTree( flatTree, idKey="_id" )
     if( branches && branches.length )
     {
       throw new Error(
-        `Invalid tree data. Missing property [root], ` +
-        `but property [branches] is not empty`);
+        'Invalid tree data. Missing property [root], ' +
+        'but property [branches] is not empty');
     }
 
     return null;
@@ -46,7 +46,7 @@ export function buildTree( flatTree, idKey="_id" )
   root = { ...root };
 
   expectObject( root,
-    "Invalid property [root] in flatTree" );
+    'Invalid property [root] in flatTree' );
 
   // -- Build graph
 
@@ -65,16 +65,16 @@ export function buildTree( flatTree, idKey="_id" )
     if( from )
     {
       expectNotEmptyString( from,
-        "Invalid property [branch.from] in flatTree" );
+        'Invalid property [branch.from] in flatTree' );
     }
     else if( to )
     {
       expectNotEmptyString( to,
-        "Invalid property [branch.to] in flatTree" );
+        'Invalid property [branch.to] in flatTree' );
     }
     else {
       throw new Error(
-        `Missing property [branch.from] or [branch.to] in flatTree`);
+        'Missing property [branch.from] or [branch.to] in flatTree');
     }
 
     // expectObject( node,
@@ -150,7 +150,7 @@ export function buildTree( flatTree, idKey="_id" )
       node = nodesByFromOrTo[ nodeId ];
     }
 
-    const x = nodeId.indexOf("/");
+    const x = nodeId.indexOf('/');
 
     let subGroupName;
 
@@ -159,7 +159,7 @@ export function buildTree( flatTree, idKey="_id" )
       subGroupName = nodeId.slice( 0, x );
     }
     else {
-      subGroupName = "_next";
+      subGroupName = '_next';
     }
 
     if( !fromOrToNode[ subGroupName ] )

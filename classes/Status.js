@@ -1,16 +1,16 @@
 
 /* ------------------------------------------------------------------ Imports */
 
-import { expectError } from "@hkd-base/helpers/expect.js";
+import { expectError } from '@hkd-base/helpers/expect.js';
 
-import ValueStore from "@hkd-base/classes/ValueStore.js";
+import ValueStore from '@hkd-base/classes/ValueStore.js';
 
 /* ------------------------------------------------------------------ Exports */
 
-export const STATUS_IDLE = "idle";
-export const STATUS_IN_PROGRESS = "in-progress";
-export const STATUS_OK = "ok";
-export const STATUS_ERROR = "error";
+export const STATUS_IDLE = 'idle';
+export const STATUS_IN_PROGRESS = 'in-progress';
+export const STATUS_OK = 'ok';
+export const STATUS_ERROR = 'error';
 
 /* ------------------------------------------------------------- Export class */
 
@@ -69,7 +69,7 @@ export default class Status extends ValueStore
    */
   setError( error )
   {
-    expectError( error, "Missing or invalid parameter [error]" );
+    expectError( error, 'Missing or invalid parameter [error]' );
 
     this.lastErrorMessage.set( error.message );
 

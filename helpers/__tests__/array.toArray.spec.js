@@ -1,5 +1,5 @@
 
-import { toArray } from "@rootDir/helpers/array.js";
+import { toArray } from '@rootDir/helpers/array.js';
 
 /* -------------------------------------------------------------------- Tests */
 
