@@ -1,7 +1,7 @@
 
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 
-import { loop } from '@rootDir/helpers/array.js';
+import { loop } from '@hkd-base/helpers/array.js';
 
 /* -------------------------------------------------------------------- Tests */
 
@@ -21,7 +21,7 @@ describe('loop( <none>, <callback> )', () =>
 {
   test('should do nothing', () => {
 
-    const fn = jest.fn();
+    const fn = vi.fn();
 
     loop( undefined, fn );
     loop( null, fn );
@@ -38,7 +38,7 @@ describe('loop( <Array>, <callback> )', () =>
 
     const arr = [ 'a', 'b', 'c' ];
 
-    const callback = jest.fn();
+    const callback = vi.fn();
 
     loop( arr, callback );
 
@@ -57,7 +57,7 @@ describe('loop( <Array>, <callback>, <additionalArguments> )', () =>
 
     const arr = [ 'a', 'b', 'c' ];
 
-    const callback = jest.fn();
+    const callback = vi.fn();
 
     loop( arr, callback, [ 'abc', 'xyz' ] );
 

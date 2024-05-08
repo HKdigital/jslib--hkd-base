@@ -1,5 +1,6 @@
 
-import { toArray } from '@rootDir/helpers/array.js';
+import { toArray }
+  from '@hkd-base/helpers/array.js';
 
 /* -------------------------------------------------------------------- Tests */
 

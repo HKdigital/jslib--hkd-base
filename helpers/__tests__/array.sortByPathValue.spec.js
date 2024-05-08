@@ -1,6 +1,7 @@
 
 import { sortByPathValue,
-         PATH_SEPARATOR } from '@rootDir/helpers/array.js';
+         PATH_SEPARATOR }
+  from '@hkd-base/helpers/array.js';
 
 /* -------------------------------------------------------------------- Tests */
 

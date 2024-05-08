@@ -2,7 +2,8 @@
 import { base58fromNumber,
          base58toNumber,
          base58toBytes,
-         bytesToNumber } from '@rootDir/helpers/base-58.js';
+         bytesToNumber }
+  from '@hkd-base/helpers/base-58.js';
 
 //
 // TODO: TEST: ALPHABET_BASE_58 and isBase58
